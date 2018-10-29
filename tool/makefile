@@ -16,6 +16,7 @@
 
 CC=clang++
 CC_FLAGS=-march=native -std=gnu++11 -Wall -Werror
+CC_FLAGS_EXT=-pthread
 DIR_BIN=./../bin/
 DIR_BIN_LIB=./../bin/lib/
 DIR_BUILD=./../build/
@@ -30,6 +31,6 @@ all: exe
 exe:
 	@echo ''
 	@echo '--- BUILDING EXECUTABLE --------------------'
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) $(DIR_TOOL)$(EXE).cpp $(DIR_BIN_LIB)$(LIB) -o $(DIR_BIN)$(EXE)
+	$(CC) $(CC_FLAGS) $(CC_FLAGS_EXT) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) $(DIR_TOOL)$(EXE).cpp $(DIR_BIN_LIB)$(LIB) -o $(DIR_BIN)$(EXE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''

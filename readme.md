@@ -50,6 +50,10 @@ Changelog
 
 Version 0.1.1843
 ----------------
+*Updated: 10/28/2018*
+
+* Added signal/thread types
+
 *Updated: 10/27/2018*
 
 * Initial commit

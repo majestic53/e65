@@ -96,7 +96,7 @@ namespace e65 {
 
 			protected:
 
-				singleton(
+				explicit singleton(
 					__in int type
 					) :
 						m_initialized(false),

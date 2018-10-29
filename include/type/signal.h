@@ -19,13 +19,59 @@
 #ifndef E65_TYPE_SIGNAL_H_
 #define E65_TYPE_SIGNAL_H_
 
+#include <condition_variable>
+#include <mutex>
 #include "../define.h"
 
 namespace e65 {
 
 	namespace type {
 
-		// TODO
+		enum {
+			E65_SIGNAL_CLEAR = 0,
+			E65_SIGNAL_NOTIFY,
+			E65_SIGNAL_TIMEOUT,
+			E65_SIGNAL_ABANDON,
+		};
+
+		class signal {
+
+			public:
+
+				signal(void);
+
+				virtual ~signal(void);
+
+				void notify(void);
+
+				virtual std::string to_string(void) const;
+
+				int state(void) const;
+
+				bool wait(
+					__in_opt uint32_t timeout = 0
+					);
+
+			protected:
+
+				signal(
+					__in const signal &other
+					) = delete;
+
+				signal &operator=(
+					__in const signal &other
+					) = delete;
+
+				void abandon(void);
+
+				void clear(void);
+
+				std::condition_variable m_condition;
+
+				std::mutex m_mutex;
+
+				int m_state;
+		};
 	}
 }
 
