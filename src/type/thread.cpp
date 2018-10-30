@@ -23,6 +23,90 @@ namespace e65 {
 
 	namespace type {
 
-		// TODO
+		thread::thread(void) :
+			m_notifiable(false),
+			m_state(E65_THREAD_STOP)
+		{
+			// TODO
+		}
+
+		thread::~thread(void)
+		{
+			// TODO
+		}
+
+		bool
+		thread::notifiable(void) const
+		{
+			return m_notifiable;
+		}
+
+		void
+		thread::notify(
+			__in_opt const void *context,
+			__in_opt size_t length
+			)
+		{
+			// TODO
+		}
+
+		void
+		thread::pause(void)
+		{
+			// TODO
+		}
+
+		bool
+		thread::run(
+			__in const void *context,
+			__in size_t length
+			)
+		{
+			bool result;
+
+			// TODO
+			result = true;
+			// ---
+
+			return result;
+		}
+
+		void
+		thread::start(
+			__in bool notifiable,
+			__in_opt const void *context,
+			__in_opt size_t length
+			)
+		{
+			// TODO
+		}
+
+		int
+		thread::state(void) const
+		{
+			return m_state;
+		}
+
+		std::string
+		thread::to_string(void) const
+		{
+			std::stringstream result;
+
+			result << E65_TYPE_THREAD_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
+				<< " State=" << m_state << "(" << E65_THREAD_STRING(m_state) << ")";
+
+			if(m_state != E65_THREAD_STOP) {
+				result << ", Id=" << m_thread.get_id()
+					<< ", Mode=" << (m_notifiable ? "Notifiable" : "Non-notifiable");
+			}
+
+			return result.str();
+		}
+
+		void
+		thread::unpause(void)
+		{
+			// TODO
+		}
 	}
 }

@@ -21,15 +21,19 @@
 
 #include "./interface/runtime.h"
 #include "./interface/singleton.h"
+#include "./type/thread.h"
 
 namespace e65 {
 
-	#define RUNTIME e65::runtime::acquire()
-	#define RUNTIME_VERSION e65::runtime::version()
+	#define RUNTIME \
+		e65::runtime::acquire()
+	#define RUNTIME_VERSION \
+		e65::runtime::version()
 
 	class runtime :
 			public e65::interface::singleton<e65::runtime>,
-			public e65::interface::runtime {
+			public e65::interface::runtime,
+			protected e65::type::thread {
 
 		public:
 
@@ -60,7 +64,23 @@ namespace e65 {
 				__in size_t length
 				) override;
 
+			void on_pause(void) override;
+
+			bool on_run(
+				__in const void *context,
+				__in size_t length
+				) override;
+
+			bool on_start(
+				__in const void *context,
+				__in size_t length
+				) override;
+
+			void on_stop(void) override;
+
 			void on_uninitialize(void) override;
+
+			void on_unpause(void) override;
 	};
 }
 

@@ -49,7 +49,67 @@ namespace e65 {
 	}
 
 	void
+	runtime::on_pause(void)
+	{
+
+		// TODO
+		std::cout << __FUNCTION__ << std::endl;
+		// ---
+	}
+
+	bool
+	runtime::on_run(
+		__in const void *context,
+		__in size_t length
+		)
+	{
+		bool result;
+
+		// TODO
+		std::cout << __FUNCTION__ << std::endl;
+		result = true;
+		// ---
+
+		return result;
+	}
+
+	bool
+	runtime::on_start(
+		__in const void *context,
+		__in size_t length
+		)
+	{
+		bool result;
+
+		// TODO
+		std::cout << __FUNCTION__ << std::endl;
+		result = true;
+		// ---
+
+		return result;
+	}
+
+
+	void
+	runtime::on_stop(void)
+	{
+
+		// TODO
+		std::cout << __FUNCTION__ << std::endl;
+		// ---
+	}
+
+	void
 	runtime::on_uninitialize(void)
+	{
+
+		// TODO
+		std::cout << __FUNCTION__ << std::endl;
+		// ---
+	}
+
+	void
+	runtime::on_unpause(void)
 	{
 
 		// TODO
@@ -64,6 +124,10 @@ namespace e65 {
 
 		result << E65_RUNTIME_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
 			<< " Interface=" << e65::interface::singleton<e65::runtime>::to_string();
+
+		if(m_initialized) {
+			result << ", Thread=" << e65::type::thread::to_string();
+		}
 
 		return result.str();
 	}
