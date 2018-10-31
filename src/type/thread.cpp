@@ -24,15 +24,29 @@ namespace e65 {
 	namespace type {
 
 		thread::thread(void) :
-			m_notifiable(false),
-			m_state(E65_THREAD_STOP)
+			m_active(false),
+			m_notifiable(false)
 		{
-			// TODO
+			return;
 		}
 
 		thread::~thread(void)
 		{
-			// TODO
+			return;
+		}
+
+		bool
+		thread::active(void) const
+		{
+			return m_active;
+		}
+
+		bool
+		thread::is_active(void)
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+
+			return m_active;
 		}
 
 		bool
@@ -42,33 +56,52 @@ namespace e65 {
 		}
 
 		void
-		thread::notify(
-			__in_opt const void *context,
-			__in_opt size_t length
-			)
+		thread::notify(void)
 		{
-			// TODO
+
+			if(is_active() && m_notifiable) {
+				m_signal.notify();
+			}
 		}
 
 		void
-		thread::pause(void)
-		{
-			// TODO
-		}
-
-		bool
 		thread::run(
 			__in const void *context,
 			__in size_t length
 			)
 		{
-			bool result;
 
-			// TODO
-			result = true;
-			// ---
+			try {
 
-			return result;
+				while(is_active()) {
+
+					if(m_notifiable) {
+						m_signal.wait();
+
+						if(!is_active()) {
+							break;
+						}
+					}
+
+					if(!on_run(context, length)) {
+						break;
+					}
+				}
+			} catch(e65::exception &exc) {
+				m_exception = exc;
+			} catch(std::exception &exc) {
+				m_exception = E65_EXCEPTION(exc.what());
+			}
+		}
+
+		void
+		thread::set_active(
+			__in bool active
+			)
+		{
+			std::lock_guard<std::mutex> lock(m_mutex);
+
+			m_active = active;
 		}
 
 		void
@@ -78,13 +111,44 @@ namespace e65 {
 			__in_opt size_t length
 			)
 		{
-			// TODO
+
+			if(is_active()) {
+				THROW_E65_TYPE_THREAD_EXCEPTION_FORMAT(E65_TYPE_THREAD_EXCEPTION_STARTED, "%p", this);
+			}
+
+			m_exception.clear();
+			m_notifiable = notifiable;
+
+			if(!on_start(context, length)) {
+				THROW_E65_TYPE_THREAD_EXCEPTION_FORMAT(E65_TYPE_THREAD_EXCEPTION_START, "%p", this);
+			}
+
+			set_active(true);
+			m_thread = std::thread(&thread::run, this, context, length);
 		}
 
-		int
-		thread::state(void) const
+		void
+		thread::stop(void)
 		{
-			return m_state;
+
+			if(is_active()) {
+				set_active(false);
+
+				if(m_notifiable) {
+					m_signal.notify();
+				}
+			}
+
+			if(m_thread.joinable()) {
+				m_thread.join();
+			}
+
+			on_stop();
+
+			if(!m_exception.empty()) {
+				THROW_E65_TYPE_THREAD_EXCEPTION_FORMAT(E65_TYPE_THREAD_EXCEPTION_INTERNAL,
+					"%s", E65_STRING_CHECK(m_exception.to_string()));
+			}
 		}
 
 		std::string
@@ -93,20 +157,14 @@ namespace e65 {
 			std::stringstream result;
 
 			result << E65_TYPE_THREAD_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " State=" << m_state << "(" << E65_THREAD_STRING(m_state) << ")";
+				<< " State=" << (m_active ? "Running" : "Stopped");
 
-			if(m_state != E65_THREAD_STOP) {
+			if(m_active) {
 				result << ", Id=" << m_thread.get_id()
 					<< ", Mode=" << (m_notifiable ? "Notifiable" : "Non-notifiable");
 			}
 
 			return result.str();
-		}
-
-		void
-		thread::unpause(void)
-		{
-			// TODO
 		}
 	}
 }

@@ -20,17 +20,12 @@
 #define E65_TYPE_THREAD_H_
 
 #include <thread>
+#include "../exception.h"
 #include "./signal.h"
 
 namespace e65 {
 
 	namespace type {
-
-		enum {
-			E65_THREAD_STOP = 0,
-			E65_THREAD_RUN,
-			E65_THREAD_PAUSE,
-		};
 
 		class thread {
 
@@ -40,14 +35,11 @@ namespace e65 {
 
 				virtual ~thread(void);
 
+				bool active(void) const;
+
 				bool notifiable(void) const;
 
-				void notify(
-					__in_opt const void *context = nullptr,
-					__in_opt size_t length = 0
-					);
-
-				void pause(void);
+				void notify(void);
 
 				void start(
 					__in bool notifiable,
@@ -55,11 +47,9 @@ namespace e65 {
 					__in_opt size_t length = 0
 					);
 
-				int state(void) const;
+				void stop(void);
 
 				virtual std::string to_string(void) const;
-
-				void unpause(void);
 
 			protected:
 
@@ -71,7 +61,7 @@ namespace e65 {
 					__in const thread &other
 					) = delete;
 
-				virtual void on_pause(void) = 0;
+				bool is_active(void);
 
 				virtual bool on_run(
 					__in const void *context,
@@ -85,22 +75,24 @@ namespace e65 {
 
 				virtual void on_stop(void) = 0;
 
-				virtual void on_unpause(void) = 0;
-
-				bool run(
+				void run(
 					__in const void *context,
 					__in size_t length
 					);
 
+				void set_active(
+					__in bool active
+					);
+
+				bool m_active;
+
+				e65::exception m_exception;
+
+				std::mutex m_mutex;
+
 				bool m_notifiable;
 
-				e65::type::signal m_signal_start;
-
-				e65::type::signal m_signal_stop;
-
-				e65::type::signal m_signal_wait;
-
-				int m_state;
+				e65::type::signal m_signal;
 
 				std::thread m_thread;
 		};

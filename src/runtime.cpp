@@ -41,20 +41,11 @@ namespace e65 {
 		bool result;
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
+		std::cout << __FUNCTION__ << "(" << E65_STRING_HEX(uintptr_t, context) << ", " << length << ")" << std::endl;
 		result = true;
 		// ---
 
 		return result;
-	}
-
-	void
-	runtime::on_pause(void)
-	{
-
-		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
 	}
 
 	bool
@@ -66,7 +57,7 @@ namespace e65 {
 		bool result;
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
+		std::cout << __FUNCTION__ << "(" << E65_STRING_HEX(uintptr_t, context) << ", " << length << ")" << std::endl;
 		result = true;
 		// ---
 
@@ -82,13 +73,12 @@ namespace e65 {
 		bool result;
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
+		std::cout << __FUNCTION__ << "(" << E65_STRING_HEX(uintptr_t, context) << ", " << length << ")" << std::endl;
 		result = true;
 		// ---
 
 		return result;
 	}
-
 
 	void
 	runtime::on_stop(void)
@@ -101,15 +91,6 @@ namespace e65 {
 
 	void
 	runtime::on_uninitialize(void)
-	{
-
-		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
-	}
-
-	void
-	runtime::on_unpause(void)
 	{
 
 		// TODO
