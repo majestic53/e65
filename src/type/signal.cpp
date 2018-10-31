@@ -72,6 +72,12 @@ namespace e65 {
 			}
 		}
 
+		bool
+		signal::timeout(void) const
+		{
+			return (m_state == E65_SIGNAL_TIMEOUT);
+		}
+
 		std::string
 		signal::to_string(void) const
 		{
@@ -83,10 +89,10 @@ namespace e65 {
 			return result.str();
 		}
 
-		int
-		signal::state(void) const
+		bool
+		signal::valid(void) const
 		{
-			return m_state;
+			return (m_state != E65_SIGNAL_ABANDON);
 		}
 
 		bool
