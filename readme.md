@@ -50,6 +50,10 @@ Changelog
 
 Version 0.1.1843
 ----------------
+*Updated: 10/31/2018*
+
+* Added trace singleton
+
 *Updated: 10/28/2018*
 
 * Added signal/thread types

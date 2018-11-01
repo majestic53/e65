@@ -24,19 +24,6 @@
 
 namespace e65 {
 
-	#define E65_EXCEPTION_UNKNOWN "Unknown exception"
-
-	#define E65_EXCEPTION(_MESSAGE_) \
-		e65::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
-
-	#define E65_EXCEPTION_GENERATE(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...) \
-		e65::exception::generate(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, __VA_ARGS__)
-
-	#define E65_THROW_EXCEPTION(_MESSAGE_) \
-		E65_THROW_EXCEPTION_FORMAT(_MESSAGE_, "", "")
-	#define E65_THROW_EXCEPTION_FORMAT(_MESSAGE_, _FORMAT_, ...) \
-		E65_EXCEPTION_GENERATE(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__, _FORMAT_, __VA_ARGS__)
-
 	class exception :
 			public std::runtime_error {
 

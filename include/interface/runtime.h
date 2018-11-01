@@ -19,7 +19,7 @@
 #ifndef E65_INTERFACE_RUNTIME_H_
 #define E65_INTERFACE_RUNTIME_H_
 
-#include "../define.h"
+#include "./trace.h"
 
 namespace e65 {
 
@@ -29,7 +29,7 @@ namespace e65 {
 
 			public:
 
-				// TODO
+				virtual e65::interface::trace &trace(void) = 0;
 		};
 	}
 }

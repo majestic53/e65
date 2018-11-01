@@ -20,15 +20,9 @@
 #define E65_RUNTIME_H_
 
 #include "./interface/runtime.h"
-#include "./interface/singleton.h"
-#include "./type/thread.h"
+#include "./trace.h"
 
 namespace e65 {
-
-	#define RUNTIME \
-		e65::runtime::acquire()
-	#define RUNTIME_VERSION \
-		e65::runtime::version()
 
 	class runtime :
 			public e65::interface::singleton<e65::runtime>,
@@ -42,6 +36,8 @@ namespace e65 {
 			// TODO
 
 			std::string to_string(void) const override;
+
+			e65::interface::trace &trace(void) override;
 
 			static std::string version(void);
 
@@ -77,6 +73,8 @@ namespace e65 {
 			void on_stop(void) override;
 
 			void on_uninitialize(void) override;
+
+			e65::trace &m_trace;
 	};
 }
 

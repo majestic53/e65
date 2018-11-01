@@ -40,6 +40,19 @@ namespace e65 {
 
 	#define E65 "E65"
 
+	#define E65_EXCEPTION(_MESSAGE_) \
+		e65::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
+
+	#define E65_EXCEPTION_GENERATE(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...) \
+		e65::exception::generate(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, __VA_ARGS__)
+
+	#define E65_EXCEPTION_THROW(_MESSAGE_) \
+		E65_EXCEPTION_THROW_FORMAT(_MESSAGE_, "", "")
+	#define E65_EXCEPTION_THROW_FORMAT(_MESSAGE_, _FORMAT_, ...) \
+		E65_EXCEPTION_GENERATE(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__, _FORMAT_, __VA_ARGS__)
+
+	#define E65_EXCEPTION_UNKNOWN "Unknown exception"
+
 	#define E65_STRING_EMPTY "Empty"
 	#define E65_STRING_UNKNOWN "Unknown"
 
@@ -50,11 +63,49 @@ namespace e65 {
 		std::setw(sizeof(_TYPE_) * 2) << std::setfill('0') << std::hex << (uintmax_t) ((_TYPE_) (_VALUE_)) \
 			<< std::dec << std::setfill(' ')
 
+	#define E65_TRACE_ENTRY() \
+		E65_TRACE_ENTRY_FORMAT("", "")
+	#define E65_TRACE_ENTRY_FORMAT(_FORMAT_, ...) \
+		E65_TRACE_GENERATE(E65_LEVEL_VERBOSE, "+", __FUNCTION__, _FORMAT_, __VA_ARGS__)
+
+	#define E65_TRACE_ERROR(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_) \
+		E65_TRACE_GENERATE_FORMAT(E65_LEVEL_ERROR, "", _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, "", "")
+
+	#define E65_TRACE_EXIT() \
+		E65_TRACE_EXIT_FORMAT("", "")
+	#define E65_TRACE_EXIT_FORMAT(_FORMAT_, ...) \
+		E65_TRACE_GENERATE(E65_LEVEL_VERBOSE, "-", __FUNCTION__, _FORMAT_, __VA_ARGS__)
+
+	#define E65_TRACE_GENERATE(_LEVEL_, _PREFIX_, _MESSAGE_, _FORMAT_, ...) \
+		E65_TRACE_GENERATE_FORMAT(_LEVEL_, _PREFIX_, _MESSAGE_, __FILE__, __FUNCTION__, __LINE__, _FORMAT_, __VA_ARGS__)
+#ifndef NDEBUG
+	#define E65_TRACE_GENERATE_FORMAT(_LEVEL_, _PREFIX_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...) \
+		try { \
+			if((TRACE) >= (_LEVEL_)) { \
+				e65::trace::acquire().generate(_LEVEL_, _PREFIX_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, __VA_ARGS__); \
+			} \
+		} catch(...) { }
+#else
+	#define E65_TRACE_GENERATE_FORMAT(_LEVEL_, _PREFIX_, _MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...)
+#endif // NDEBUG
+
+	#define E65_TRACE_MESSAGE(_LEVEL_, _MESSAGE_) \
+		E65_TRACE_MESSAGE_FORMAT(_LEVEL_, _MESSAGE_, "", "")
+	#define E65_TRACE_MESSAGE_FORMAT(_LEVEL_, _MESSAGE_, _FORMAT_, ...) \
+		E65_TRACE_GENERATE(_LEVEL_, "", _MESSAGE_, _FORMAT_, __VA_ARGS__)
+
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 4
+	#define E65_VERSION_REVISION 5
 	#define E65_VERSION_WEEK 1843
+
+	enum {
+		E65_LEVEL_ERROR = 0,
+		E65_LEVEL_WARNING,
+		E65_LEVEL_INFORMATION,
+		E65_LEVEL_VERBOSE,
+	};
 }
 
 #endif // E65_DEFINE_H_

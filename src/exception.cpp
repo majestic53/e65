@@ -18,6 +18,7 @@
 
 #include <cstdarg>
 #include "../include/exception.h"
+#include "../include/trace.h"
 #include "./exception_type.h"
 
 namespace e65 {
@@ -139,6 +140,8 @@ namespace e65 {
 
 			if(length < 0) {
 				buffer = E65_EXCEPTION_EXCEPTION_STRING(E65_EXCEPTION_EXCEPTION_MALFORMED);
+			} else if(length > 0) {
+				buffer.resize(length);
 			}
 
 			if(!buffer.empty()) {
@@ -151,6 +154,7 @@ namespace e65 {
 			}
 		}
 
+		E65_TRACE_ERROR(result.str(), file, function, line);
 		throw e65::exception(result.str(), file, function, line);
 	}
 

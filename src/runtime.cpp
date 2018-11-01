@@ -22,14 +22,27 @@
 namespace e65 {
 
 	runtime::runtime(void) :
-		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME)
+		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME),
+		m_trace(e65::trace::acquire())
 	{
-		// TODO
+		m_trace.initialize();
+
+		E65_TRACE_ENTRY();
+
+		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime created", "%s", E65_STRING_CHECK(version()));
+
+		E65_TRACE_EXIT();
 	}
 
 	runtime::~runtime(void)
 	{
-		// TODO
+		E65_TRACE_ENTRY();
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime destroyed");
+
+		E65_TRACE_EXIT();
+
+		m_trace.uninitialize();
 	}
 
 	bool
@@ -38,13 +51,19 @@ namespace e65 {
 		__in size_t length
 		)
 	{
-		bool result;
+		bool result = true;
+
+		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initializing");
 
 		// TODO
-		std::cout << __FUNCTION__ << "(" << E65_STRING_HEX(uintptr_t, context) << ", " << length << ")" << std::endl;
-		result = true;
-		// ---
 
+		e65::type::thread::start(false, context, length);
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initialized");
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
 	}
 
@@ -54,13 +73,20 @@ namespace e65 {
 		__in size_t length
 		)
 	{
-		bool result;
+		bool result = true;
 
-		// TODO
-		std::cout << __FUNCTION__ << "(" << E65_STRING_HEX(uintptr_t, context) << ", " << length << ")" << std::endl;
-		result = true;
-		// ---
+		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime main loop entry");
+
+		while(e65::type::thread::active()) {
+
+			// TODO
+		}
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime main loop exit");
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
 	}
 
@@ -70,32 +96,48 @@ namespace e65 {
 		__in size_t length
 		)
 	{
-		bool result;
+		bool result = true;
+
+		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime starting");
 
 		// TODO
-		std::cout << __FUNCTION__ << "(" << E65_STRING_HEX(uintptr_t, context) << ", " << length << ")" << std::endl;
-		result = true;
-		// ---
 
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime started");
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
 	}
 
 	void
 	runtime::on_stop(void)
 	{
+		E65_TRACE_ENTRY();
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stopping");
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stopped");
+
+		E65_TRACE_EXIT();
 	}
 
 	void
 	runtime::on_uninitialize(void)
 	{
+		E65_TRACE_ENTRY();
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime uninitializing");
+
+		e65::type::thread::stop();
 
 		// TODO
-		std::cout << __FUNCTION__ << std::endl;
-		// ---
+
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime uninitialized");
+
+		E65_TRACE_EXIT();
 	}
 
 	std::string
@@ -103,14 +145,31 @@ namespace e65 {
 	{
 		std::stringstream result;
 
+		E65_TRACE_ENTRY();
+
 		result << E65_RUNTIME_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
 			<< " Interface=" << e65::interface::singleton<e65::runtime>::to_string();
 
 		if(m_initialized) {
-			result << ", Thread=" << e65::type::thread::to_string();
+			result << ", Thread=" << e65::type::thread::to_string()
+				<< ", Trace=" << m_trace.to_string();
 		}
 
+		E65_TRACE_EXIT();
 		return result.str();
+	}
+
+	e65::interface::trace &
+	runtime::trace(void)
+	{
+		E65_TRACE_ENTRY();
+
+		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_UNINITIALIZED, "%p", this);
+		}
+
+		E65_TRACE_EXIT();
+		return m_trace;
 	}
 
 	std::string

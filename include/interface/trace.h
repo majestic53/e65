@@ -16,39 +16,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "./e65_type.h"
+#ifndef E65_INTERFACE_TRACE_H_
+#define E65_INTERFACE_TRACE_H_
 
-// TODO
-#include "../include/trace.h"
-// ---
+#include "../define.h"
 
-int
-main(
-	__in int argc,
-	__in const char *argv[]
-	)
-{
-	int result = EXIT_SUCCESS;
+namespace e65 {
 
-	try {
+	namespace interface {
 
-		// TODO
-		e65::runtime &instance = e65::runtime::acquire();
+		class trace {
 
-		instance.initialize();
+			public:
 
-		std::cin.get();
+				virtual bool empty(void) const = 0;
 
-		instance.uninitialize();
-		// ---
+				virtual void flush(void) = 0;
 
-	} catch(e65::exception &exc) {
-		std::cerr << exc.to_string() << std::endl;
-		result = EXIT_FAILURE;
-	} catch(std::exception &exc) {
-		std::cerr << exc.what() << std::endl;
-		result = EXIT_FAILURE;
+				virtual void generate(
+					__in int level,
+					__in const std::string &prefix,
+					__in const std::string &message,
+					__in const std::string &file,
+					__in const std::string &function,
+					__in size_t line,
+					__in const char *format,
+					...
+					) = 0;
+
+				virtual size_t size(void) const = 0;
+		};
 	}
-
-	return result;
 }
+
+#endif // E65_INTERFACE_TRACE_H_
