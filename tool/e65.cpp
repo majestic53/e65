@@ -37,7 +37,7 @@ main(
 
 		instance.initialize();
 
-		std::cin.get();
+		instance.wait();
 
 		instance.uninitialize();
 		// ---

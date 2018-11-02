@@ -50,6 +50,11 @@ Changelog
 
 Version 0.1.1843
 ----------------
+*Updated: 11/1/2018*
+
+* Implemented runtime main loop
+* Integrated SDL into runtime
+
 *Updated: 10/31/2018*
 
 * Added trace singleton

@@ -92,6 +92,8 @@ namespace e65 {
 			} catch(std::exception &exc) {
 				m_exception = E65_EXCEPTION(exc.what());
 			}
+
+			m_signal_wait.notify();
 		}
 
 		void
@@ -165,6 +167,21 @@ namespace e65 {
 			}
 
 			return result.str();
+		}
+
+		bool
+		thread::wait(
+			__in_opt uint32_t timeout
+			)
+		{
+			bool result;
+
+			result = is_active();
+			if(result) {
+				result = m_signal_wait.wait(timeout);
+			}
+
+			return result;
 		}
 	}
 }

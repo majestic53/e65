@@ -33,6 +33,8 @@ namespace e65 {
 
 			~runtime(void);
 
+			uint32_t frame(void) const override;
+
 			// TODO
 
 			std::string to_string(void) const override;
@@ -40,6 +42,10 @@ namespace e65 {
 			e65::interface::trace &trace(void) override;
 
 			static std::string version(void);
+
+			bool wait(
+				__in_opt uint32_t timeout = 0
+				) override;
 
 		protected:
 
@@ -73,6 +79,10 @@ namespace e65 {
 			void on_stop(void) override;
 
 			void on_uninitialize(void) override;
+
+			bool poll(void);
+
+			uint32_t m_frame;
 
 			e65::trace &m_trace;
 	};

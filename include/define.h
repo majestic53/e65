@@ -53,6 +53,8 @@ namespace e65 {
 
 	#define E65_EXCEPTION_UNKNOWN "Unknown exception"
 
+	#define E65_MILLISECONDS_PER_SECOND 1000.f
+
 	#define E65_STRING_EMPTY "Empty"
 	#define E65_STRING_UNKNOWN "Unknown"
 
@@ -97,7 +99,7 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 5
+	#define E65_VERSION_REVISION 6
 	#define E65_VERSION_WEEK 1843
 
 	enum {

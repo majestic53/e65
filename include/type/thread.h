@@ -51,6 +51,10 @@ namespace e65 {
 
 				virtual std::string to_string(void) const;
 
+				bool wait(
+					__in_opt uint32_t timeout = 0
+					);
+
 			protected:
 
 				thread(
@@ -93,6 +97,8 @@ namespace e65 {
 				bool m_notifiable;
 
 				e65::type::signal m_signal;
+
+				e65::type::signal m_signal_wait;
 
 				std::thread m_thread;
 		};
