@@ -49,7 +49,7 @@ namespace e65 {
 				THROW_E65_SDL_DISPLAY_EXCEPTION(E65_SDL_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_BACKGROUND.raw);
+			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND.raw);
 
 			E65_TRACE_EXIT();
 		}
@@ -85,7 +85,7 @@ namespace e65 {
 				E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT, E65_DISPLAY_SCALE);
 
 			m_title = E65;
-			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_BACKGROUND.raw);
+			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND.raw);
 
 			m_window = SDL_CreateWindow(E65_STRING_CHECK(m_title), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 					E65_DISPLAY_WIDTH * E65_DISPLAY_SCALE, E65_DISPLAY_HEIGHT * E65_DISPLAY_SCALE, E65_DISPLAY_SDL_FLAGS);
@@ -106,8 +106,8 @@ namespace e65 {
 					SDL_GetError());
 			}
 
-			if(SDL_SetRenderDrawColor(m_renderer, E65_DISPLAY_BACKGROUND.red, E65_DISPLAY_BACKGROUND.green, E65_DISPLAY_BACKGROUND.blue,
-					E65_DISPLAY_BACKGROUND.alpha)) {
+			if(SDL_SetRenderDrawColor(m_renderer, E65_DISPLAY_COLOR_BACKGROUND.red, E65_DISPLAY_COLOR_BACKGROUND.green,
+					E65_DISPLAY_COLOR_BACKGROUND.blue, E65_DISPLAY_COLOR_BACKGROUND.alpha)) {
 				THROW_E65_SDL_DISPLAY_EXCEPTION_FORMAT(E65_SDL_DISPLAY_EXCEPTION_EXTERNAL, "SDL_SetRenderDrawColor failed! Error=%s",
 					SDL_GetError());
 			}
@@ -273,7 +273,7 @@ namespace e65 {
 		{
 			uint32_t index;
 
-			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%02x)", x, y, color, color);
+			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%s)", x, y, color, E65_DISPLAY_COLOR_STRING(color));
 
 			if(!e65::interface::singleton<e65::sdl::display>::initialized()) {
 				THROW_E65_SDL_DISPLAY_EXCEPTION(E65_SDL_DISPLAY_EXCEPTION_UNINITIALIZED);
