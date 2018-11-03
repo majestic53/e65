@@ -19,7 +19,7 @@
 #ifndef E65_INTERFACE_RUNTIME_H_
 #define E65_INTERFACE_RUNTIME_H_
 
-#include "./sdl/display.h"
+#include "./console/bus.h"
 #include "./trace.h"
 
 namespace e65 {
@@ -30,9 +30,9 @@ namespace e65 {
 
 			public:
 
-				virtual uint32_t frame(void) const = 0;
+				virtual e65::interface::console::bus &bus(void) = 0;
 
-				virtual e65::interface::sdl::display &display(void) = 0;
+				virtual uint32_t frame(void) const = 0;
 
 				virtual e65::interface::trace &trace(void) = 0;
 

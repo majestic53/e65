@@ -23,7 +23,7 @@ namespace e65 {
 
 	runtime::runtime(void) :
 		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME),
-		m_display(e65::sdl::display::acquire()),
+		m_bus(e65::console::bus::acquire()),
 		m_frame(0),
 		m_trace(e65::trace::acquire())
 	{
@@ -47,8 +47,8 @@ namespace e65 {
 		m_trace.uninitialize();
 	}
 
-	e65::interface::sdl::display &
-	runtime::display(void)
+	e65::interface::console::bus &
+	runtime::bus(void)
 	{
 		E65_TRACE_ENTRY();
 
@@ -57,7 +57,7 @@ namespace e65 {
 		}
 
 		E65_TRACE_EXIT();
-		return m_display;
+		return m_bus;
 	}
 
 	uint32_t
@@ -86,19 +86,16 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initializing");
 
+		m_frame = 0;
+
 		SDL_GetVersion(&version);
-		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "SDL initializing", "%u.%u.%u", version.major, version.minor, version.patch);
+		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime library created", "%u.%u.%u", version.major, version.minor, version.patch);
 
 		if(SDL_Init(E65_RUNTIME_SDL_FLAGS)) {
 			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_EXTERNAL, "SDL_Init failed! Error=%s", SDL_GetError());
 		}
 
-		m_display.initialize(context, length);
-
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL initialized");
-
-		// TODO: console::bus::initialize(context, length)
-
+		m_bus.initialize(context, length);
 		e65::type::thread::start(false, context, length);
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initialized");
@@ -128,9 +125,9 @@ namespace e65 {
 			if(rate >= E65_MILLISECONDS_PER_SECOND) {
 				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
 
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime fps", "%.1f", (rate > 0.f) ? rate : 0.f);
+				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f", (rate > 0.f) ? rate : 0.f);
 
-				m_display.set_frame_rate((rate > 0.f) ? rate : 0.f);
+				m_bus.display().set_frame_rate((rate > 0.f) ? rate : 0.f);
 				begin = end;
 				current = 0;
 			}
@@ -140,9 +137,7 @@ namespace e65 {
 				break;
 			}
 
-			// TODO: console::bus::update(*this)
-
-			m_display.render();
+			m_bus.update(*this);
 
 			delta = (SDL_GetTicks() - end);
 			if(delta < E65_RUNTIME_FRAME_DELTA) {
@@ -198,14 +193,10 @@ namespace e65 {
 
 		e65::type::thread::stop();
 
-		// TODO: console::bus::uninitialize()
-
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL uninitializing");
-
-		m_display.uninitialize();
+		m_bus.uninitialize();
 		SDL_Quit();
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL uninitialized");
+		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime library destroyed");
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime uninitialized");
 
@@ -226,26 +217,22 @@ namespace e65 {
 				case SDL_KEYDOWN:
 
 					if(!event.key.repeat) {
-						SDL_Scancode scancode;
+						SDL_Scancode key;
 
-						scancode = event.key.keysym.scancode;
-						switch(scancode) {
+						key = event.key.keysym.scancode;
+						switch(key) {
 							case E65_RUNTIME_SDL_FULLSCREEN_KEY:
-								E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display key event");
-								m_display.set_fullscreen(!m_display.fullscreen());
+								E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display mode event");
+								m_bus.display().set_fullscreen(!m_bus.display().fullscreen());
 								break;
 							default:
-								E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Input key event", "%u(%x)",
-									scancode, scancode);
-
-								// TODO: console::bus::input(scancode)
-
+								m_bus.input(key);
 								break;
 						}
 					}
 					break;
 				case SDL_QUIT:
-					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL quit event");
+					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime quit event");
 					result = false;
 					break;
 				default:
@@ -269,6 +256,7 @@ namespace e65 {
 
 		if(e65::interface::singleton<e65::runtime>::initialized()) {
 			result << ", Thread=" << e65::type::thread::to_string()
+				<< ", Bus=" << m_bus.to_string()
 				<< ", Trace=" << m_trace.to_string()
 				<< ", Frame=" << m_frame;
 		}

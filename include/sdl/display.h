@@ -57,7 +57,7 @@ namespace e65 {
 					__in uint32_t y
 					) const override;
 
-				void render(void) const override;
+				void render(void) const;
 
 				void set_frame_rate(
 					__in float frame_rate

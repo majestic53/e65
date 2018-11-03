@@ -20,7 +20,7 @@
 #define E65_RUNTIME_H_
 
 #include "./interface/runtime.h"
-#include "./sdl/display.h"
+#include "./console/bus.h"
 #include "./trace.h"
 
 namespace e65 {
@@ -34,7 +34,7 @@ namespace e65 {
 
 			~runtime(void);
 
-			e65::interface::sdl::display &display(void) override;
+			e65::interface::console::bus &bus(void) override;
 
 			uint32_t frame(void) const override;
 
@@ -83,7 +83,7 @@ namespace e65 {
 
 			bool poll(void);
 
-			e65::sdl::display &m_display;
+			e65::console::bus &m_bus;
 
 			uint32_t m_frame;
 

@@ -16,52 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_SDL_DISPLAY_H_
-#define E65_INTERFACE_SDL_DISPLAY_H_
+#ifndef E65_INTERFACE_CONSOLE_BUS_H_
+#define E65_INTERFACE_CONSOLE_BUS_H_
 
-#include "../../define.h"
+#include "../sdl/display.h"
 
 namespace e65 {
 
 	namespace interface {
 
-		namespace sdl {
+		namespace console {
 
-			class display {
+			class bus {
 
 				public:
 
-					virtual void clear(void) = 0;
+					virtual e65::interface::sdl::display &display(void) = 0;
 
-					virtual bool fullscreen(void) const = 0;
-
-					virtual uint32_t pixel(
-						__in uint32_t x,
-						__in uint32_t y
-						) const = 0;
-
-					virtual void set_frame_rate(
-						__in float frame_rate
+					virtual void input(
+						__in int key
 						) = 0;
 
-					virtual void set_fullscreen(
-						__in bool fullscreen
-						) = 0;
-
-					virtual void set_pixel(
-						__in uint32_t x,
-						__in uint32_t y,
-						__in uint8_t color
-						) = 0;
-
-					virtual void set_title(
-						__in const std::string &title
-						) = 0;
-
-					virtual std::string title(void) const = 0;
+					virtual uint32_t tick(void) const = 0;
 			};
 		}
 	}
 }
 
-#endif // E65_INTERFACE_SDL_DISPLAY_H_
+#endif // E65_INTERFACE_CONSOLE_BUS_H_

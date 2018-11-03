@@ -20,9 +20,11 @@ DIR_BIN_INCLUDE=./../bin/include/
 DIR_BIN_LIB=./../bin/lib/
 DIR_BUILD=./../build/
 DIR_INCLUDE=./../include/
+DIR_INCLUDE_CONSOLE=./../include/console/
 DIR_INCLUDE_SDL=./../include/sdl/
 DIR_INCLUDE_TYPE=./../include/type/
 DIR_SRC=./
+DIR_SRC_CONSOLE=./console/
 DIR_SRC_SDL=./sdl/
 DIR_SRC_TYPE=./type/
 LIB=libe65.a
@@ -35,13 +37,14 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN_LIB)$(LIB) $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o \
+		$(DIR_BUILD)console_bus.o \
 		$(DIR_BUILD)sdl_display.o \
 		$(DIR_BUILD)type_signal.o $(DIR_BUILD)type_thread.o
 	cp $(DIR_INCLUDE)e65.h $(DIR_BIN_INCLUDE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_sdl build_type
+build: build_base build_console build_sdl build_type
 
 ### BASE ###
 
@@ -55,6 +58,13 @@ base_runtime.o: $(DIR_SRC)runtime.cpp $(DIR_INCLUDE)runtime.h
 
 base_trace.o: $(DIR_SRC)trace.cpp $(DIR_INCLUDE)trace.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)trace.cpp -o $(DIR_BUILD)base_trace.o
+
+### CONSOLE ###
+
+build_console: console_bus.o
+
+console_bus.o: $(DIR_SRC_CONSOLE)bus.cpp $(DIR_INCLUDE_CONSOLE)bus.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CONSOLE)bus.cpp -o $(DIR_BUILD)console_bus.o
 
 ### SDL ###
 

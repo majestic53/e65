@@ -81,7 +81,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "SDL display initializing", "{%u, %u} Scale=%.1f",
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Display initializing", "{%u, %u} Scale=%.1f",
 				E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT, E65_DISPLAY_SCALE);
 
 			m_title = E65;
@@ -132,7 +132,7 @@ namespace e65 {
 
 			SDL_RenderPresent(m_renderer);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL display initialized");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -143,7 +143,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL display uninitializing");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display uninitializing");
 
 			if(m_texture) {
 				SDL_DestroyTexture(m_texture);
@@ -160,7 +160,7 @@ namespace e65 {
 				m_window = nullptr;
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL display uninitialized");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display uninitialized");
 
 			E65_TRACE_EXIT();
 		}
@@ -250,7 +250,7 @@ namespace e65 {
 			}
 
 			if((SDL_GetWindowFlags(m_window) & E65_DISPLAY_SDL_FULLSCREEN_FLAGS) != fullscreen) {
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "SDL display mode change", "%s", fullscreen ? "Fullscreen" : "Window");
+				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Display mode change", "%s", fullscreen ? "Fullscreen" : "Window");
 
 				SDL_ShowCursor(!fullscreen);
 
@@ -324,7 +324,16 @@ namespace e65 {
 		{
 			std::stringstream result;
 
-			// TODO
+			result << E65_SDL_DISPLAY_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
+				<< " Interface=" << e65::interface::singleton<e65::sdl::display>::to_string();
+
+			if(e65::interface::singleton<e65::sdl::display>::initialized()) {
+				result << ", Title[" << m_title.size() << "]=" << E65_STRING_CHECK(m_title)
+					<< ", Pixel[" << m_pixel.size() << "]=" << E65_STRING_HEX(uintptr_t, &m_pixel)
+					<< ", Window=" << E65_STRING_HEX(uintptr_t, m_window)
+					<< ", Renderer=" << E65_STRING_HEX(uintptr_t, m_renderer)
+					<< ", Texture=" << E65_STRING_HEX(uintptr_t, m_texture);
+			}
 
 			return result.str();
 		}

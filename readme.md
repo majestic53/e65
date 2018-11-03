@@ -50,6 +50,11 @@ Changelog
 
 Version 0.1.1843
 ----------------
+*Updated: 11/3/2018*
+
+* Added bus singleton
+* Integrated bus into runtime
+
 *Updated: 11/2/2018*
 
 * Added display singleton
