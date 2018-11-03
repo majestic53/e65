@@ -53,6 +53,9 @@ namespace e65 {
 
 	#define E65_EXCEPTION_UNKNOWN "Unknown exception"
 
+	#define E65_FLOAT_PRECISION(_PRECISION_, _VALUE_) \
+		std::right << std::setprecision(_PRECISION_) << std::fixed << (_VALUE_) << std::defaultfloat
+
 	#define E65_MILLISECONDS_PER_SECOND 1000.f
 
 	#define E65_STRING_EMPTY "Empty"
@@ -62,7 +65,7 @@ namespace e65 {
 		((_STRING_).empty() ? E65_STRING_EMPTY : (_STRING_).c_str())
 
 	#define E65_STRING_HEX(_TYPE_, _VALUE_) \
-		std::setw(sizeof(_TYPE_) * 2) << std::setfill('0') << std::hex << (uintmax_t) ((_TYPE_) (_VALUE_)) \
+		std::right << std::setw(sizeof(_TYPE_) * 2) << std::setfill('0') << std::hex << (uintmax_t) ((_TYPE_) (_VALUE_)) \
 			<< std::dec << std::setfill(' ')
 
 	#define E65_TRACE_ENTRY() \
@@ -99,7 +102,7 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 6
+	#define E65_VERSION_REVISION 7
 	#define E65_VERSION_WEEK 1843
 
 	enum {

@@ -56,14 +56,15 @@ namespace e65 {
 			E65_EXCEPTION_THROW_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_STRING(_EXCEPT_), _FORMAT_, __VA_ARGS__)
 
 		enum {
-			E65_SINGLETON_RUNTIME = 0,
+			E65_SINGLETON_DISPLAY = 0,
+			E65_SINGLETON_RUNTIME,
 			E65_SINGLETON_TRACE,
 		};
 
 		#define E65_SINGLETON_MAX E65_SINGLETON_TRACE
 
 		static const std::string E65_SINGLETON_STR[] = {
-			"Runtime", "Trace",
+			"Display", "Runtime", "Trace",
 			};
 
 		#define E65_SINGLETON_STRING(_TYPE_) \

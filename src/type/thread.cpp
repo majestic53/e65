@@ -115,14 +115,14 @@ namespace e65 {
 		{
 
 			if(is_active()) {
-				THROW_E65_TYPE_THREAD_EXCEPTION_FORMAT(E65_TYPE_THREAD_EXCEPTION_STARTED, "%p", this);
+				THROW_E65_TYPE_THREAD_EXCEPTION(E65_TYPE_THREAD_EXCEPTION_STARTED);
 			}
 
 			m_exception.clear();
 			m_notifiable = notifiable;
 
 			if(!on_start(context, length)) {
-				THROW_E65_TYPE_THREAD_EXCEPTION_FORMAT(E65_TYPE_THREAD_EXCEPTION_START, "%p", this);
+				THROW_E65_TYPE_THREAD_EXCEPTION(E65_TYPE_THREAD_EXCEPTION_START);
 			}
 
 			set_active(true);

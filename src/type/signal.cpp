@@ -52,7 +52,7 @@ namespace e65 {
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(m_state == E65_SIGNAL_ABANDON) {
-				THROW_E65_TYPE_SIGNAL_EXCEPTION_FOMAT(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED, "%p", this);
+				THROW_E65_TYPE_SIGNAL_EXCEPTION(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED);
 			} else if(m_state != E65_SIGNAL_CLEAR) {
 				m_state = E65_SIGNAL_CLEAR;
 				m_condition.notify_all();
@@ -65,7 +65,7 @@ namespace e65 {
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			if(m_state == E65_SIGNAL_ABANDON) {
-				THROW_E65_TYPE_SIGNAL_EXCEPTION_FOMAT(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED, "%p", this);
+				THROW_E65_TYPE_SIGNAL_EXCEPTION(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED);
 			} else if(m_state == E65_SIGNAL_CLEAR) {
 				m_state = E65_SIGNAL_NOTIFY;
 				m_condition.notify_all();
@@ -104,7 +104,7 @@ namespace e65 {
 			std::unique_lock<std::mutex> lock(m_mutex);
 
 			if(m_state == E65_SIGNAL_ABANDON) {
-				THROW_E65_TYPE_SIGNAL_EXCEPTION_FOMAT(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED, "%p", this);
+				THROW_E65_TYPE_SIGNAL_EXCEPTION(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED);
 			} else if(m_state != E65_SIGNAL_CLEAR) {
 				m_state = E65_SIGNAL_CLEAR;
 			}

@@ -16,7 +16,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
 #include "../include/runtime.h"
 #include "./runtime_type.h"
 
@@ -24,6 +23,7 @@ namespace e65 {
 
 	runtime::runtime(void) :
 		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME),
+		m_display(e65::sdl::display::acquire()),
 		m_frame(0),
 		m_trace(e65::trace::acquire())
 	{
@@ -47,13 +47,26 @@ namespace e65 {
 		m_trace.uninitialize();
 	}
 
+	e65::interface::sdl::display &
+	runtime::display(void)
+	{
+		E65_TRACE_ENTRY();
+
+		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		E65_TRACE_EXIT();
+		return m_display;
+	}
+
 	uint32_t
 	runtime::frame(void) const
 	{
 		E65_TRACE_ENTRY();
 
 		if(!e65::interface::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_UNINITIALIZED, "%p", this);
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%u", m_frame);
@@ -77,12 +90,14 @@ namespace e65 {
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "SDL initializing", "%u.%u.%u", version.major, version.minor, version.patch);
 
 		if(SDL_Init(E65_RUNTIME_SDL_FLAGS)) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_EXTERNAL, "%s", SDL_GetError());
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_EXTERNAL, "SDL_Init failed! Error=%s", SDL_GetError());
 		}
+
+		m_display.initialize(context, length);
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL initialized");
 
-		// TODO: initialize singletons
+		// TODO: console::bus::initialize(context, length)
 
 		e65::type::thread::start(false, context, length);
 
@@ -111,11 +126,11 @@ namespace e65 {
 
 			rate = (end - begin);
 			if(rate >= E65_MILLISECONDS_PER_SECOND) {
-				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_SDL_FRAME_RATE));
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f", (rate > 0.f) ? rate : 0.f);
+				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
 
-				// TODO: sdl::display::frame_rate((rate > 0.f) ? rate : 0.f)
+				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime fps", "%.1f", (rate > 0.f) ? rate : 0.f);
 
+				m_display.set_frame_rate((rate > 0.f) ? rate : 0.f);
 				begin = end;
 				current = 0;
 			}
@@ -125,16 +140,13 @@ namespace e65 {
 				break;
 			}
 
-			// TODO: generate one frame at 1MHz:
-			// for(...) {
-			//	console::bus::update(*this)
-			// }
+			// TODO: console::bus::update(*this)
 
-			// TODO: sdl::display::render(*this)
+			m_display.render();
 
 			delta = (SDL_GetTicks() - end);
-			if(delta < E65_RUNTIME_SDL_FRAME_DELTA) {
-				SDL_Delay(E65_RUNTIME_SDL_FRAME_DELTA - delta);
+			if(delta < E65_RUNTIME_FRAME_DELTA) {
+				SDL_Delay(E65_RUNTIME_FRAME_DELTA - delta);
 			}
 
 			++current;
@@ -159,8 +171,6 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime starting");
 
-		// TODO: perform start tasks
-
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime started");
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
@@ -173,8 +183,6 @@ namespace e65 {
 		E65_TRACE_ENTRY();
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stopping");
-
-		// TODO: perform stop tasks
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stopped");
 
@@ -190,10 +198,11 @@ namespace e65 {
 
 		e65::type::thread::stop();
 
-		// TODO: uninitialize singletons
+		// TODO: console::bus::uninitialize()
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL uninitializing");
 
+		m_display.uninitialize();
 		SDL_Quit();
 
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL uninitialized");
@@ -214,13 +223,31 @@ namespace e65 {
 		while(SDL_PollEvent(&event)) {
 
 			switch(event.type) {
+				case SDL_KEYDOWN:
+
+					if(!event.key.repeat) {
+						SDL_Scancode scancode;
+
+						scancode = event.key.keysym.scancode;
+						switch(scancode) {
+							case E65_RUNTIME_SDL_FULLSCREEN_KEY:
+								E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display key event");
+								m_display.set_fullscreen(!m_display.fullscreen());
+								break;
+							default:
+								E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Input key event", "%u(%x)",
+									scancode, scancode);
+
+								// TODO: console::bus::input(scancode)
+
+								break;
+						}
+					}
+					break;
 				case SDL_QUIT:
 					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "SDL quit event");
 					result = false;
 					break;
-
-				// TODO: report input to sdl::input::singleton
-
 				default:
 					break;
 			}
@@ -256,7 +283,7 @@ namespace e65 {
 		E65_TRACE_ENTRY();
 
 		if(!e65::interface::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_UNINITIALIZED, "%p", this);
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
 		E65_TRACE_EXIT();
@@ -284,7 +311,7 @@ namespace e65 {
 		E65_TRACE_ENTRY_FORMAT("Timeout=%u", timeout);
 
 		if(!e65::interface::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_UNINITIALIZED, "%p", this);
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
 		result = e65::type::thread::wait(timeout);

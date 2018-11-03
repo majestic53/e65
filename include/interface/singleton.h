@@ -49,7 +49,7 @@ namespace e65 {
 
 					if(m_initialized) {
 						THROW_E65_INTERFACE_SINGLETON_EXCEPTION_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_INITIALIZED,
-							"%u(%s), %p", m_type, E65_SINGLETON_STRING(m_type), this);
+							"%u(%s)", m_type, E65_SINGLETON_STRING(m_type));
 					}
 
 					m_initialized = true;
@@ -57,7 +57,7 @@ namespace e65 {
 					if(!on_initialize(context, length)) {
 						uninitialize();
 						THROW_E65_INTERFACE_SINGLETON_EXCEPTION_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_INITIALIZING,
-							"%u(%s), %p", m_type, E65_SINGLETON_STRING(m_type), this);
+							"%u(%s)", m_type, E65_SINGLETON_STRING(m_type));
 					}
 				}
 
@@ -87,7 +87,7 @@ namespace e65 {
 
 					if(!m_initialized) {
 						THROW_E65_INTERFACE_SINGLETON_EXCEPTION_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_UNINITIALIZED,
-							"%u(%s), %p", m_type, E65_SINGLETON_STRING(m_type), this);
+							"%u(%s)", m_type, E65_SINGLETON_STRING(m_type));
 					}
 
 					on_uninitialize();

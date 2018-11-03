@@ -49,7 +49,7 @@ namespace e65 {
 		std::lock_guard<std::mutex> lock(m_queue_mutex);
 
 		if(m_queue.empty()) {
-			THROW_E65_TRACE_EXCEPTION_FORMAT(E65_TRACE_EXCEPTION_EMPTY, "%p", this);
+			THROW_E65_TRACE_EXCEPTION(E65_TRACE_EXCEPTION_EMPTY);
 		}
 
 		result = m_queue.front();
@@ -63,7 +63,7 @@ namespace e65 {
 	{
 
 		if(!e65::interface::singleton<e65::trace>::initialized()) {
-			THROW_E65_TRACE_EXCEPTION_FORMAT(E65_TRACE_EXCEPTION_UNINITIALIZED, "%p", this);
+			THROW_E65_TRACE_EXCEPTION(E65_TRACE_EXCEPTION_UNINITIALIZED);
 		}
 
 		return m_queue.empty();
@@ -76,7 +76,7 @@ namespace e65 {
 	{
 		std::lock_guard<std::mutex> lock(m_queue_mutex);
 
-		while(m_queue.size() >= E65_TRACE_COUNT_MAX) {
+		while(m_queue.size() >= E65_TRACE_QUEUE_MAX) {
 			m_queue.pop();
 		}
 
@@ -89,7 +89,7 @@ namespace e65 {
 	{
 
 		if(!e65::interface::singleton<e65::trace>::initialized()) {
-			THROW_E65_TRACE_EXCEPTION_FORMAT(E65_TRACE_EXCEPTION_UNINITIALIZED, "%p", this);
+			THROW_E65_TRACE_EXCEPTION(E65_TRACE_EXCEPTION_UNINITIALIZED);
 		}
 
 		while(!m_queue.empty()) {
