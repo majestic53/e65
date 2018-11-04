@@ -19,6 +19,7 @@
 #ifndef E65_RUNTIME_H_
 #define E65_RUNTIME_H_
 
+#include <set>
 #include "./interface/runtime.h"
 #include "./console/bus.h"
 #include "./trace.h"
@@ -34,9 +35,32 @@ namespace e65 {
 
 			~runtime(void);
 
+			bool breakpoint_clear(
+				__in uint16_t address
+				);
+
+			bool breakpoint_contains(
+				__in uint16_t address
+				);
+
+			bool breakpoint_set(
+				__in uint16_t address
+				);
+
+			std::set<uint16_t> breakpoints(void) const;
+
+			void breakpoints_clear(void);
+
 			e65::interface::console::bus &bus(void) override;
 
 			uint32_t frame(void) const override;
+
+			void run(
+				__in const std::string &path,
+				__in_opt bool debug = false
+				);
+
+			bool step(void);
 
 			std::string to_string(void) const override;
 
@@ -83,7 +107,11 @@ namespace e65 {
 
 			bool poll(void);
 
+			std::set<uint16_t> m_breakpoint;
+
 			e65::console::bus &m_bus;
+
+			bool m_debug;
 
 			uint32_t m_frame;
 

@@ -105,13 +105,11 @@ namespace e65 {
 
 			if(m_state == E65_SIGNAL_ABANDON) {
 				THROW_E65_TYPE_SIGNAL_EXCEPTION(E65_TYPE_SIGNAL_EXCEPTION_ABANDONED);
-			} else if(m_state != E65_SIGNAL_CLEAR) {
-				m_state = E65_SIGNAL_CLEAR;
 			}
 
 			if(timeout) {
 				result = m_condition.wait_for(lock, std::chrono::milliseconds(timeout),
-								[this](void) { return (m_state != E65_SIGNAL_CLEAR); });
+					[this](void) { return (m_state != E65_SIGNAL_CLEAR); });
 
 				if(!result) {
 					m_state = E65_SIGNAL_TIMEOUT;

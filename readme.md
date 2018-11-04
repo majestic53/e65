@@ -50,6 +50,12 @@ Changelog
 
 Version 0.1.1843
 ----------------
+*Updated: 11/4/2018*
+
+* Added c-style interface
+* Added debug stepping support
+* Added cpu/mmu singletons
+
 *Updated: 11/3/2018*
 
 * Added bus singleton

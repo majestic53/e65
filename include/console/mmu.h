@@ -16,55 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_CONSOLE_BUS_H_
-#define E65_CONSOLE_BUS_H_
+#ifndef E65_CONSOLE_MMU_H_
+#define E65_CONSOLE_MMU_H_
 
-#include "../interface/runtime.h"
+#include "../interface/console/mmu.h"
 #include "../interface/singleton.h"
-#include "../sdl/display.h"
 
 namespace e65 {
 
 	namespace console {
 
-		class bus :
-				public e65::interface::singleton<e65::console::bus>,
-				public e65::interface::console::bus {
+		class mmu :
+				public e65::interface::singleton<e65::console::mmu>,
+				public e65::interface::console::mmu {
 
 			public:
 
-				~bus(void);
+				~mmu(void);
 
-				e65::interface::sdl::display &display(void) override;
-
-				void input(
-					__in int key
-					) override;
-
-				void step(
-					__in e65::interface::runtime &runtime
-					);
-
-				void step_frame(
-					__in e65::interface::runtime &runtime
-					);
-
-				uint32_t tick(void) const override;
+				// TODO
 
 				std::string to_string(void) const override;
 
 			protected:
 
-				friend class e65::interface::singleton<e65::console::bus>;
+				friend class e65::interface::singleton<e65::console::mmu>;
 
-				bus(void);
+				mmu(void);
 
-				bus(
-					__in const bus &other
+				mmu(
+					__in const mmu &other
 					) = delete;
 
-				bus &operator=(
-					__in const bus &other
+				mmu &operator=(
+					__in const mmu &other
 					) = delete;
 
 				bool on_initialize(
@@ -74,11 +59,9 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				e65::sdl::display &m_display;
-
-				uint32_t m_tick;
+				// TODO
 		};
 	}
 }
 
-#endif // E65_CONSOLE_BUS_H_
+#endif // E65_CONSOLE_MMU_H_

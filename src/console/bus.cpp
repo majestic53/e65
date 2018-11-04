@@ -98,13 +98,39 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initializing");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitializing");
 
 			// TODO: uninitialize console::cpu, console::mmu, etc.
 
 			m_display.uninitialize();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initialized");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitialized");
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		bus::step(
+			__in e65::interface::runtime &runtime
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
+
+			// TODO: step console::cpu through a single instruction
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		bus::step_frame(
+			__in e65::interface::runtime &runtime
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
+
+			// TODO: step console::cpu through an entire frame
+
+			m_display.render();
 
 			E65_TRACE_EXIT();
 		}
@@ -139,20 +165,6 @@ namespace e65 {
 
 			E65_TRACE_EXIT();
 			return result.str();
-		}
-
-		void
-		bus::update(
-			__in e65::interface::runtime &runtime
-			)
-		{
-			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
-
-			// TODO: run console::cpu through an entire frame
-
-			m_display.render();
-
-			E65_TRACE_EXIT();
 		}
 	}
 }

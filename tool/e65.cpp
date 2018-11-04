@@ -37,6 +37,8 @@ main(
 
 		instance.initialize();
 
+		instance.run(std::string(), false);
+
 		instance.wait();
 
 		instance.uninitialize();

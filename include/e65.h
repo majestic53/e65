@@ -19,11 +19,53 @@
 #ifndef E65_H_
 #define E65_H_
 
+enum {
+	E65_BREAKPOINT_CLEAR = 0,
+	E65_BREAKPOINT_CLEAR_ALL,
+	E65_BREAKPOINT_CONTAINS,
+	E65_BREAKPOINT_SET,
+	E65_FRAME,
+};
+
+typedef struct {
+	int type;
+
+	union {
+		unsigned short u16;
+	} data;
+} e65_req_t;
+
+typedef struct {
+	int type;
+
+	union {
+		unsigned short u16;
+		unsigned int u32;
+		int i;
+	} data;
+} e65_rsp_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
-// TODO
+// Runtime routines
+
+extern int e65_run(const char *path, int debug);
+
+extern int e65_step(void);
+
+// Interactive routines
+
+extern int e65_command(const e65_req_t *request, e65_rsp_t *response);
+
+// Helper routines
+
+extern const char *e65_error(void);
+
+extern void e65_version(int *major, int *minor);
+
+extern const char *e65_version_string(void);
 
 #ifdef __cplusplus
 }

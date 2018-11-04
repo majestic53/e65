@@ -216,6 +216,7 @@ namespace e65 {
 #ifdef TRACE_COLOR
 		result << E65_LEVEL_COLOR(level);
 #endif // TRACE_COLOR
+
 		result << "[" << timestamp(E65_TRACE_VALUE(E65_TRACE_TIMESTAMP, entry)) << "] {" << E65_LEVEL_STRING(level) << "}";
 
 		buffer = E65_TRACE_VALUE(E65_TRACE_MESSAGE, entry);
@@ -238,6 +239,7 @@ namespace e65 {
 
 		result << E65_TRACE_VALUE(E65_TRACE_LINE, entry) << ")";
 #endif // NDEBUG
+
 #ifdef TRACE_COLOR
 		result << E65_LEVEL_COLOR_RESET;
 #endif // TRACE_COLOR

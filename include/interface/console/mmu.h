@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_CONSOLE_BUS_H_
-#define E65_INTERFACE_CONSOLE_BUS_H_
+#ifndef E65_INTERFACE_CONSOLE_MMU_H_
+#define E65_INTERFACE_CONSOLE_MMU_H_
 
-#include "../sdl/display.h"
-#include "./cpu.h"
-#include "./mmu.h"
+#include "../../define.h"
 
 namespace e65 {
 
@@ -29,20 +27,14 @@ namespace e65 {
 
 		namespace console {
 
-			class bus {
+			class mmu {
 
 				public:
 
-					virtual e65::interface::sdl::display &display(void) = 0;
-
-					virtual void input(
-						__in int key
-						) = 0;
-
-					virtual uint32_t tick(void) const = 0;
+					// TODO
 			};
 		}
 	}
 }
 
-#endif // E65_INTERFACE_CONSOLE_BUS_H_
+#endif // E65_INTERFACE_CONSOLE_MMU_H_
