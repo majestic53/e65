@@ -51,7 +51,7 @@ namespace e65 {
 				__in size_t line,
 				__in const char *format,
 				...
-				) override;
+				);
 
 			size_t size(void) const override;
 

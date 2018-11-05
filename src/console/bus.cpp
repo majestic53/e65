@@ -27,6 +27,7 @@ namespace e65 {
 		bus::bus(void) :
 			e65::interface::singleton<e65::console::bus>(e65::interface::E65_SINGLETON_BUS),
 			m_display(e65::sdl::display::acquire()),
+			m_mmu(e65::console::mmu::acquire()),
 			m_tick(0)
 		{
 			E65_TRACE_ENTRY();
@@ -36,6 +37,23 @@ namespace e65 {
 		bus::~bus(void)
 		{
 			E65_TRACE_ENTRY();
+			E65_TRACE_EXIT();
+		}
+
+		void
+		bus::clear(void)
+		{
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::console::bus>::initialized()) {
+				THROW_E65_CONSOLE_BUS_EXCEPTION(E65_CONSOLE_BUS_EXCEPTION_UNINITIALIZED);
+			}
+
+			// TODO: clear cpu
+
+			m_mmu.clear();
+			m_tick = 0;
+
 			E65_TRACE_EXIT();
 		}
 
@@ -52,22 +70,17 @@ namespace e65 {
 			return m_display;
 		}
 
-		void
-		bus::input(
-			__in int key
-			)
+		e65::interface::console::mmu &
+		bus::mmu(void)
 		{
-			E65_TRACE_ENTRY_FORMAT("Key=%u(%x)", key, key);
+			E65_TRACE_ENTRY();
 
 			if(!e65::interface::singleton<e65::console::bus>::initialized()) {
 				THROW_E65_CONSOLE_BUS_EXCEPTION(E65_CONSOLE_BUS_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Bus key event", "%u(%x)", key, key);
-
-			// TODO: send input to console::mmu
-
 			E65_TRACE_EXIT();
+			return m_mmu;
 		}
 
 		bool
@@ -84,8 +97,9 @@ namespace e65 {
 
 			m_tick = 0;
 			m_display.initialize(context, length);
+			m_mmu.initialize(context, length);
 
-			// TODO: initialize console::cpu, console::mmu, etc.
+			// TODO: initialize console::cpu
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initialized");
 
@@ -100,8 +114,9 @@ namespace e65 {
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitializing");
 
-			// TODO: uninitialize console::cpu, console::mmu, etc.
+			// TODO: uninitialize console::cpu
 
+			m_mmu.uninitialize();
 			m_display.uninitialize();
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitialized");
@@ -116,6 +131,8 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
+			m_mmu.write(E65_ADDRESS_RANDOM, std::rand());
+
 			// TODO: step console::cpu through a single instruction
 
 			E65_TRACE_EXIT();
@@ -129,6 +146,8 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
 			// TODO: step console::cpu through an entire frame
+			m_mmu.write(E65_ADDRESS_RANDOM, std::rand());
+			// ---
 
 			m_display.render();
 
@@ -160,6 +179,7 @@ namespace e65 {
 
 			if(e65::interface::singleton<e65::console::bus>::initialized()) {
 				result << ", Display=" << m_display.to_string()
+					<< ", Mmu=" << m_mmu.to_string()
 					<< ", Tick=" << m_tick;
 			}
 

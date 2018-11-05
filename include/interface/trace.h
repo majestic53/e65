@@ -33,17 +33,6 @@ namespace e65 {
 
 				virtual void flush(void) = 0;
 
-				virtual void generate(
-					__in int level,
-					__in const std::string &prefix,
-					__in const std::string &message,
-					__in const std::string &file,
-					__in const std::string &function,
-					__in size_t line,
-					__in const char *format,
-					...
-					) = 0;
-
 				virtual size_t size(void) const = 0;
 		};
 	}

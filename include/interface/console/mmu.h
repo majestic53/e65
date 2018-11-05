@@ -19,6 +19,7 @@
 #ifndef E65_INTERFACE_CONSOLE_MMU_H_
 #define E65_INTERFACE_CONSOLE_MMU_H_
 
+#include <vector>
 #include "../../define.h"
 
 namespace e65 {
@@ -31,7 +32,28 @@ namespace e65 {
 
 				public:
 
-					// TODO
+					virtual std::string dump(
+						__in uint16_t origin,
+						__in uint16_t length
+						) const = 0;
+
+					virtual uint8_t read(
+						__in uint16_t address
+						) const = 0;
+
+					virtual uint16_t read_word(
+						__in uint16_t address
+						) const = 0;
+
+					virtual void write(
+						__in uint16_t address,
+						__in uint8_t value
+						) = 0;
+
+					virtual void write_word(
+						__in uint16_t address,
+						__in uint16_t value
+						) = 0;
 			};
 		}
 	}

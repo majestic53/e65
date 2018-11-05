@@ -35,10 +35,6 @@ namespace e65 {
 				virtual uint32_t frame(void) const = 0;
 
 				virtual e65::interface::trace &trace(void) = 0;
-
-				virtual bool wait(
-					__in_opt uint32_t timeout = 0
-					) = 0;
 		};
 	}
 }

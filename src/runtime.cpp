@@ -34,6 +34,8 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime created", "%s", E65_STRING_CHECK(version()));
 
+		std::srand(std::time(nullptr));
+
 		E65_TRACE_EXIT();
 	}
 
@@ -325,7 +327,8 @@ namespace e65 {
 								m_bus.display().set_fullscreen(!m_bus.display().fullscreen());
 								break;
 							default:
-								m_bus.input(key);
+								E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime key event", "%u(%x)", key, key);
+								m_bus.mmu().write(E65_ADDRESS_KEY, key);
 								break;
 						}
 					}
@@ -357,7 +360,9 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime running", "%s (%s)", E65_STRING_CHECK(path), debug ? "Debug" : "Normal");
 
-		// TODO: reset bus && load input into console::mmu
+		m_bus.clear();
+
+		// TODO: load input into console::mmu
 
 		m_debug = debug;
 		if(!m_debug) {

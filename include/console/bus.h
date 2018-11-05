@@ -19,6 +19,8 @@
 #ifndef E65_CONSOLE_BUS_H_
 #define E65_CONSOLE_BUS_H_
 
+#include "../console/cpu.h"
+#include "../console/mmu.h"
 #include "../interface/runtime.h"
 #include "../interface/singleton.h"
 #include "../sdl/display.h"
@@ -37,9 +39,9 @@ namespace e65 {
 
 				e65::interface::sdl::display &display(void) override;
 
-				void input(
-					__in int key
-					) override;
+				e65::interface::console::mmu &mmu(void) override;
+
+				void clear(void);
 
 				void step(
 					__in e65::interface::runtime &runtime
@@ -75,6 +77,8 @@ namespace e65 {
 				void on_uninitialize(void) override;
 
 				e65::sdl::display &m_display;
+
+				e65::console::mmu &m_mmu;
 
 				uint32_t m_tick;
 		};

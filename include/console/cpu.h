@@ -34,6 +34,8 @@ namespace e65 {
 
 				~cpu(void);
 
+				void clear(void);
+
 				// TODO
 
 				std::string to_string(void) const override;

@@ -48,7 +48,7 @@ TBD
 Changelog
 =========
 
-Version 0.1.1843
+Version 0.1.1844
 ----------------
 *Updated: 11/4/2018*
 
@@ -79,6 +79,8 @@ Version 0.1.1843
 
 * Added signal/thread types
 
+Version 0.1.1843
+----------------
 *Updated: 10/27/2018*
 
 * Initial commit

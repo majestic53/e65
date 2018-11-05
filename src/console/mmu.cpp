@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <climits>
 #include "../../include/console/mmu.h"
 #include "../../include/trace.h"
 #include "./mmu_type.h"
@@ -24,6 +25,244 @@ namespace e65 {
 
 	namespace console {
 
-		// TODO
+		mmu::mmu(void) :
+			e65::interface::singleton<e65::console::mmu>(e65::interface::E65_SINGLETON_MMU)
+		{
+			E65_TRACE_ENTRY();
+			E65_TRACE_EXIT();
+		}
+
+		mmu::~mmu(void)
+		{
+			E65_TRACE_ENTRY();
+			E65_TRACE_EXIT();
+		}
+
+		void
+		mmu::clear(void)
+		{
+			uint16_t offset;
+
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_memory.resize(E65_MMU_MEMORY_LENGTH, E65_MMU_MEMORY_FILL);
+
+			for(offset = E65_ADDRESS_VIDEO_MIN; offset <= E65_ADDRESS_VIDEO_MAX; ++offset) {
+				write(offset, E65_COLOR_BLACK);
+			}
+
+			write(E65_ADDRESS_KEY, 0);
+			write(E65_ADDRESS_RANDOM, 0);
+
+			E65_TRACE_EXIT();
+		}
+
+		std::string
+		mmu::dump(
+			__in uint16_t origin,
+			__in uint16_t length
+			) const
+		{
+			size_t offset;
+			uint16_t index;
+			std::stringstream result;
+
+			E65_TRACE_ENTRY_FORMAT("Origin=%u(%04x), Length=%u(%04x)", origin, origin, length, length);
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			for(offset = origin; offset < (origin + length); ++offset) {
+
+				index = (offset % E65_MMU_MEMORY_LENGTH);
+				if(!(index % E65_MMU_MEMORY_BLOCK_LENGTH)) {
+
+					if(offset != origin) {
+						result << std::endl;
+					}
+
+					result << E65_STRING_HEX(uint16_t, index) << " |";
+				}
+
+				result << " " << E65_STRING_HEX(uint8_t, m_memory.at(index));
+			}
+
+			E65_TRACE_EXIT();
+			return result.str();
+		}
+
+		void
+		mmu::load(
+			__in const std::vector<uint8_t> &data,
+			__in uint16_t origin
+			)
+		{
+			size_t offset;
+
+			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Origin=%u(%04x)", data.size(), &data, origin, origin);
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			offset = (origin + data.size());
+			if(offset > m_memory.size()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_OFFSET, "%u(%x)", offset, offset);
+			}
+
+			for(offset = 0; offset < data.size(); ++offset) {
+				m_memory.at(origin + offset) = data.at(offset);
+			}
+
+			E65_TRACE_EXIT();
+		}
+
+		bool
+		mmu::on_initialize(
+			__in const void *context,
+			__in size_t length
+			)
+		{
+			bool result = true;
+
+			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
+
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Mmu initializing", "%.1f KB (%u bytes)",
+				E65_MMU_MEMORY_LENGTH / E65_MMU_BYTES_PER_KBYTE, E65_MMU_MEMORY_LENGTH);
+
+			clear();
+
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Mmu initialized");
+
+			E65_TRACE_EXIT_FORMAT("Result=%x", result);
+			return result;
+		}
+
+		void
+		mmu::on_uninitialize(void)
+		{
+			E65_TRACE_ENTRY();
+
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Mmu uninitializing");
+
+			m_memory.clear();
+
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Mmu uninitialized");
+
+			E65_TRACE_EXIT();
+		}
+
+		uint8_t
+		mmu::read(
+			__in uint16_t address
+			) const
+		{
+			uint8_t result;
+
+			E65_TRACE_ENTRY_FORMAT("%u(%04x)", address, address);
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(address >= m_memory.size()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+			}
+
+			result = m_memory.at(address);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%02x)", result, result);
+			return result;
+		}
+
+		uint16_t
+		mmu::read_word(
+			__in uint16_t address
+			) const
+		{
+			uint16_t result;
+
+			E65_TRACE_ENTRY_FORMAT("%u(%04x)", address, address);
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(address >= (m_memory.size() - 1)) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+			}
+
+			result = m_memory.at(address);
+			result |= (m_memory.at(address) << CHAR_BIT);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%04x)", result, result);
+			return result;
+		}
+
+		std::string
+		mmu::to_string(void) const
+		{
+			std::stringstream result;
+
+			E65_TRACE_ENTRY();
+
+			result << E65_CONSOLE_MMU_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
+				<< " Interface=" << e65::interface::singleton<e65::console::mmu>::to_string();
+
+			if(e65::interface::singleton<e65::console::mmu>::initialized()) {
+				result << ", Memory[" << m_memory.size() << "]=" << E65_STRING_HEX(uintptr_t, &m_memory);
+			}
+
+			E65_TRACE_EXIT();
+			return result.str();
+		}
+
+		void
+		mmu::write(
+			__in uint16_t address,
+			__in uint8_t value
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Address=%u(%04x), Value=%u(%02x)", address, address, value, value);
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(address >= m_memory.size()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+			}
+
+			m_memory.at(address) = value;
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		mmu::write_word(
+			__in uint16_t address,
+			__in uint16_t value
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Address=%u(%04x), Value=%u(%04x)", address, address, value, value);
+
+			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(address >= (m_memory.size() - 1)) {
+				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+			}
+
+			m_memory.at(address) = value;
+			m_memory.at(address + 1) = (value >> CHAR_BIT);
+
+			E65_TRACE_EXIT();
+		}
 	}
 }

@@ -34,9 +34,37 @@ namespace e65 {
 
 				~mmu(void);
 
-				// TODO
+				void clear(void);
+
+				std::string dump(
+					__in uint16_t origin,
+					__in uint16_t length
+					) const override;
+
+				void load(
+					__in const std::vector<uint8_t> &data,
+					__in uint16_t origin
+					);
+
+				uint8_t read(
+					__in uint16_t address
+					) const override;
+
+				uint16_t read_word(
+					__in uint16_t address
+					) const override;
 
 				std::string to_string(void) const override;
+
+				void write(
+					__in uint16_t address,
+					__in uint8_t value
+					) override;
+
+				void write_word(
+					__in uint16_t address,
+					__in uint16_t value
+					) override;
 
 			protected:
 
@@ -59,7 +87,7 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				// TODO
+				std::vector<uint8_t> m_memory;
 		};
 	}
 }

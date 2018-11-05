@@ -70,7 +70,7 @@ namespace e65 {
 
 			bool wait(
 				__in_opt uint32_t timeout = 0
-				) override;
+				);
 
 		protected:
 

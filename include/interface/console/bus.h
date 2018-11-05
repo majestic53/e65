@@ -35,9 +35,7 @@ namespace e65 {
 
 					virtual e65::interface::sdl::display &display(void) = 0;
 
-					virtual void input(
-						__in int key
-						) = 0;
+					virtual e65::interface::console::mmu &mmu(void) = 0;
 
 					virtual uint32_t tick(void) const = 0;
 			};
