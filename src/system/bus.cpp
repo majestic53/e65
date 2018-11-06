@@ -235,6 +235,7 @@ namespace e65 {
 				result << ", Display=" << m_display.to_string()
 					<< ", Input=" << m_input.to_string()
 					<< ", Memory=" << m_memory.to_string()
+					<< ", Processor=" << m_processor.to_string()
 					<< ", Video=" << m_video.to_string()
 					<< ", Tick=" << m_tick;
 			}
