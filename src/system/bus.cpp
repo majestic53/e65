@@ -29,6 +29,7 @@ namespace e65 {
 			m_display(e65::system::display::acquire()),
 			m_input(e65::system::input::acquire()),
 			m_memory(e65::system::memory::acquire()),
+			m_processor(e65::system::processor::acquire()),
 			m_tick(0),
 			m_video(e65::system::video::acquire())
 		{
@@ -55,9 +56,6 @@ namespace e65 {
 
 			m_memory.clear();
 			m_input.clear(m_memory);
-
-			// TODO: clear system::processor
-
 			m_video.clear(m_memory);
 			m_tick = 0;
 
@@ -105,6 +103,8 @@ namespace e65 {
 
 			// TODO: load file at path into memory
 
+			m_processor.reset(m_memory);
+
 			E65_TRACE_EXIT();
 		}
 
@@ -137,9 +137,7 @@ namespace e65 {
 			m_display.initialize(context, length);
 			m_memory.initialize(context, length);
 			m_input.initialize(context, length);
-
-			// TODO: initialize system::processor
-
+			m_processor.initialize(context, length);
 			m_video.initialize(context, length);
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initialized");
@@ -156,9 +154,7 @@ namespace e65 {
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitializing");
 
 			m_video.uninitialize();
-
-			// TODO: uninitialize system::processor
-
+			m_processor.uninitialize();
 			m_input.uninitialize();
 			m_memory.uninitialize();
 			m_display.uninitialize();
@@ -166,6 +162,19 @@ namespace e65 {
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitialized");
 
 			E65_TRACE_EXIT();
+		}
+
+		e65::interface::system::processor &
+		bus::processor(void)
+		{
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
+			}
+
+			E65_TRACE_EXIT();
+			return m_processor;
 		}
 
 		void
@@ -177,7 +186,7 @@ namespace e65 {
 
 			m_input.update(m_memory);
 
-			// TODO: step system::processor through a single instruction
+			// TODO: step processor through a single instruction
 
 			E65_TRACE_EXIT();
 		}
@@ -189,7 +198,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
-			// TODO: step system::processor through an entire frame
+			// TODO: step processor through an entire frame
 			step(runtime);
 			// ---
 

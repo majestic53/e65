@@ -52,6 +52,7 @@ Version 0.1.1845
 ----------------
 *Updated: 11/5/2018*
 
+* Added input/processor/video singleton
 * Code reorg
 
 Version 0.1.1844
@@ -60,7 +61,7 @@ Version 0.1.1844
 
 * Added c-style interface
 * Added debug stepping support
-* Added cpu/mmu singletons
+* <s>Added cpu/mmu singletons</s>
 
 *Updated: 11/3/2018*
 

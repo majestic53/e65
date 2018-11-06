@@ -60,6 +60,7 @@ namespace e65 {
 			E65_SINGLETON_DISPLAY,
 			E65_SINGLETON_INPUT,
 			E65_SINGLETON_MEMORY,
+			E65_SINGLETON_PROCESSOR,
 			E65_SINGLETON_RUNTIME,
 			E65_SINGLETON_TRACE,
 			E65_SINGLETON_VIDEO,
@@ -68,7 +69,7 @@ namespace e65 {
 		#define E65_SINGLETON_MAX E65_SINGLETON_VIDEO
 
 		static const std::string E65_SINGLETON_STR[] = {
-			"Bus", "Display", "Input", "Memory", "Runtime", "Trace", "Video",
+			"Bus", "Display", "Input", "Memory", "Processor", "Runtime", "Trace", "Video",
 			};
 
 		#define E65_SINGLETON_STRING(_TYPE_) \

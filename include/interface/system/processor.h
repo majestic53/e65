@@ -16,12 +16,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_SYSTEM_BUS_H_
-#define E65_INTERFACE_SYSTEM_BUS_H_
+#ifndef E65_INTERFACE_SYSTEM_PROCESSOR_H_
+#define E65_INTERFACE_SYSTEM_PROCESSOR_H_
 
-#include "./input.h"
-#include "./processor.h"
-#include "./video.h"
+#include "./memory.h"
 
 namespace e65 {
 
@@ -29,30 +27,22 @@ namespace e65 {
 
 		namespace system {
 
-			class bus {
+			class processor {
 
 				public:
 
-					virtual void clear(void) = 0;
-
-					virtual e65::interface::system::display &display(void) = 0;
-
-					virtual e65::interface::system::input &input(void) = 0;
-
-					virtual void load(
-						__in const std::string &path
+					virtual void reset(
+						__in e65::interface::system::memory &memory
 						) = 0;
 
-					virtual e65::interface::system::memory &memory(void) = 0;
+					// TODO
 
-					virtual e65::interface::system::processor &processor(void) = 0;
-
-					virtual uint32_t tick(void) const = 0;
-
-					virtual e65::interface::system::video &video(void) = 0;
+					virtual void step(
+						__in e65::interface::system::memory &memory
+						) = 0;
 			};
 		}
 	}
 }
 
-#endif // E65_INTERFACE_SYSTEM_BUS_H_
+#endif // E65_INTERFACE_SYSTEM_PROCESSOR_H_

@@ -20,9 +20,9 @@
 #define E65_SYSTEM_BUS_H_
 
 #include "../interface/runtime.h"
-#include "../interface/singleton.h"
-#include "../system/input.h"
-#include "../system/video.h"
+#include "./input.h"
+#include "./processor.h"
+#include "./video.h"
 
 namespace e65 {
 
@@ -47,6 +47,8 @@ namespace e65 {
 					) override;
 
 				e65::interface::system::memory &memory(void) override;
+
+				e65::interface::system::processor &processor(void) override;
 
 				void step(
 					__in e65::interface::runtime &runtime
@@ -88,6 +90,8 @@ namespace e65 {
 				e65::system::input &m_input;
 
 				e65::system::memory &m_memory;
+
+				e65::system::processor &m_processor;
 
 				uint32_t m_tick;
 

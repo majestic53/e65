@@ -35,7 +35,8 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN_LIB)$(LIB) $(DIR_BUILD)base_e65.o $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o \
-		$(DIR_BUILD)system_bus.o $(DIR_BUILD)system_display.o $(DIR_BUILD)system_input.o $(DIR_BUILD)system_memory.o $(DIR_BUILD)system_video.o \
+		$(DIR_BUILD)system_bus.o $(DIR_BUILD)system_display.o $(DIR_BUILD)system_input.o $(DIR_BUILD)system_memory.o \
+			$(DIR_BUILD)system_processor.o $(DIR_BUILD)system_video.o \
 		$(DIR_BUILD)type_signal.o $(DIR_BUILD)type_thread.o
 	cp $(DIR_INCLUDE)e65.h $(DIR_BIN_INCLUDE)
 	@echo '--- DONE -----------------------------------'
@@ -61,7 +62,7 @@ base_trace.o: $(DIR_SRC)trace.cpp $(DIR_INCLUDE)trace.h
 
 ### SYSTEM ###
 
-build_system: system_bus.o system_display.o system_input.o system_memory.o system_video.o
+build_system: system_bus.o system_display.o system_input.o system_memory.o system_processor.o system_video.o
 
 system_bus.o: $(DIR_SRC_SYSTEM)bus.cpp $(DIR_INCLUDE_SYSTEM)bus.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)bus.cpp -o $(DIR_BUILD)system_bus.o
@@ -74,6 +75,9 @@ system_input.o: $(DIR_SRC_SYSTEM)input.cpp $(DIR_INCLUDE_SYSTEM)input.h
 
 system_memory.o: $(DIR_SRC_SYSTEM)memory.cpp $(DIR_INCLUDE_SYSTEM)memory.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)memory.cpp -o $(DIR_BUILD)system_memory.o
+
+system_processor.o: $(DIR_SRC_SYSTEM)processor.cpp $(DIR_INCLUDE_SYSTEM)processor.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)processor.cpp -o $(DIR_BUILD)system_processor.o
 
 system_video.o: $(DIR_SRC_SYSTEM)video.cpp $(DIR_INCLUDE_SYSTEM)video.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)video.cpp -o $(DIR_BUILD)system_video.o
