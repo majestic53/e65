@@ -16,14 +16,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../include/console/cpu.h"
-#include "../../include/trace.h"
-#include "./cpu_type.h"
+#ifndef E65_INTERFACE_SYSTEM_BUS_H_
+#define E65_INTERFACE_SYSTEM_BUS_H_
+
+#include "./input.h"
+#include "./video.h"
 
 namespace e65 {
 
-	namespace console {
+	namespace interface {
 
-		// TODO
+		namespace system {
+
+			class bus {
+
+				public:
+
+					virtual void clear(void) = 0;
+
+					virtual e65::interface::system::display &display(void) = 0;
+
+					virtual e65::interface::system::input &input(void) = 0;
+
+					virtual void load(
+						__in const std::string &path
+						) = 0;
+
+					virtual e65::interface::system::memory &memory(void) = 0;
+
+					virtual uint32_t tick(void) const = 0;
+
+					virtual e65::interface::system::video &video(void) = 0;
+			};
+		}
 	}
 }
+
+#endif // E65_INTERFACE_SYSTEM_BUS_H_

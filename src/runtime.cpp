@@ -23,7 +23,7 @@ namespace e65 {
 
 	runtime::runtime(void) :
 		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME),
-		m_bus(e65::console::bus::acquire()),
+		m_bus(e65::system::bus::acquire()),
 		m_debug(false),
 		m_frame(0),
 		m_trace(e65::trace::acquire())
@@ -33,8 +33,6 @@ namespace e65 {
 		E65_TRACE_ENTRY();
 
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime created", "%s", E65_STRING_CHECK(version()));
-
-		std::srand(std::time(nullptr));
 
 		E65_TRACE_EXIT();
 	}
@@ -138,7 +136,7 @@ namespace e65 {
 		E65_TRACE_EXIT();
 	}
 
-	e65::interface::console::bus &
+	e65::interface::system::bus &
 	runtime::bus(void)
 	{
 		E65_TRACE_ENTRY();
@@ -318,17 +316,18 @@ namespace e65 {
 				case SDL_KEYDOWN:
 
 					if(!event.key.repeat) {
-						SDL_Scancode key;
+						SDL_Scancode value;
 
-						key = event.key.keysym.scancode;
-						switch(key) {
+						value = event.key.keysym.scancode;
+						switch(value) {
 							case E65_RUNTIME_SDL_FULLSCREEN_KEY:
 								E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display mode event");
 								m_bus.display().set_fullscreen(!m_bus.display().fullscreen());
 								break;
 							default:
-								E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime key event", "%u(%x)", key, key);
-								m_bus.mmu().write(E65_ADDRESS_KEY, key);
+								E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime key event", "%u(%x)",
+									value, value);
+								m_bus.input().key(m_bus.memory(), value);
 								break;
 						}
 					}
@@ -360,9 +359,7 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime running", "%s (%s)", E65_STRING_CHECK(path), debug ? "Debug" : "Normal");
 
-		m_bus.clear();
-
-		// TODO: load input into console::mmu
+		m_bus.load(path);
 
 		m_debug = debug;
 		if(!m_debug) {
@@ -388,7 +385,7 @@ namespace e65 {
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stepping");
 
 			// TODO
-			// result = breakpoint_contains(/* get console::cpu::pc */);
+			// result = breakpoint_contains(/* get system::processor::pc */);
 			// if(result) {
 				e65::type::thread::notify();
 			// }

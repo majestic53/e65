@@ -16,17 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_SDL_DISPLAY_H_
-#define E65_SDL_DISPLAY_H_
+#ifndef E65_SYSTEM_DISPLAY_H_
+#define E65_SYSTEM_DISPLAY_H_
 
 #include <vector>
 #include <SDL2/SDL.h>
 #include "../interface/singleton.h"
-#include "../interface/sdl/display.h"
+#include "../interface/system/display.h"
 
 namespace e65 {
 
-	namespace sdl {
+	namespace system {
 
 		typedef union {
 
@@ -41,8 +41,8 @@ namespace e65 {
 		} color_t;
 
 		class display :
-				public e65::interface::singleton<e65::sdl::display>,
-				public e65::interface::sdl::display {
+				public e65::interface::singleton<e65::system::display>,
+				public e65::interface::system::display {
 
 			public:
 
@@ -57,14 +57,17 @@ namespace e65 {
 					__in uint32_t y
 					) const override;
 
-				void render(void) const;
-
 				void set_frame_rate(
 					__in float frame_rate
 					) override;
 
 				void set_fullscreen(
 					__in bool fullscreen
+					) override;
+
+				void set_pixel(
+					__in uint32_t index,
+					__in uint8_t color
 					) override;
 
 				void set_pixel(
@@ -77,13 +80,15 @@ namespace e65 {
 					__in const std::string &title
 					) override;
 
+				void show(void) const override;
+
 				std::string title(void) const override;
 
 				std::string to_string(void) const override;
 
 			protected:
 
-				friend class e65::interface::singleton<e65::sdl::display>;
+				friend class e65::interface::singleton<e65::system::display>;
 
 				display(void);
 
@@ -115,4 +120,4 @@ namespace e65 {
 	}
 }
 
-#endif // E65_SDL_DISPLAY_H_
+#endif // E65_SYSTEM_DISPLAY_H_

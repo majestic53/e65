@@ -57,17 +57,18 @@ namespace e65 {
 
 		enum {
 			E65_SINGLETON_BUS = 0,
-			E65_SINGLETON_CPU,
 			E65_SINGLETON_DISPLAY,
-			E65_SINGLETON_MMU,
+			E65_SINGLETON_INPUT,
+			E65_SINGLETON_MEMORY,
 			E65_SINGLETON_RUNTIME,
 			E65_SINGLETON_TRACE,
+			E65_SINGLETON_VIDEO,
 		};
 
-		#define E65_SINGLETON_MAX E65_SINGLETON_TRACE
+		#define E65_SINGLETON_MAX E65_SINGLETON_VIDEO
 
 		static const std::string E65_SINGLETON_STR[] = {
-			"Bus", "Cpu", "Display", "Mmu", "Runtime", "Trace",
+			"Bus", "Display", "Input", "Memory", "Runtime", "Trace", "Video",
 			};
 
 		#define E65_SINGLETON_STRING(_TYPE_) \

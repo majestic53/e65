@@ -48,6 +48,12 @@ TBD
 Changelog
 =========
 
+Version 0.1.1845
+----------------
+*Updated: 11/5/2018*
+
+* Code reorg
+
 Version 0.1.1844
 ----------------
 *Updated: 11/4/2018*
@@ -78,12 +84,6 @@ Version 0.1.1844
 *Updated: 10/28/2018*
 
 * Added signal/thread types
-
-Version 0.1.1843
-----------------
-*Updated: 10/27/2018*
-
-* Initial commit
 
 *Changelog truncated (see file history for full log)*
 

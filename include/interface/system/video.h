@@ -16,25 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_CONSOLE_CPU_H_
-#define E65_INTERFACE_CONSOLE_CPU_H_
+#ifndef E65_INTERFACE_SYSTEM_VIDEO_H_
+#define E65_INTERFACE_SYSTEM_VIDEO_H_
 
-#include "../../define.h"
+#include "./display.h"
+#include "./memory.h"
 
 namespace e65 {
 
 	namespace interface {
 
-		namespace console {
+		namespace system {
 
-			class cpu {
+			class video {
 
 				public:
 
-					// TODO
+					virtual void clear(
+						__in e65::interface::system::memory &memory
+						) = 0;
+
+					virtual void update(
+						__in e65::interface::system::display &display,
+						__in e65::interface::system::memory &memory
+						) = 0;
 			};
 		}
 	}
 }
 
-#endif // E65_INTERFACE_CONSOLE_CPU_H_
+#endif // E65_INTERFACE_SYSTEM_VIDEO_H_

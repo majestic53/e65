@@ -16,47 +16,59 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_CONSOLE_MMU_H_
-#define E65_INTERFACE_CONSOLE_MMU_H_
+#ifndef E65_INTERFACE_SYSTEM_DISPLAY_H_
+#define E65_INTERFACE_SYSTEM_DISPLAY_H_
 
-#include <vector>
 #include "../../define.h"
 
 namespace e65 {
 
 	namespace interface {
 
-		namespace console {
+		namespace system {
 
-			class mmu {
+			class display {
 
 				public:
 
-					virtual std::string dump(
-						__in uint16_t origin,
-						__in uint16_t length
+					virtual void clear(void) = 0;
+
+					virtual bool fullscreen(void) const = 0;
+
+					virtual uint32_t pixel(
+						__in uint32_t x,
+						__in uint32_t y
 						) const = 0;
 
-					virtual uint8_t read(
-						__in uint16_t address
-						) const = 0;
-
-					virtual uint16_t read_word(
-						__in uint16_t address
-						) const = 0;
-
-					virtual void write(
-						__in uint16_t address,
-						__in uint8_t value
+					virtual void set_frame_rate(
+						__in float frame_rate
 						) = 0;
 
-					virtual void write_word(
-						__in uint16_t address,
-						__in uint16_t value
+					virtual void set_fullscreen(
+						__in bool fullscreen
 						) = 0;
+
+					virtual void set_pixel(
+						__in uint32_t index,
+						__in uint8_t color
+						) = 0;
+
+					virtual void set_pixel(
+						__in uint32_t x,
+						__in uint32_t y,
+						__in uint8_t color
+						) = 0;
+
+					virtual void set_title(
+						__in const std::string &title
+						) = 0;
+
+					virtual void show(void) const = 0;
+
+					virtual std::string title(void) const = 0;
 			};
 		}
 	}
 }
 
-#endif // E65_INTERFACE_CONSOLE_MMU_H_
+#endif // E65_INTERFACE_SYSTEM_DISPLAY_H_

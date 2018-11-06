@@ -17,70 +17,67 @@
  */
 
 #include <climits>
-#include "../../include/console/mmu.h"
+#include "../../include/system/memory.h"
 #include "../../include/trace.h"
-#include "./mmu_type.h"
+#include "./memory_type.h"
 
 namespace e65 {
 
-	namespace console {
+	namespace system {
 
-		mmu::mmu(void) :
-			e65::interface::singleton<e65::console::mmu>(e65::interface::E65_SINGLETON_MMU)
+		memory::memory(void) :
+			e65::interface::singleton<e65::system::memory>(e65::interface::E65_SINGLETON_MEMORY)
 		{
 			E65_TRACE_ENTRY();
 			E65_TRACE_EXIT();
 		}
 
-		mmu::~mmu(void)
+		memory::~memory(void)
 		{
 			E65_TRACE_ENTRY();
 			E65_TRACE_EXIT();
 		}
 
 		void
-		mmu::clear(void)
+		memory::clear(void)
 		{
-			uint16_t offset;
-
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_memory.resize(E65_MMU_MEMORY_LENGTH, E65_MMU_MEMORY_FILL);
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory clearing");
 
-			for(offset = E65_ADDRESS_VIDEO_MIN; offset <= E65_ADDRESS_VIDEO_MAX; ++offset) {
-				write(offset, E65_COLOR_BLACK);
-			}
+			m_memory.resize(E65_MEMORY_MEMORY_LENGTH, E65_MEMORY_MEMORY_FILL);
 
-			write(E65_ADDRESS_KEY, 0);
-			write(E65_ADDRESS_RANDOM, 0);
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory cleared");
 
 			E65_TRACE_EXIT();
 		}
 
 		std::string
-		mmu::dump(
+		memory::dump(
 			__in uint16_t origin,
 			__in uint16_t length
 			) const
 		{
 			size_t offset;
-			uint16_t index;
 			std::stringstream result;
 
 			E65_TRACE_ENTRY_FORMAT("Origin=%u(%04x), Length=%u(%04x)", origin, origin, length, length);
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
-			for(offset = origin; offset < (origin + length); ++offset) {
+			// TODO: add string representations && pad if origin or (origin + length) are not block-aligned
 
-				index = (offset % E65_MMU_MEMORY_LENGTH);
-				if(!(index % E65_MMU_MEMORY_BLOCK_LENGTH)) {
+			for(offset = origin; offset < (origin + length); ++offset) {
+				uint16_t index;
+
+				index = (offset % E65_MEMORY_MEMORY_LENGTH);
+				if(!(index % E65_MEMORY_MEMORY_BLOCK_LENGTH)) {
 
 					if(offset != origin) {
 						result << std::endl;
@@ -97,7 +94,7 @@ namespace e65 {
 		}
 
 		void
-		mmu::load(
+		memory::load(
 			__in const std::vector<uint8_t> &data,
 			__in uint16_t origin
 			)
@@ -106,13 +103,13 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Origin=%u(%04x)", data.size(), &data, origin, origin);
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
 			offset = (origin + data.size());
 			if(offset > m_memory.size()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_OFFSET, "%u(%x)", offset, offset);
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_OFFSET, "%u(%x)", offset, offset);
 			}
 
 			for(offset = 0; offset < data.size(); ++offset) {
@@ -123,7 +120,7 @@ namespace e65 {
 		}
 
 		bool
-		mmu::on_initialize(
+		memory::on_initialize(
 			__in const void *context,
 			__in size_t length
 			)
@@ -132,33 +129,33 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Mmu initializing", "%.1f KB (%u bytes)",
-				E65_MMU_MEMORY_LENGTH / E65_MMU_BYTES_PER_KBYTE, E65_MMU_MEMORY_LENGTH);
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Memory initializing", "%.1f KB (%u bytes)",
+				E65_MEMORY_MEMORY_LENGTH / E65_MEMORY_BYTES_PER_KBYTE, E65_MEMORY_MEMORY_LENGTH);
 
 			clear();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Mmu initialized");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
 		}
 
 		void
-		mmu::on_uninitialize(void)
+		memory::on_uninitialize(void)
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Mmu uninitializing");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory uninitializing");
 
 			m_memory.clear();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Mmu uninitialized");
+			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory uninitialized");
 
 			E65_TRACE_EXIT();
 		}
 
 		uint8_t
-		mmu::read(
+		memory::read(
 			__in uint16_t address
 			) const
 		{
@@ -166,12 +163,12 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("%u(%04x)", address, address);
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
 			if(address >= m_memory.size()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
 			}
 
 			result = m_memory.at(address);
@@ -181,7 +178,7 @@ namespace e65 {
 		}
 
 		uint16_t
-		mmu::read_word(
+		memory::read_word(
 			__in uint16_t address
 			) const
 		{
@@ -189,12 +186,12 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("%u(%04x)", address, address);
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
 			if(address >= (m_memory.size() - 1)) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
 			}
 
 			result = m_memory.at(address);
@@ -205,16 +202,16 @@ namespace e65 {
 		}
 
 		std::string
-		mmu::to_string(void) const
+		memory::to_string(void) const
 		{
 			std::stringstream result;
 
 			E65_TRACE_ENTRY();
 
-			result << E65_CONSOLE_MMU_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::console::mmu>::to_string();
+			result << E65_SYSTEM_MEMORY_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
+				<< " Interface=" << e65::interface::singleton<e65::system::memory>::to_string();
 
-			if(e65::interface::singleton<e65::console::mmu>::initialized()) {
+			if(e65::interface::singleton<e65::system::memory>::initialized()) {
 				result << ", Memory[" << m_memory.size() << "]=" << E65_STRING_HEX(uintptr_t, &m_memory);
 			}
 
@@ -223,19 +220,19 @@ namespace e65 {
 		}
 
 		void
-		mmu::write(
+		memory::write(
 			__in uint16_t address,
 			__in uint8_t value
 			)
 		{
 			E65_TRACE_ENTRY_FORMAT("Address=%u(%04x), Value=%u(%02x)", address, address, value, value);
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
 			if(address >= m_memory.size()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
 			}
 
 			m_memory.at(address) = value;
@@ -244,19 +241,19 @@ namespace e65 {
 		}
 
 		void
-		mmu::write_word(
+		memory::write_word(
 			__in uint16_t address,
 			__in uint16_t value
 			)
 		{
 			E65_TRACE_ENTRY_FORMAT("Address=%u(%04x), Value=%u(%04x)", address, address, value, value);
 
-			if(!e65::interface::singleton<e65::console::mmu>::initialized()) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION(E65_CONSOLE_MMU_EXCEPTION_UNINITIALIZED);
+			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
 			if(address >= (m_memory.size() - 1)) {
-				THROW_E65_CONSOLE_MMU_EXCEPTION_FORMAT(E65_CONSOLE_MMU_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
+				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
 			}
 
 			m_memory.at(address) = value;

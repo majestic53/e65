@@ -16,52 +16,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_SDL_DISPLAY_H_
-#define E65_INTERFACE_SDL_DISPLAY_H_
+#ifndef E65_INTERFACE_SYSTEM_INPUT_H_
+#define E65_INTERFACE_SYSTEM_INPUT_H_
 
-#include "../../define.h"
+#include "./memory.h"
 
 namespace e65 {
 
 	namespace interface {
 
-		namespace sdl {
+		namespace system {
 
-			class display {
+			class input {
 
 				public:
 
-					virtual void clear(void) = 0;
-
-					virtual bool fullscreen(void) const = 0;
-
-					virtual uint32_t pixel(
-						__in uint32_t x,
-						__in uint32_t y
-						) const = 0;
-
-					virtual void set_frame_rate(
-						__in float frame_rate
+					virtual void clear(
+						__in e65::interface::system::memory &memory
 						) = 0;
 
-					virtual void set_fullscreen(
-						__in bool fullscreen
+					virtual void key(
+						__in e65::interface::system::memory &memory,
+						__in int value
 						) = 0;
 
-					virtual void set_pixel(
-						__in uint32_t x,
-						__in uint32_t y,
-						__in uint8_t color
+					virtual void update(
+						__in e65::interface::system::memory &memory
 						) = 0;
-
-					virtual void set_title(
-						__in const std::string &title
-						) = 0;
-
-					virtual std::string title(void) const = 0;
 			};
 		}
 	}
 }
 
-#endif // E65_INTERFACE_SDL_DISPLAY_H_
+#endif // E65_INTERFACE_SYSTEM_INPUT_H_

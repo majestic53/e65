@@ -21,7 +21,7 @@
 
 #include <set>
 #include "./interface/runtime.h"
-#include "./console/bus.h"
+#include "./system/bus.h"
 #include "./trace.h"
 
 namespace e65 {
@@ -51,7 +51,7 @@ namespace e65 {
 
 			void breakpoints_clear(void);
 
-			e65::interface::console::bus &bus(void) override;
+			e65::interface::system::bus &bus(void) override;
 
 			uint32_t frame(void) const override;
 
@@ -109,7 +109,7 @@ namespace e65 {
 
 			std::set<uint16_t> m_breakpoint;
 
-			e65::console::bus &m_bus;
+			e65::system::bus &m_bus;
 
 			bool m_debug;
 

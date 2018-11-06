@@ -20,12 +20,10 @@ DIR_BIN_INCLUDE=./../bin/include/
 DIR_BIN_LIB=./../bin/lib/
 DIR_BUILD=./../build/
 DIR_INCLUDE=./../include/
-DIR_INCLUDE_CONSOLE=./../include/console/
-DIR_INCLUDE_SDL=./../include/sdl/
+DIR_INCLUDE_SYSTEM=./../include/system/
 DIR_INCLUDE_TYPE=./../include/type/
 DIR_SRC=./
-DIR_SRC_CONSOLE=./console/
-DIR_SRC_SDL=./sdl/
+DIR_SRC_SYSTEM=./system/
 DIR_SRC_TYPE=./type/
 LIB=libe65.a
 
@@ -37,14 +35,13 @@ archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
 	ar rcs $(DIR_BIN_LIB)$(LIB) $(DIR_BUILD)base_e65.o $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o \
-		$(DIR_BUILD)console_bus.o $(DIR_BUILD)console_cpu.o $(DIR_BUILD)console_mmu.o \
-		$(DIR_BUILD)sdl_display.o \
+		$(DIR_BUILD)system_bus.o $(DIR_BUILD)system_display.o $(DIR_BUILD)system_input.o $(DIR_BUILD)system_memory.o $(DIR_BUILD)system_video.o \
 		$(DIR_BUILD)type_signal.o $(DIR_BUILD)type_thread.o
 	cp $(DIR_INCLUDE)e65.h $(DIR_BIN_INCLUDE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_base build_console build_sdl build_type
+build: build_base build_system build_type
 
 ### BASE ###
 
@@ -62,25 +59,24 @@ base_runtime.o: $(DIR_SRC)runtime.cpp $(DIR_INCLUDE)runtime.h
 base_trace.o: $(DIR_SRC)trace.cpp $(DIR_INCLUDE)trace.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)trace.cpp -o $(DIR_BUILD)base_trace.o
 
-### CONSOLE ###
+### SYSTEM ###
 
-build_console: console_bus.o console_cpu.o console_mmu.o
+build_system: system_bus.o system_display.o system_input.o system_memory.o system_video.o
 
-console_bus.o: $(DIR_SRC_CONSOLE)bus.cpp $(DIR_INCLUDE_CONSOLE)bus.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CONSOLE)bus.cpp -o $(DIR_BUILD)console_bus.o
+system_bus.o: $(DIR_SRC_SYSTEM)bus.cpp $(DIR_INCLUDE_SYSTEM)bus.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)bus.cpp -o $(DIR_BUILD)system_bus.o
 
-console_cpu.o: $(DIR_SRC_CONSOLE)cpu.cpp $(DIR_INCLUDE_CONSOLE)cpu.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CONSOLE)cpu.cpp -o $(DIR_BUILD)console_cpu.o
+system_display.o: $(DIR_SRC_SYSTEM)display.cpp $(DIR_INCLUDE_SYSTEM)display.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)display.cpp -o $(DIR_BUILD)system_display.o
 
-console_mmu.o: $(DIR_SRC_CONSOLE)mmu.cpp $(DIR_INCLUDE_CONSOLE)mmu.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_CONSOLE)mmu.cpp -o $(DIR_BUILD)console_mmu.o
+system_input.o: $(DIR_SRC_SYSTEM)input.cpp $(DIR_INCLUDE_SYSTEM)input.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)input.cpp -o $(DIR_BUILD)system_input.o
 
-### SDL ###
+system_memory.o: $(DIR_SRC_SYSTEM)memory.cpp $(DIR_INCLUDE_SYSTEM)memory.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)memory.cpp -o $(DIR_BUILD)system_memory.o
 
-build_sdl: sdl_display.o
-
-sdl_display.o: $(DIR_SRC_SDL)display.cpp $(DIR_INCLUDE_SDL)display.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SDL)display.cpp -o $(DIR_BUILD)sdl_display.o
+system_video.o: $(DIR_SRC_SYSTEM)video.cpp $(DIR_INCLUDE_SYSTEM)video.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_SYSTEM)video.cpp -o $(DIR_BUILD)system_video.o
 
 ### TYPE ###
 

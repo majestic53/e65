@@ -40,11 +40,6 @@ namespace e65 {
 
 	#define E65 "E65"
 
-	#define E65_ADDRESS_KEY 0x00ff
-	#define E65_ADDRESS_RANDOM 0x00fe
-	#define E65_ADDRESS_VIDEO_MAX 0x05ff
-	#define E65_ADDRESS_VIDEO_MIN 0x0200
-
 	#define E65_EXCEPTION(_MESSAGE_) \
 		e65::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
 
@@ -107,8 +102,8 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 10
-	#define E65_VERSION_WEEK 1844
+	#define E65_VERSION_REVISION 1
+	#define E65_VERSION_WEEK 1845
 
 	enum {
 		E65_COLOR_BLACK = 0,

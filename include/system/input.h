@@ -16,42 +16,51 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_CONSOLE_CPU_H_
-#define E65_CONSOLE_CPU_H_
+#ifndef E65_SYSTEM_INPUT_H_
+#define E65_SYSTEM_INPUT_H_
 
-#include "../interface/console/cpu.h"
-#include "../interface/singleton.h"
+#include "../interface/system/input.h"
+#include "./memory.h"
 
 namespace e65 {
 
-	namespace console {
+	namespace system {
 
-		class cpu :
-				public e65::interface::singleton<e65::console::cpu>,
-				public e65::interface::console::cpu {
+		class input :
+				public e65::interface::singleton<e65::system::input>,
+				public e65::interface::system::input {
 
 			public:
 
-				~cpu(void);
+				~input(void);
 
-				void clear(void);
+				void clear(
+					__in e65::interface::system::memory &memory
+					) override;
 
-				// TODO
+				void key(
+					__in e65::interface::system::memory &memory,
+					__in int value
+					) override;
 
 				std::string to_string(void) const override;
 
+				void update(
+					__in e65::interface::system::memory &memory
+					) override;
+
 			protected:
 
-				friend class e65::interface::singleton<e65::console::cpu>;
+				friend class e65::interface::singleton<e65::system::input>;
 
-				cpu(void);
+				input(void);
 
-				cpu(
-					__in const cpu &other
+				input(
+					__in const input &other
 					) = delete;
 
-				cpu &operator=(
-					__in const cpu &other
+				input &operator=(
+					__in const input &other
 					) = delete;
 
 				bool on_initialize(
@@ -60,10 +69,8 @@ namespace e65 {
 					) override;
 
 				void on_uninitialize(void) override;
-
-				// TODO
 		};
 	}
 }
 
-#endif // E65_CONSOLE_CPU_H_
+#endif // E65_SYSTEM_INPUT_H_

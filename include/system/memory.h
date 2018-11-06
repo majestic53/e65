@@ -16,25 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_CONSOLE_MMU_H_
-#define E65_CONSOLE_MMU_H_
+#ifndef E65_SYSTEM_MEMORY_H_
+#define E65_SYSTEM_MEMORY_H_
 
-#include "../interface/console/mmu.h"
+#include "../interface/system/memory.h"
 #include "../interface/singleton.h"
 
 namespace e65 {
 
-	namespace console {
+	namespace system {
 
-		class mmu :
-				public e65::interface::singleton<e65::console::mmu>,
-				public e65::interface::console::mmu {
+		class memory :
+				public e65::interface::singleton<e65::system::memory>,
+				public e65::interface::system::memory {
 
 			public:
 
-				~mmu(void);
+				~memory(void);
 
-				void clear(void);
+				void clear(void) override;
 
 				std::string dump(
 					__in uint16_t origin,
@@ -44,7 +44,7 @@ namespace e65 {
 				void load(
 					__in const std::vector<uint8_t> &data,
 					__in uint16_t origin
-					);
+					) override;
 
 				uint8_t read(
 					__in uint16_t address
@@ -68,16 +68,16 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::console::mmu>;
+				friend class e65::interface::singleton<e65::system::memory>;
 
-				mmu(void);
+				memory(void);
 
-				mmu(
-					__in const mmu &other
+				memory(
+					__in const memory &other
 					) = delete;
 
-				mmu &operator=(
-					__in const mmu &other
+				memory &operator=(
+					__in const memory &other
 					) = delete;
 
 				bool on_initialize(
@@ -92,4 +92,4 @@ namespace e65 {
 	}
 }
 
-#endif // E65_CONSOLE_MMU_H_
+#endif // E65_SYSTEM_MEMORY_H_

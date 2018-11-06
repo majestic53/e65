@@ -16,57 +16,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_CONSOLE_BUS_H_
-#define E65_CONSOLE_BUS_H_
+#ifndef E65_SYSTEM_VIDEO_H_
+#define E65_SYSTEM_VIDEO_H_
 
-#include "../console/cpu.h"
-#include "../console/mmu.h"
-#include "../interface/runtime.h"
-#include "../interface/singleton.h"
-#include "../sdl/display.h"
+#include "../interface/system/video.h"
+#include "./display.h"
 
 namespace e65 {
 
-	namespace console {
+	namespace system {
 
-		class bus :
-				public e65::interface::singleton<e65::console::bus>,
-				public e65::interface::console::bus {
+		class video :
+				public e65::interface::singleton<e65::system::video>,
+				public e65::interface::system::video {
 
 			public:
 
-				~bus(void);
+				~video(void);
 
-				e65::interface::sdl::display &display(void) override;
-
-				e65::interface::console::mmu &mmu(void) override;
-
-				void clear(void);
-
-				void step(
-					__in e65::interface::runtime &runtime
-					);
-
-				void step_frame(
-					__in e65::interface::runtime &runtime
-					);
-
-				uint32_t tick(void) const override;
+				void clear(
+					__in e65::interface::system::memory &memory
+					) override;
 
 				std::string to_string(void) const override;
 
+				void update(
+					__in e65::interface::system::display &display,
+					__in e65::interface::system::memory &memory
+					) override;
+
 			protected:
 
-				friend class e65::interface::singleton<e65::console::bus>;
+				friend class e65::interface::singleton<e65::system::video>;
 
-				bus(void);
+				video(void);
 
-				bus(
-					__in const bus &other
+				video(
+					__in const video &other
 					) = delete;
 
-				bus &operator=(
-					__in const bus &other
+				video &operator=(
+					__in const video &other
 					) = delete;
 
 				bool on_initialize(
@@ -75,14 +65,8 @@ namespace e65 {
 					) override;
 
 				void on_uninitialize(void) override;
-
-				e65::sdl::display &m_display;
-
-				e65::console::mmu &m_mmu;
-
-				uint32_t m_tick;
 		};
 	}
 }
 
-#endif // E65_CONSOLE_BUS_H_
+#endif // E65_SYSTEM_VIDEO_H_
