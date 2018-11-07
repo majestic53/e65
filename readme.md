@@ -50,6 +50,10 @@ Changelog
 
 Version 0.1.1845
 ----------------
+*Updated: 11/6/2018*
+
+* Further code reorg/cleanup
+
 *Updated: 11/5/2018*
 
 * Added input/processor/video singleton

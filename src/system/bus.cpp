@@ -26,11 +26,9 @@ namespace e65 {
 
 		bus::bus(void) :
 			e65::interface::singleton<e65::system::bus>(e65::interface::E65_SINGLETON_BUS),
-			m_display(e65::system::display::acquire()),
 			m_input(e65::system::input::acquire()),
 			m_memory(e65::system::memory::acquire()),
 			m_processor(e65::system::processor::acquire()),
-			m_tick(0),
 			m_video(e65::system::video::acquire())
 		{
 			E65_TRACE_ENTRY();
@@ -57,24 +55,10 @@ namespace e65 {
 			m_memory.clear();
 			m_input.clear(m_memory);
 			m_video.clear(m_memory);
-			m_tick = 0;
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus cleared");
 
 			E65_TRACE_EXIT();
-		}
-
-		e65::interface::system::display &
-		bus::display(void)
-		{
-			E65_TRACE_ENTRY();
-
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
-				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
-			}
-
-			E65_TRACE_EXIT();
-			return m_display;
 		}
 
 		e65::interface::system::input &
@@ -133,8 +117,6 @@ namespace e65 {
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initializing");
 
-			m_tick = 0;
-			m_display.initialize(context, length);
 			m_memory.initialize(context, length);
 			m_input.initialize(context, length);
 			m_processor.initialize(context, length);
@@ -157,7 +139,6 @@ namespace e65 {
 			m_processor.uninitialize();
 			m_input.uninitialize();
 			m_memory.uninitialize();
-			m_display.uninitialize();
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitialized");
 
@@ -184,9 +165,9 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
-			m_input.update(m_memory);
-
-			// TODO: step processor through a single instruction
+			m_input.step(m_memory);
+			m_processor.step(m_memory);
+			m_video.step(m_memory);
 
 			E65_TRACE_EXIT();
 		}
@@ -199,26 +180,13 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
 			// TODO: step processor through an entire frame
-			step(runtime);
+			m_input.step(m_memory);
+			m_processor.step(m_memory);
 			// ---
 
-			m_video.update(m_display, m_memory);
-			m_display.show();
+			m_video.step(m_memory);
 
 			E65_TRACE_EXIT();
-		}
-
-		uint32_t
-		bus::tick(void) const
-		{
-			E65_TRACE_ENTRY();
-
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
-				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
-			}
-
-			E65_TRACE_EXIT_FORMAT("Result=%u", m_tick);
-			return m_tick;
 		}
 
 		std::string
@@ -232,12 +200,10 @@ namespace e65 {
 				<< " Interface=" << e65::interface::singleton<e65::system::bus>::to_string();
 
 			if(e65::interface::singleton<e65::system::bus>::initialized()) {
-				result << ", Display=" << m_display.to_string()
-					<< ", Input=" << m_input.to_string()
+				result << ", Input=" << m_input.to_string()
 					<< ", Memory=" << m_memory.to_string()
 					<< ", Processor=" << m_processor.to_string()
-					<< ", Video=" << m_video.to_string()
-					<< ", Tick=" << m_tick;
+					<< ", Video=" << m_video.to_string();
 			}
 
 			E65_TRACE_EXIT();

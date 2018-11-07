@@ -31,17 +31,9 @@ namespace e65 {
 
 				public:
 
-					virtual void clear(
-						__in e65::interface::system::memory &memory
-						) = 0;
-
 					virtual void key(
 						__in e65::interface::system::memory &memory,
 						__in int value
-						) = 0;
-
-					virtual void update(
-						__in e65::interface::system::memory &memory
 						) = 0;
 			};
 		}

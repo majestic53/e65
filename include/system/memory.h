@@ -34,17 +34,12 @@ namespace e65 {
 
 				~memory(void);
 
-				void clear(void) override;
-
-				std::string dump(
-					__in uint16_t origin,
-					__in uint16_t length
-					) const override;
+				void clear(void);
 
 				void load(
 					__in const std::vector<uint8_t> &data,
 					__in uint16_t origin
-					) override;
+					);
 
 				uint8_t read(
 					__in uint16_t address

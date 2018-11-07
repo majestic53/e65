@@ -56,43 +56,6 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
-		std::string
-		memory::dump(
-			__in uint16_t origin,
-			__in uint16_t length
-			) const
-		{
-			size_t offset;
-			std::stringstream result;
-
-			E65_TRACE_ENTRY_FORMAT("Origin=%u(%04x), Length=%u(%04x)", origin, origin, length, length);
-
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
-				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
-			}
-
-			// TODO: add string representations && pad if origin or (origin + length) are not block-aligned
-
-			for(offset = origin; offset < (origin + length); ++offset) {
-				uint16_t index;
-
-				index = (offset % E65_MEMORY_MEMORY_LENGTH);
-				if(!(index % E65_MEMORY_MEMORY_BLOCK_LENGTH)) {
-
-					if(offset != origin) {
-						result << std::endl;
-					}
-
-					result << E65_STRING_HEX(uint16_t, index) << " |";
-				}
-
-				result << " " << E65_STRING_HEX(uint8_t, m_memory.at(index));
-			}
-
-			E65_TRACE_EXIT();
-			return result.str();
-		}
-
 		void
 		memory::load(
 			__in const std::vector<uint8_t> &data,
@@ -132,7 +95,7 @@ namespace e65 {
 			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Memory initializing", "%.1f KB (%u bytes)",
 				E65_MEMORY_MEMORY_LENGTH / E65_MEMORY_BYTES_PER_KBYTE, E65_MEMORY_MEMORY_LENGTH);
 
-			clear();
+			m_memory.resize(E65_MEMORY_MEMORY_LENGTH, E65_MEMORY_MEMORY_FILL);
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory initialized");
 
@@ -146,8 +109,6 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory uninitializing");
-
-			m_memory.clear();
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory uninitialized");
 

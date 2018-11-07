@@ -36,18 +36,18 @@ namespace e65 {
 
 				void clear(
 					__in e65::interface::system::memory &memory
-					) override;
+					);
 
 				void key(
 					__in e65::interface::system::memory &memory,
 					__in int value
 					) override;
 
-				std::string to_string(void) const override;
-
-				void update(
+				void step(
 					__in e65::interface::system::memory &memory
-					) override;
+					);
+
+				std::string to_string(void) const override;
 
 			protected:
 

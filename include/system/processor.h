@@ -34,13 +34,15 @@ namespace e65 {
 
 				~processor(void);
 
+				uint32_t cycle(void) const override;
+
 				void reset(
 					__in e65::interface::system::memory &memory
 					) override;
 
 				void step(
 					__in e65::interface::system::memory &memory
-					) override;
+					);
 
 				std::string to_string(void) const override;
 
@@ -68,6 +70,8 @@ namespace e65 {
 				void on_uninitialize(void) override;
 
 				// TODO
+
+				uint32_t m_cycle;
 		};
 	}
 }

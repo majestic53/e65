@@ -31,8 +31,6 @@ namespace e65 {
 
 				public:
 
-					virtual void clear(void) = 0;
-
 					virtual bool fullscreen(void) const = 0;
 
 					virtual uint32_t pixel(
@@ -62,8 +60,6 @@ namespace e65 {
 					virtual void set_title(
 						__in const std::string &title
 						) = 0;
-
-					virtual void show(void) const = 0;
 
 					virtual std::string title(void) const = 0;
 			};

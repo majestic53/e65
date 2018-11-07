@@ -31,13 +31,9 @@ namespace e65 {
 
 				public:
 
+					virtual uint32_t cycle(void) const = 0;
+
 					virtual void reset(
-						__in e65::interface::system::memory &memory
-						) = 0;
-
-					// TODO
-
-					virtual void step(
 						__in e65::interface::system::memory &memory
 						) = 0;
 			};

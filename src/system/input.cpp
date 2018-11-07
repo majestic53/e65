@@ -73,6 +73,8 @@ namespace e65 {
 				THROW_E65_SYSTEM_INPUT_EXCEPTION(E65_SYSTEM_INPUT_EXCEPTION_UNINITIALIZED);
 			}
 
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Input key event", "%u(%x)", value, value);
+
 			memory.write(E65_INPUT_ADDRESS_KEY, value);
 
 			E65_TRACE_EXIT();
@@ -108,19 +110,8 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
-		std::string
-		input::to_string(void) const
-		{
-			std::stringstream result;
-
-			result << E65_SYSTEM_INPUT_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::system::input>::to_string();
-
-			return result.str();
-		}
-
 		void
-		input::update(
+		input::step(
 			__in e65::interface::system::memory &memory
 			)
 		{
@@ -133,6 +124,17 @@ namespace e65 {
 			memory.write(E65_INPUT_ADDRESS_RANDOM, std::rand());
 
 			E65_TRACE_EXIT();
+		}
+
+		std::string
+		input::to_string(void) const
+		{
+			std::stringstream result;
+
+			result << E65_SYSTEM_INPUT_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
+				<< " Interface=" << e65::interface::singleton<e65::system::input>::to_string();
+
+			return result.str();
 		}
 	}
 }

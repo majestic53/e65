@@ -33,21 +33,11 @@ namespace e65 {
 
 				public:
 
-					virtual void clear(void) = 0;
-
-					virtual e65::interface::system::display &display(void) = 0;
-
 					virtual e65::interface::system::input &input(void) = 0;
-
-					virtual void load(
-						__in const std::string &path
-						) = 0;
 
 					virtual e65::interface::system::memory &memory(void) = 0;
 
 					virtual e65::interface::system::processor &processor(void) = 0;
-
-					virtual uint32_t tick(void) const = 0;
 
 					virtual e65::interface::system::video &video(void) = 0;
 			};

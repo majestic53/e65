@@ -48,7 +48,7 @@ namespace e65 {
 
 				~display(void);
 
-				void clear(void) override;
+				void clear(void);
 
 				bool fullscreen(void) const override;
 
@@ -80,7 +80,7 @@ namespace e65 {
 					__in const std::string &title
 					) override;
 
-				void show(void) const override;
+				void show(void) const;
 
 				std::string title(void) const override;
 

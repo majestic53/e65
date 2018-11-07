@@ -36,15 +36,13 @@ namespace e65 {
 
 				~bus(void);
 
-				void clear(void) override;
-
-				e65::interface::system::display &display(void) override;
+				void clear(void);
 
 				e65::interface::system::input &input(void) override;
 
 				void load(
 					__in const std::string &path
-					) override;
+					);
 
 				e65::interface::system::memory &memory(void) override;
 
@@ -57,8 +55,6 @@ namespace e65 {
 				void step_frame(
 					__in e65::interface::runtime &runtime
 					);
-
-				uint32_t tick(void) const override;
 
 				std::string to_string(void) const override;
 
@@ -85,15 +81,11 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				e65::system::display &m_display;
-
 				e65::system::input &m_input;
 
 				e65::system::memory &m_memory;
 
 				e65::system::processor &m_processor;
-
-				uint32_t m_tick;
 
 				e65::system::video &m_video;
 		};

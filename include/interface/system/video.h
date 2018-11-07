@@ -32,14 +32,9 @@ namespace e65 {
 
 				public:
 
-					virtual void clear(
-						__in e65::interface::system::memory &memory
-						) = 0;
+					virtual e65::interface::system::display &display(void) = 0;
 
-					virtual void update(
-						__in e65::interface::system::display &display,
-						__in e65::interface::system::memory &memory
-						) = 0;
+					virtual uint32_t frame(void) const = 0;
 			};
 		}
 	}

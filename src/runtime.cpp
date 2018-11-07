@@ -25,7 +25,6 @@ namespace e65 {
 		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME),
 		m_bus(e65::system::bus::acquire()),
 		m_debug(false),
-		m_frame(0),
 		m_trace(e65::trace::acquire())
 	{
 		m_trace.initialize();
@@ -149,19 +148,6 @@ namespace e65 {
 		return m_bus;
 	}
 
-	uint32_t
-	runtime::frame(void) const
-	{
-		E65_TRACE_ENTRY();
-
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		E65_TRACE_EXIT_FORMAT("Result=%u", m_frame);
-		return m_frame;
-	}
-
 	bool
 	runtime::on_initialize(
 		__in const void *context,
@@ -176,7 +162,6 @@ namespace e65 {
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initializing");
 
 		m_breakpoint.clear();
-		m_frame = 0;
 
 		SDL_GetVersion(&version);
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime library created", "%u.%u.%u", version.major, version.minor, version.patch);
@@ -219,7 +204,7 @@ namespace e65 {
 
 					E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f", (rate > 0.f) ? rate : 0.f);
 
-					m_bus.display().set_frame_rate((rate > 0.f) ? rate : 0.f);
+					m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
 					begin = end;
 					current = 0;
 				}
@@ -237,7 +222,6 @@ namespace e65 {
 				}
 
 				++current;
-				++m_frame;
 			}
 		} else {
 
@@ -321,12 +305,9 @@ namespace e65 {
 						value = event.key.keysym.scancode;
 						switch(value) {
 							case E65_RUNTIME_SDL_FULLSCREEN_KEY:
-								E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display mode event");
-								m_bus.display().set_fullscreen(!m_bus.display().fullscreen());
+								m_bus.video().display().set_fullscreen(!m_bus.video().display().fullscreen());
 								break;
 							default:
-								E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime key event", "%u(%x)",
-									value, value);
 								m_bus.input().key(m_bus.memory(), value);
 								break;
 						}
@@ -409,25 +390,11 @@ namespace e65 {
 			result << ", Thread=" << e65::type::thread::to_string()
 				<< ", Bus=" << m_bus.to_string()
 				<< ", Trace=" << m_trace.to_string()
-				<< ", Mode=" << m_debug << "(" << (m_debug ? "Debug" : "Normal") << ")"
-				<< ", Frame=" << m_frame;
+				<< ", Mode=" << m_debug << "(" << (m_debug ? "Debug" : "Normal") << ")";
 		}
 
 		E65_TRACE_EXIT();
 		return result.str();
-	}
-
-	e65::interface::trace &
-	runtime::trace(void)
-	{
-		E65_TRACE_ENTRY();
-
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		E65_TRACE_EXIT();
-		return m_trace;
 	}
 
 	std::string

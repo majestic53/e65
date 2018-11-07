@@ -22,15 +22,19 @@
 enum {
 	E65_BREAKPOINT_CLEAR = 0,
 	E65_BREAKPOINT_CLEAR_ALL,
-	E65_BREAKPOINT_CONTAINS,
 	E65_BREAKPOINT_SET,
-	E65_FRAME,
+	E65_MEMORY_READ,
+	E65_MEMORY_WRITE,
+	E65_PROCESSOR_CYCLE,
+	E65_VIDEO_FRAME,
 };
 
 typedef struct {
 	int type;
+	unsigned short address;
 
 	union {
+		unsigned char u8;
 		unsigned short u16;
 	} data;
 } e65_req_t;
@@ -39,6 +43,7 @@ typedef struct {
 	int type;
 
 	union {
+		unsigned char u8;
 		unsigned short u16;
 		unsigned int u32;
 		int i;

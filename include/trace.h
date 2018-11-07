@@ -22,7 +22,6 @@
 #include <ctime>
 #include <queue>
 #include "./interface/singleton.h"
-#include "./interface/trace.h"
 #include "./type/thread.h"
 
 namespace e65 {
@@ -31,16 +30,15 @@ namespace e65 {
 
 	class trace :
 			public e65::interface::singleton<e65::trace>,
-			public e65::interface::trace,
 			protected e65::type::thread {
 
 		public:
 
 			~trace(void);
 
-			bool empty(void) const override;
+			bool empty(void) const;
 
-			void flush(void) override;
+			void flush(void);
 
 			void generate(
 				__in int level,
@@ -53,7 +51,7 @@ namespace e65 {
 				...
 				);
 
-			size_t size(void) const override;
+			size_t size(void) const;
 
 			std::string to_string(void) const override;
 

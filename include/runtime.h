@@ -53,8 +53,6 @@ namespace e65 {
 
 			e65::interface::system::bus &bus(void) override;
 
-			uint32_t frame(void) const override;
-
 			void run(
 				__in const std::string &path,
 				__in_opt bool debug = false
@@ -63,8 +61,6 @@ namespace e65 {
 			bool step(void);
 
 			std::string to_string(void) const override;
-
-			e65::interface::trace &trace(void) override;
 
 			static std::string version(void);
 
@@ -112,8 +108,6 @@ namespace e65 {
 			e65::system::bus &m_bus;
 
 			bool m_debug;
-
-			uint32_t m_frame;
 
 			e65::trace &m_trace;
 	};

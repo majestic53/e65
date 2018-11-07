@@ -35,6 +35,7 @@ e65_command(
 
 	try {
 		int type;
+		uint8_t data;
 		uint16_t address;
 
 		if(!request || !response) {
@@ -46,33 +47,55 @@ e65_command(
 		type = request->type;
 		switch(type) {
 			case E65_BREAKPOINT_CLEAR:
-				address = request->data.u16;
+				address = request->address;
 
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Request clear breakpoint", "%u(%04x)", address, address);
+				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Clearing breakpoint", "%u(%04x)", address, address);
 
 				response->data.i = e65::runtime::acquire().breakpoint_clear(address);
 				break;
 			case E65_BREAKPOINT_CLEAR_ALL:
-				E65_TRACE_MESSAGE(e65::E65_LEVEL_INFORMATION, "Request clear all breakpoints");
+				E65_TRACE_MESSAGE(e65::E65_LEVEL_INFORMATION, "Clearing all breakpoints");
 
 				e65::runtime::acquire().breakpoints_clear();
 				break;
-			case E65_BREAKPOINT_CONTAINS:
-				address = request->data.u16;
-
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Request contains breakpoint", "%u(%04x)", address, address);
-
-				response->data.i = e65::runtime::acquire().breakpoint_contains(address);
-				break;
 			case E65_BREAKPOINT_SET:
-				address = request->data.u16;
+				address = request->address;
 
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Request set breakpoint", "%u(%04x)", address, address);
+				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Setting breakpoint", "%u(%04x)", address, address);
 
 				response->data.i = e65::runtime::acquire().breakpoint_set(address);
 				break;
-			case E65_FRAME:
-				response->data.u32 = e65::runtime::acquire().frame();
+			case E65_MEMORY_READ:
+				address = request->address;
+
+				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Reading memory", "[%u(%04x)]", address, address);
+
+				data = e65::runtime::acquire().bus().memory().read(address);
+
+				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Read memory", "[%u(%04x)] -> %u(%02x)", address, address,
+					data, data);
+
+				response->data.u8 = data;
+				break;
+			case E65_MEMORY_WRITE:
+				data = request->data.u8;
+				address = request->address;
+
+				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Writing memory", "[%u(%04x)] <- %u(%02x)", address, address,
+					data, data);
+
+				e65::runtime::acquire().bus().memory().write(address, data);
+
+				data = e65::runtime::acquire().bus().memory().read(address);
+
+				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Wrote memory", "[%u(%04x)] <- %u(%02x)", address, address,
+					data, data);
+				break;
+			case E65_PROCESSOR_CYCLE:
+				response->data.u32 = e65::runtime::acquire().bus().processor().cycle();
+				break;
+			case E65_VIDEO_FRAME:
+				response->data.u32 = e65::runtime::acquire().bus().video().frame();
 				break;
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", type, E65_COMMAND_STRING(type));

@@ -36,14 +36,17 @@ namespace e65 {
 
 				void clear(
 					__in e65::interface::system::memory &memory
-					) override;
+					);
+
+				e65::interface::system::display &display(void) override;
+
+				uint32_t frame(void) const override;
+
+				void step(
+					__in e65::interface::system::memory &memory
+					);
 
 				std::string to_string(void) const override;
-
-				void update(
-					__in e65::interface::system::display &display,
-					__in e65::interface::system::memory &memory
-					) override;
 
 			protected:
 
@@ -65,6 +68,10 @@ namespace e65 {
 					) override;
 
 				void on_uninitialize(void) override;
+
+				e65::system::display &m_display;
+
+				uint32_t m_frame;
 		};
 	}
 }

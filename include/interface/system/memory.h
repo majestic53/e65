@@ -32,18 +32,6 @@ namespace e65 {
 
 				public:
 
-					virtual void clear(void) = 0;
-
-					virtual std::string dump(
-						__in uint16_t origin,
-						__in uint16_t length
-						) const = 0;
-
-					virtual void load(
-						__in const std::vector<uint8_t> &data,
-						__in uint16_t origin
-						) = 0;
-
 					virtual uint8_t read(
 						__in uint16_t address
 						) const = 0;

@@ -25,8 +25,8 @@ namespace e65 {
 	namespace system {
 
 		processor::processor(void) :
-			e65::interface::singleton<e65::system::processor>(e65::interface::E65_SINGLETON_PROCESSOR)
-			// TODO
+			e65::interface::singleton<e65::system::processor>(e65::interface::E65_SINGLETON_PROCESSOR),
+			m_cycle(0)
 		{
 			E65_TRACE_ENTRY();
 			E65_TRACE_EXIT();
@@ -36,6 +36,19 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 			E65_TRACE_EXIT();
+		}
+
+		uint32_t
+		processor::cycle(void) const
+		{
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%u", m_cycle);
+			return m_cycle;
 		}
 
 		bool
@@ -49,8 +62,6 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor initializing");
-
-			// TODO
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor initialized");
 
@@ -85,6 +96,8 @@ namespace e65 {
 
 			// TODO
 
+			m_cycle = 0;
+
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor reset");
 
 			E65_TRACE_EXIT();
@@ -114,7 +127,9 @@ namespace e65 {
 			result << E65_SYSTEM_PROCESSOR_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
 				<< " Interface=" << e65::interface::singleton<e65::system::processor>::to_string();
 
-			// TODO
+			if(e65::interface::singleton<e65::system::processor>::initialized()) {
+				result << ", Cycle=" << m_cycle;
+			}
 
 			return result.str();
 		}
