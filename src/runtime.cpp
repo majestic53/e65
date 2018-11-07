@@ -167,7 +167,7 @@ namespace e65 {
 		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime library created", "%u.%u.%u", version.major, version.minor, version.patch);
 
 		if(SDL_Init(E65_RUNTIME_SDL_FLAGS)) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_EXTERNAL, "SDL_Init failed! Error=%s", SDL_GetError());
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_EXTERNAL, "SDL_Init failed! %s", SDL_GetError());
 		}
 
 		m_bus.initialize(context, length);

@@ -52,6 +52,9 @@ e65_command(
 				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Clearing breakpoint", "%u(%04x)", address, address);
 
 				response->data.i = e65::runtime::acquire().breakpoint_clear(address);
+				if(response->data.i) {
+					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to clear breakpoint", "%u(%04x)", address, address);
+				}
 				break;
 			case E65_BREAKPOINT_CLEAR_ALL:
 				E65_TRACE_MESSAGE(e65::E65_LEVEL_INFORMATION, "Clearing all breakpoints");
@@ -64,6 +67,9 @@ e65_command(
 				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Setting breakpoint", "%u(%04x)", address, address);
 
 				response->data.i = e65::runtime::acquire().breakpoint_set(address);
+				if(response->data.i) {
+					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to set breakpoint", "%u(%04x)", address, address);
+				}
 				break;
 			case E65_MEMORY_READ:
 				address = request->address;

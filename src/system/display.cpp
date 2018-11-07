@@ -95,29 +95,29 @@ namespace e65 {
 					E65_DISPLAY_WIDTH * E65_DISPLAY_SCALE, E65_DISPLAY_HEIGHT * E65_DISPLAY_SCALE, E65_DISPLAY_FLAGS);
 
 			if(!m_window) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateWindow failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateWindow failed! %s",
 					SDL_GetError());
 			}
 
 			m_renderer = SDL_CreateRenderer(m_window, -1, E65_DISPLAY_RENDERER_FLAGS);
 			if(!m_renderer) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateRenderer failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateRenderer failed! %s",
 					SDL_GetError());
 			}
 
 			if(SDL_RenderSetLogicalSize(m_renderer, E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT)) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL,
-					"SDL_RenderSetLogicalSize failed! Error=%s", SDL_GetError());
+					"SDL_RenderSetLogicalSize failed! %s", SDL_GetError());
 			}
 
 			if(SDL_SetRenderDrawColor(m_renderer, E65_DISPLAY_COLOR_BACKGROUND.red, E65_DISPLAY_COLOR_BACKGROUND.green,
 					E65_DISPLAY_COLOR_BACKGROUND.blue, E65_DISPLAY_COLOR_BACKGROUND.alpha)) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL,
-					"SDL_SetRenderDrawColor failed! Error=%s", SDL_GetError());
+					"SDL_SetRenderDrawColor failed! %s", SDL_GetError());
 			}
 
 			if(SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, E65_DISPLAY_RENDERER_QUALITY) == SDL_FALSE) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_SetHint failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_SetHint failed! %s",
 					SDL_GetError());
 			}
 
@@ -125,12 +125,12 @@ namespace e65 {
 					E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT);
 
 			if(!m_texture) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateTexture failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateTexture failed! %s",
 					SDL_GetError());
 			}
 
 			if(SDL_RenderClear(m_renderer)) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_RenderClear failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_RenderClear failed! %s",
 					SDL_GetError());
 			}
 
@@ -231,7 +231,7 @@ namespace e65 {
 
 				if(SDL_SetWindowFullscreen(m_window, fullscreen ? E65_DISPLAY_FULLSCREEN_FLAGS : 0) < 0) {
 					THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL,
-						"SDL_SetWindowFullscreen failed! Error=%s", SDL_GetError());
+						"SDL_SetWindowFullscreen failed! %s", SDL_GetError());
 				}
 			}
 
@@ -301,17 +301,17 @@ namespace e65 {
 			}
 
 			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_DISPLAY_WIDTH * sizeof(uint32_t))) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_UpdateTexture failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_UpdateTexture failed! %s",
 					SDL_GetError());
 			}
 
 			if(SDL_RenderClear(m_renderer)) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_RenderClear failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_RenderClear failed! %s",
 					SDL_GetError());
 			}
 
 			if(SDL_RenderCopy(m_renderer, m_texture, nullptr, nullptr)) {
-				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_RenderCopy failed! Error=%s",
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_RenderCopy failed! %s",
 					SDL_GetError());
 			}
 
