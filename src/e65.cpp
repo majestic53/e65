@@ -129,8 +129,28 @@ e65_error(void)
 }
 
 int
+e65_initialize(void)
+{
+	int result = EXIT_SUCCESS;
+
+	try {
+		e65::runtime::acquire().initialize();
+	} catch(e65::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
 e65_run(
 	__in const char *path,
+	__in int hex,
 	__in int debug
 	)
 {
@@ -142,7 +162,7 @@ e65_run(
 			THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", path);
 		}
 
-		e65::runtime::acquire().run(path, debug);
+		e65::runtime::acquire().run(path, hex, debug);
 	} catch(e65::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
@@ -175,6 +195,24 @@ e65_step(void)
 }
 
 void
+e65_uninitialize(void)
+{
+	int result = EXIT_SUCCESS;
+
+	try {
+		e65::runtime::acquire().uninitialize();
+	} catch(e65::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT();
+}
+
+void
 e65_version(
 	__in int *major,
 	__in int *minor
@@ -204,4 +242,23 @@ e65_version_string(void)
 
 	E65_TRACE_EXIT();
 	return E65_STRING_CHECK(g_version);
+}
+
+int
+e65_wait(void)
+{
+	int result = EXIT_SUCCESS;
+
+	try {
+		result = e65::runtime::acquire().wait();
+	} catch(e65::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
 }

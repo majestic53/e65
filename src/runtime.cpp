@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fstream>
 #include "../include/runtime.h"
 #include "./runtime_type.h"
 
@@ -329,18 +330,43 @@ namespace e65 {
 	void
 	runtime::run(
 		__in const std::string &path,
+		__in bool hex,
 		__in_opt bool debug
 		)
 	{
-		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Debug=%x", path.size(), E65_STRING_CHECK(path), debug);
+		int length;
+		std::ifstream file;
+		std::vector<uint8_t> data;
+
+		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
 
 		if(!e65::interface::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
-		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime running", "%s (%s)", E65_STRING_CHECK(path), debug ? "Debug" : "Normal");
+		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime running", "%s, %s", debug ? "Debug" : "Normal", E65_STRING_CHECK(path));
 
-		m_bus.load(path);
+		file = std::ifstream(path.c_str(), std::ios::binary | std::ios::in);
+		if(!file) {
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_FILE_NOT_FOUND, "%s", E65_STRING_CHECK(path));
+		}
+
+		file.seekg(0, std::ios::end);
+		length = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		if(length >= 0) {
+			data.resize(length);
+			file.read((char *) &data[0], data.size());
+		}
+
+		file.close();
+
+		if(length < 0) {
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_FILE_MALFORMED, "%s", E65_STRING_CHECK(path));
+		}
+
+		m_bus.load(data, hex);
 
 		m_debug = debug;
 		if(!m_debug) {

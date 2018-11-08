@@ -40,6 +40,8 @@ namespace e65 {
 
 	#define E65 "E65"
 
+	#define E65_BYTES_PER_KBYTE 1024.f
+
 	#define E65_EXCEPTION(_MESSAGE_) \
 		e65::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
 
@@ -55,6 +57,9 @@ namespace e65 {
 
 	#define E65_FLOAT_PRECISION(_PRECISION_, _VALUE_) \
 		std::right << std::setprecision(_PRECISION_) << std::fixed << (_VALUE_) << std::defaultfloat
+
+	#define E65_MEMORY_FILL 0xea
+	#define E65_MEMORY_LENGTH 0x10000
 
 	#define E65_MILLISECONDS_PER_SECOND 1000.f
 
@@ -102,7 +107,7 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 2
+	#define E65_VERSION_REVISION 3
 	#define E65_VERSION_WEEK 1845
 
 	enum {

@@ -18,39 +18,31 @@
 
 #include "./e65_type.h"
 
-// TODO
-#include "../include/trace.h"
-// ---
-
 int
 main(
 	__in int argc,
 	__in const char *argv[]
 	)
 {
-	int result = EXIT_SUCCESS;
+	int result;
 
-	try {
-
-		// TODO
-		e65::runtime &instance = e65::runtime::acquire();
-
-		instance.initialize();
-
-		instance.run(std::string(), false);
-
-		instance.wait();
-
-		instance.uninitialize();
-		// ---
-
-	} catch(e65::exception &exc) {
-		std::cerr << exc.to_string() << std::endl;
-		result = EXIT_FAILURE;
-	} catch(std::exception &exc) {
-		std::cerr << exc.what() << std::endl;
-		result = EXIT_FAILURE;
+	result = e65_initialize();
+	if(result != EXIT_SUCCESS) {
+		goto exit;
 	}
+
+	result = e65_run("./test/test.bin", false, false);
+	if(result != EXIT_SUCCESS) {
+		goto exit;
+	}
+
+	result = e65_wait();
+	if(result != EXIT_SUCCESS) {
+		goto exit;
+	}
+
+exit:
+	e65_uninitialize();
 
 	return result;
 }

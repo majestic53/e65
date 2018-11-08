@@ -41,7 +41,8 @@ namespace e65 {
 				e65::interface::system::input &input(void) override;
 
 				void load(
-					__in const std::string &path
+					__in const std::vector<uint8_t> &data,
+					__in bool hex
 					);
 
 				e65::interface::system::memory &memory(void) override;
@@ -73,6 +74,14 @@ namespace e65 {
 				bus &operator=(
 					__in const bus &other
 					) = delete;
+
+				void load_binary(
+					__in const std::vector<uint8_t> &data
+					);
+
+				void load_hex(
+					__in const std::string &data
+					);
 
 				bool on_initialize(
 					__in const void *context,

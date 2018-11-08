@@ -54,23 +54,23 @@ typedef struct {
 extern "C" {
 #endif // __cplusplus
 
-// Runtime routines
-
-extern int e65_run(const char *path, int debug);
-
-extern int e65_step(void);
-
-// Interactive routines
-
 extern int e65_command(const e65_req_t *request, e65_rsp_t *response);
 
-// Helper routines
-
 extern const char *e65_error(void);
+
+extern int e65_initialize(void);
+
+extern void e65_uninitialize(void);
+
+extern int e65_run(const char *path, int hex, int debug);
+
+extern int e65_step(void);
 
 extern void e65_version(int *major, int *minor);
 
 extern const char *e65_version_string(void);
+
+extern int e65_wait(void);
 
 #ifdef __cplusplus
 }

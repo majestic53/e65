@@ -55,6 +55,7 @@ namespace e65 {
 
 			void run(
 				__in const std::string &path,
+				__in bool hex,
 				__in_opt bool debug = false
 				);
 

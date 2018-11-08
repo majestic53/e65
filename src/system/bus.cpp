@@ -76,18 +76,58 @@ namespace e65 {
 
 		void
 		bus::load(
-			__in const std::string &path
+			__in const std::vector<uint8_t> &data,
+			__in bool hex
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Path[%u]=%s", path.size(), E65_STRING_CHECK(path));
+			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Hex=%x", data.size(), &data, hex);
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Bus loading", "%s", E65_STRING_CHECK(path));
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
+				data.size() / E65_BYTES_PER_KBYTE, data.size());
 
 			clear();
 
-			// TODO: load file at path into memory
+			if(hex) {
+				load_hex(std::string(data.begin(), data.end()));
+			} else {
+				load_binary(data);
+			}
 
 			m_processor.reset(m_memory);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		bus::load_binary(
+			__in const std::vector<uint8_t> &data
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p", data.size(), &data);
+
+			if(data.size() != E65_MEMORY_LENGTH) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_LENGTH,
+					"%.1f KB (%u bytes), expecting %.1f KB (%u bytes)", data.size() / E65_BYTES_PER_KBYTE, data.size(),
+					E65_MEMORY_LENGTH / E65_BYTES_PER_KBYTE, E65_MEMORY_LENGTH);
+			}
+
+			// TODO: load binary data into memory
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		bus::load_hex(
+			__in const std::string &data
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p", data.size(), &data);
+
+			if(data.empty()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_EMPTY);
+			}
+
+			// TODO: load hex data into memory
 
 			E65_TRACE_EXIT();
 		}
