@@ -150,6 +150,25 @@ namespace e65 {
 	}
 
 	bool
+	runtime::interrupt(
+		__in bool maskable
+		)
+	{
+		bool result = true;
+
+		E65_TRACE_ENTRY_FORMAT("Maskable=%x", maskable);
+
+		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		m_bus.processor().interrupt(m_bus.memory(), maskable);
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
 	runtime::on_initialize(
 		__in const void *context,
 		__in size_t length
@@ -389,13 +408,15 @@ namespace e65 {
 
 		result = m_debug;
 		if(result) {
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stepping");
+			uint16_t address = m_bus.processor().program_counter();
 
-			// TODO
-			// result = breakpoint_contains(/* get system::processor::pc */);
-			// if(result) {
+			if(breakpoint_contains(address)) {
+				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime breakpoint", "%u(%04x)", address, address);
+				result = false;
+			} else {
+				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime stepping", "%u(%04x)", address, address);
 				e65::type::thread::notify();
-			// }
+			}
 		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);

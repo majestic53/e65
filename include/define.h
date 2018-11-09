@@ -63,6 +63,9 @@ namespace e65 {
 
 	#define E65_MILLISECONDS_PER_SECOND 1000.f
 
+	#define E65_PROCESSOR_CYCLES_PER_FRAME 10000 // TODO: calculate processor cycles per second at E65_PROCESSOR_FREQUENCY
+	#define E65_PROCESSOR_FREQUENCY 1000000 // TODO: define default processor frequency
+
 	#define E65_STRING_EMPTY "Empty"
 	#define E65_STRING_UNKNOWN "Unknown"
 
@@ -107,7 +110,7 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 3
+	#define E65_VERSION_REVISION 4
 	#define E65_VERSION_WEEK 1845
 
 	enum {

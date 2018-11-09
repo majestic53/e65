@@ -25,7 +25,23 @@ enum {
 	E65_BREAKPOINT_SET,
 	E65_MEMORY_READ,
 	E65_MEMORY_WRITE,
+	E65_PROCESSOR_ACCUMULATOR,
+	E65_PROCESSOR_ACCUMULATOR_SET,
 	E65_PROCESSOR_CYCLE,
+	E65_PROCESSOR_FLAGS,
+	E65_PROCESSOR_FLAGS_SET,
+	E65_PROCESSOR_HALT,
+	E65_PROCESSOR_HALT_CLEAR,
+	E65_PROCESSOR_INDEX_X,
+	E65_PROCESSOR_INDEX_X_SET,
+	E65_PROCESSOR_INDEX_Y,
+	E65_PROCESSOR_INDEX_Y_SET,
+	E65_PROCESSOR_PROGRAM_COUNTER,
+	E65_PROCESSOR_PROGRAM_COUNTER_SET,
+	E65_PROCESSOR_STACK_POINTER,
+	E65_PROCESSOR_STACK_POINTER_SET,
+	E65_PROCESSOR_STOP,
+	E65_PROCESSOR_STOP_CLEAR,
 	E65_VIDEO_FRAME,
 };
 
@@ -36,7 +52,7 @@ typedef struct {
 	union {
 		unsigned char u8;
 		unsigned short u16;
-	} data;
+	} payload;
 } e65_req_t;
 
 typedef struct {
@@ -47,7 +63,7 @@ typedef struct {
 		unsigned short u16;
 		unsigned int u32;
 		int i;
-	} data;
+	} payload;
 } e65_rsp_t;
 
 #ifdef __cplusplus
@@ -59,6 +75,8 @@ extern int e65_command(const e65_req_t *request, e65_rsp_t *response);
 extern const char *e65_error(void);
 
 extern int e65_initialize(void);
+
+extern int e65_interrupt(int maskable);
 
 extern void e65_uninitialize(void);
 

@@ -35,7 +35,6 @@ e65_command(
 
 	try {
 		int type;
-		uint8_t data;
 		uint16_t address;
 
 		if(!request || !response) {
@@ -49,59 +48,81 @@ e65_command(
 			case E65_BREAKPOINT_CLEAR:
 				address = request->address;
 
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Clearing breakpoint", "%u(%04x)", address, address);
-
-				response->data.i = e65::runtime::acquire().breakpoint_clear(address);
-				if(response->data.i) {
+				response->payload.i = e65::runtime::acquire().breakpoint_clear(address);
+				if(response->payload.i) {
 					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to clear breakpoint", "%u(%04x)", address, address);
 				}
 				break;
 			case E65_BREAKPOINT_CLEAR_ALL:
-				E65_TRACE_MESSAGE(e65::E65_LEVEL_INFORMATION, "Clearing all breakpoints");
-
 				e65::runtime::acquire().breakpoints_clear();
 				break;
 			case E65_BREAKPOINT_SET:
 				address = request->address;
 
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Setting breakpoint", "%u(%04x)", address, address);
-
-				response->data.i = e65::runtime::acquire().breakpoint_set(address);
-				if(response->data.i) {
+				response->payload.i = e65::runtime::acquire().breakpoint_set(address);
+				if(response->payload.i) {
 					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to set breakpoint", "%u(%04x)", address, address);
 				}
 				break;
 			case E65_MEMORY_READ:
-				address = request->address;
-
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Reading memory", "[%u(%04x)]", address, address);
-
-				data = e65::runtime::acquire().bus().memory().read(address);
-
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Read memory", "[%u(%04x)] -> %u(%02x)", address, address,
-					data, data);
-
-				response->data.u8 = data;
+				response->payload.u8 = e65::runtime::acquire().bus().memory().read(request->address);
 				break;
 			case E65_MEMORY_WRITE:
-				data = request->data.u8;
-				address = request->address;
-
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Writing memory", "[%u(%04x)] <- %u(%02x)", address, address,
-					data, data);
-
-				e65::runtime::acquire().bus().memory().write(address, data);
-
-				data = e65::runtime::acquire().bus().memory().read(address);
-
-				E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_INFORMATION, "Wrote memory", "[%u(%04x)] <- %u(%02x)", address, address,
-					data, data);
+				e65::runtime::acquire().bus().memory().write(request->address, request->payload.u8);
+				break;
+			case E65_PROCESSOR_ACCUMULATOR:
+				response->payload.u8 = e65::runtime::acquire().bus().processor().accumulator();
+				break;
+			case E65_PROCESSOR_ACCUMULATOR_SET:
+				e65::runtime::acquire().bus().processor().set_accumulator(request->payload.u8);
 				break;
 			case E65_PROCESSOR_CYCLE:
-				response->data.u32 = e65::runtime::acquire().bus().processor().cycle();
+				response->payload.u32 = e65::runtime::acquire().bus().processor().cycle();
+				break;
+			case E65_PROCESSOR_FLAGS:
+				response->payload.u8 = e65::runtime::acquire().bus().processor().flags();
+				break;
+			case E65_PROCESSOR_FLAGS_SET:
+				e65::runtime::acquire().bus().processor().set_flags(request->payload.u8);
+				break;
+			case E65_PROCESSOR_HALT:
+				e65::runtime::acquire().bus().processor().set_halt(true);
+				break;
+			case E65_PROCESSOR_HALT_CLEAR:
+				e65::runtime::acquire().bus().processor().set_halt(false);
+				break;
+			case E65_PROCESSOR_INDEX_X:
+				response->payload.u8 = e65::runtime::acquire().bus().processor().index_x();
+				break;
+			case E65_PROCESSOR_INDEX_X_SET:
+				e65::runtime::acquire().bus().processor().set_index_x(request->payload.u8);
+				break;
+			case E65_PROCESSOR_INDEX_Y:
+				response->payload.u8 = e65::runtime::acquire().bus().processor().index_y();
+				break;
+			case E65_PROCESSOR_INDEX_Y_SET:
+				e65::runtime::acquire().bus().processor().set_index_y(request->payload.u8);
+				break;
+			case E65_PROCESSOR_PROGRAM_COUNTER:
+				response->payload.u16 = e65::runtime::acquire().bus().processor().program_counter();
+				break;
+			case E65_PROCESSOR_PROGRAM_COUNTER_SET:
+				e65::runtime::acquire().bus().processor().set_program_counter(request->payload.u16);
+				break;
+			case E65_PROCESSOR_STACK_POINTER:
+				response->payload.u8 = e65::runtime::acquire().bus().processor().stack_pointer();
+				break;
+			case E65_PROCESSOR_STACK_POINTER_SET:
+				e65::runtime::acquire().bus().processor().set_stack_pointer(request->payload.u8);
+				break;
+			case E65_PROCESSOR_STOP:
+				e65::runtime::acquire().bus().processor().set_stop(true);
+				break;
+			case E65_PROCESSOR_STOP_CLEAR:
+				e65::runtime::acquire().bus().processor().set_stop(false);
 				break;
 			case E65_VIDEO_FRAME:
-				response->data.u32 = e65::runtime::acquire().bus().video().frame();
+				response->payload.u32 = e65::runtime::acquire().bus().video().frame();
 				break;
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", type, E65_COMMAND_STRING(type));
@@ -148,6 +169,27 @@ e65_initialize(void)
 }
 
 int
+e65_interrupt(
+	__in int maskable
+	)
+{
+	int result = EXIT_SUCCESS;
+
+	try {
+		result = (e65::runtime::acquire().interrupt(maskable) ? EXIT_SUCCESS : EXIT_FAILURE);
+	} catch(e65::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
 e65_run(
 	__in const char *path,
 	__in int hex,
@@ -181,7 +223,7 @@ e65_step(void)
 	int result = EXIT_SUCCESS;
 
 	try {
-		result = e65::runtime::acquire().step();
+		result = (e65::runtime::acquire().step() ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
@@ -197,16 +239,13 @@ e65_step(void)
 void
 e65_uninitialize(void)
 {
-	int result = EXIT_SUCCESS;
 
 	try {
 		e65::runtime::acquire().uninitialize();
 	} catch(e65::exception &exc) {
 		g_error = exc.to_string();
-		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
 		g_error = exc.what();
-		result = EXIT_FAILURE;
 	}
 
 	E65_TRACE_EXIT();

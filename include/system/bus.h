@@ -42,19 +42,21 @@ namespace e65 {
 
 				void load(
 					__in const std::vector<uint8_t> &data,
-					__in bool hex
+					__in bool hex,
+					__in_opt uint16_t origin = 0
 					);
 
 				e65::interface::system::memory &memory(void) override;
 
 				e65::interface::system::processor &processor(void) override;
 
-				void step(
+				uint8_t step(
 					__in e65::interface::runtime &runtime
 					);
 
-				void step_frame(
-					__in e65::interface::runtime &runtime
+				uint32_t step_frame(
+					__in e65::interface::runtime &runtime,
+					__in_opt uint32_t previous = 0
 					);
 
 				std::string to_string(void) const override;
@@ -76,7 +78,8 @@ namespace e65 {
 					) = delete;
 
 				void load_binary(
-					__in const std::vector<uint8_t> &data
+					__in const std::vector<uint8_t> &data,
+					__in uint16_t origin
 					);
 
 				void load_hex(

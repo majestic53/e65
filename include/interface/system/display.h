@@ -54,7 +54,7 @@ namespace e65 {
 					virtual void set_pixel(
 						__in uint32_t x,
 						__in uint32_t y,
-						__in uint8_t color
+						__in int color
 						) = 0;
 
 					virtual void set_title(

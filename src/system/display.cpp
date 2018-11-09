@@ -51,7 +51,7 @@ namespace e65 {
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display clearing");
 
-			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND.raw);
+			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display cleared");
 
@@ -89,7 +89,7 @@ namespace e65 {
 				E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT, E65_DISPLAY_SCALE);
 
 			m_title = E65;
-			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND.raw);
+			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
 
 			m_window = SDL_CreateWindow(E65_STRING_CHECK(m_title), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 					E65_DISPLAY_WIDTH * E65_DISPLAY_SCALE, E65_DISPLAY_HEIGHT * E65_DISPLAY_SCALE, E65_DISPLAY_FLAGS);
@@ -188,7 +188,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_POSITION, "{%u, %u}", x, y);
 			}
 
-			result = m_pixel.at(index);
+			result = m_pixel.at(index).raw;
 
 			E65_TRACE_EXIT_FORMAT("Result=%u(%08x)", result, result);
 			return result;
@@ -254,7 +254,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_INDEX, "%u", index);
 			}
 
-			m_pixel.at(index) = E65_DISPLAY_COLOR(color).raw;
+			m_pixel.at(index) = E65_DISPLAY_COLOR(color);
 
 			E65_TRACE_EXIT();
 		}
@@ -263,7 +263,7 @@ namespace e65 {
 		display::set_pixel(
 			__in uint32_t x,
 			__in uint32_t y,
-			__in uint8_t color
+			__in int color
 			)
 
 		{
@@ -300,7 +300,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_DISPLAY_WIDTH * sizeof(uint32_t))) {
+			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_DISPLAY_WIDTH * sizeof(e65::system::color_t))) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_UpdateTexture failed! %s",
 					SDL_GetError());
 			}

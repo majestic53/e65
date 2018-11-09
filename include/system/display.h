@@ -73,7 +73,7 @@ namespace e65 {
 				void set_pixel(
 					__in uint32_t x,
 					__in uint32_t y,
-					__in uint8_t color
+					__in int color
 					) override;
 
 				void set_title(
@@ -107,7 +107,7 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				std::vector<uint32_t> m_pixel;
+				std::vector<e65::system::color_t> m_pixel;
 
 				SDL_Renderer *m_renderer;
 

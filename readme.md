@@ -50,6 +50,12 @@ Changelog
 
 Version 0.1.1845
 ----------------
+*Updated: 11/8/2018*
+
+* Implemented bus load binary routine
+* Added processor registers
+* Added additional interface commands
+
 *Updated: 11/7/2018*
 
 * Added additional interface routines

@@ -26,6 +26,21 @@ namespace e65 {
 
 	namespace system {
 
+		typedef union {
+			struct {
+				uint8_t carry : 1;
+				uint8_t zero : 1;
+				uint8_t irq_disable : 1;
+				uint8_t decimal_enable : 1;
+				uint8_t breakpoint : 1;
+				uint8_t unused : 1;
+				uint8_t overflow : 1;
+				uint8_t sign : 1;
+			};
+
+			uint8_t raw;
+		} e65_flag_t;
+
 		class processor :
 				public e65::interface::singleton<e65::system::processor>,
 				public e65::interface::system::processor {
@@ -34,19 +49,70 @@ namespace e65 {
 
 				~processor(void);
 
+				uint8_t accumulator(void) const override;
+
 				uint32_t cycle(void) const override;
+
+				uint8_t flags(void) const override;
+
+				uint8_t index_x(void) const override;
+
+				uint8_t index_y(void) const override;
+
+				void interrupt(
+					__in e65::interface::system::memory &memory,
+					__in bool maskable
+					) override;
+
+				bool halted(void) const override;
+
+				uint16_t program_counter(void) const override;
 
 				void reset(
 					__in e65::interface::system::memory &memory
 					) override;
 
-				void step(
+				void set_accumulator(
+					__in uint8_t value
+					) override;
+
+				void set_flags(
+					__in uint8_t value
+					) override;
+
+				void set_halt(
+					__in bool value
+					) override;
+
+				void set_index_x(
+					__in uint8_t value
+					) override;
+
+				void set_index_y(
+					__in uint8_t value
+					) override;
+
+				void set_program_counter(
+					__in uint16_t value
+					) override;
+
+				void set_stack_pointer(
+					__in uint8_t value
+					) override;
+
+				void set_stop(
+					__in bool value
+					) override;
+
+				uint8_t stack_pointer(void) const override;
+
+				uint8_t step(
 					__in e65::interface::system::memory &memory
 					);
 
-				std::string to_string(void) const override;
+				bool stopped(void) const override;
 
-				// TODO
+				std::string to_string(void) const override;
 
 			protected:
 
@@ -69,9 +135,25 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				// TODO
+				uint8_t m_accumulator;
 
 				uint32_t m_cycle;
+
+				uint8_t m_cycle_last;
+
+				e65::system::e65_flag_t m_flags;
+
+				bool m_halt;
+
+				uint8_t m_index_x;
+
+				uint8_t m_index_y;
+
+				uint16_t m_program_counter;
+
+				uint8_t m_stack_pointer;
+
+				bool m_stop;
 		};
 	}
 }

@@ -31,11 +31,64 @@ namespace e65 {
 
 				public:
 
+					virtual uint8_t accumulator(void) const = 0;
+
 					virtual uint32_t cycle(void) const = 0;
+
+					virtual uint8_t flags(void) const = 0;
+
+					virtual bool halted(void) const = 0;
+
+					virtual uint8_t index_x(void) const = 0;
+
+					virtual uint8_t index_y(void) const = 0;
+
+					virtual void interrupt(
+						__in e65::interface::system::memory &memory,
+						__in bool maskable
+						) = 0;
+
+					virtual uint16_t program_counter(void) const = 0;
 
 					virtual void reset(
 						__in e65::interface::system::memory &memory
 						) = 0;
+
+					virtual void set_accumulator(
+						__in uint8_t value
+						) = 0;
+
+					virtual void set_flags(
+						__in uint8_t value
+						) = 0;
+
+					virtual void set_halt(
+						__in bool value
+						) = 0;
+
+					virtual void set_index_x(
+						__in uint8_t value
+						) = 0;
+
+					virtual void set_index_y(
+						__in uint8_t value
+						) = 0;
+
+					virtual void set_program_counter(
+						__in uint16_t value
+						) = 0;
+
+					virtual void set_stack_pointer(
+						__in uint8_t value
+						) = 0;
+
+					virtual void set_stop(
+						__in bool value
+						) = 0;
+
+					virtual uint8_t stack_pointer(void) const = 0;
+
+					virtual bool stopped(void) const = 0;
 			};
 		}
 	}

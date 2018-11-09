@@ -77,10 +77,11 @@ namespace e65 {
 		void
 		bus::load(
 			__in const std::vector<uint8_t> &data,
-			__in bool hex
+			__in bool hex,
+			__in_opt uint16_t origin
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Hex=%x", data.size(), &data, hex);
+			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Hex=%x, Origin=%u(%04x)", data.size(), &data, hex, origin, origin);
 
 			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
 				data.size() / E65_BYTES_PER_KBYTE, data.size());
@@ -90,7 +91,7 @@ namespace e65 {
 			if(hex) {
 				load_hex(std::string(data.begin(), data.end()));
 			} else {
-				load_binary(data);
+				load_binary(data, origin);
 			}
 
 			m_processor.reset(m_memory);
@@ -100,18 +101,18 @@ namespace e65 {
 
 		void
 		bus::load_binary(
-			__in const std::vector<uint8_t> &data
+			__in const std::vector<uint8_t> &data,
+			__in uint16_t origin
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p", data.size(), &data);
+			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Origin=%u(%04x)", data.size(), &data, origin, origin);
 
-			if(data.size() != E65_MEMORY_LENGTH) {
+			if((data.size() + origin) > E65_MEMORY_LENGTH) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_LENGTH,
-					"%.1f KB (%u bytes), expecting %.1f KB (%u bytes)", data.size() / E65_BYTES_PER_KBYTE, data.size(),
-					E65_MEMORY_LENGTH / E65_BYTES_PER_KBYTE, E65_MEMORY_LENGTH);
+					"%.1f KB (%u bytes) @%u(%04x)", data.size() / E65_BYTES_PER_KBYTE, data.size(), origin, origin);
 			}
 
-			// TODO: load binary data into memory
+			m_memory.load(data, origin);
 
 			E65_TRACE_EXIT();
 		}
@@ -198,35 +199,48 @@ namespace e65 {
 			return m_processor;
 		}
 
-		void
+		uint8_t
 		bus::step(
 			__in e65::interface::runtime &runtime
 			)
 		{
+			uint8_t result;
+
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
 			m_input.step(m_memory);
-			m_processor.step(m_memory);
+			result = m_processor.step(m_memory);
 			m_video.step(m_memory);
 
-			E65_TRACE_EXIT();
+			E65_TRACE_EXIT_FORMAT("Result=%u", result);
+			return result;
 		}
 
-		void
+		uint32_t
 		bus::step_frame(
-			__in e65::interface::runtime &runtime
+			__in e65::interface::runtime &runtime,
+			__in_opt uint32_t previous
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
+			int64_t remaining;
+			uint32_t result = 0;
 
-			// TODO: step processor through an entire frame
-			m_input.step(m_memory);
-			m_processor.step(m_memory);
-			// ---
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Previous=%u", &runtime, previous);
+
+			remaining = (E65_PROCESSOR_CYCLES_PER_FRAME - previous);
+			while(remaining > 0) {
+				m_input.step(m_memory);
+				remaining -= m_processor.step(m_memory);
+			}
 
 			m_video.step(m_memory);
 
-			E65_TRACE_EXIT();
+			if(remaining < 0) {
+				result = -remaining;
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%u", result);
+			return result;
 		}
 
 		std::string

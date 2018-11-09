@@ -22,6 +22,6 @@
 #include "../include/e65.h"
 #include "../include/runtime.h"
 
-// TODO
+// TODO: implement tool interface
 
 #endif // E65_TYPE_H_
