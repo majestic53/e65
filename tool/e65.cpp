@@ -31,7 +31,8 @@ main(
 		goto exit;
 	}
 
-	result = e65_run("./test/test.bin", false, false);
+	//result = e65_run("./test/test.bin", false, false);
+	result = e65_run("./test/test.hex", true, false);
 	if(result != EXIT_SUCCESS) {
 		goto exit;
 	}

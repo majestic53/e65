@@ -48,8 +48,8 @@ e65_command(
 			case E65_BREAKPOINT_CLEAR:
 				address = request->address;
 
-				response->payload.i = e65::runtime::acquire().breakpoint_clear(address);
-				if(response->payload.i) {
+				response->payload.i = (e65::runtime::acquire().breakpoint_clear(address) ? EXIT_SUCCESS : EXIT_FAILURE);
+				if(response->payload.i != EXIT_SUCCESS) {
 					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to clear breakpoint", "%u(%04x)", address, address);
 				}
 				break;
@@ -59,8 +59,8 @@ e65_command(
 			case E65_BREAKPOINT_SET:
 				address = request->address;
 
-				response->payload.i = e65::runtime::acquire().breakpoint_set(address);
-				if(response->payload.i) {
+				response->payload.i = (e65::runtime::acquire().breakpoint_set(address) ? EXIT_SUCCESS : EXIT_FAILURE);
+				if(response->payload.i != EXIT_SUCCESS) {
 					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to set breakpoint", "%u(%04x)", address, address);
 				}
 				break;

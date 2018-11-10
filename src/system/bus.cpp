@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <climits>
 #include "../../include/system/bus.h"
 #include "../../include/trace.h"
 #include "./bus_type.h"
@@ -83,10 +84,10 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Hex=%x, Origin=%u(%04x)", data.size(), &data, hex, origin, origin);
 
+			clear();
+
 			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
 				data.size() / E65_BYTES_PER_KBYTE, data.size());
-
-			clear();
 
 			if(hex) {
 				load_hex(std::string(data.begin(), data.end()));
@@ -122,13 +123,116 @@ namespace e65 {
 			__in const std::string &data
 			)
 		{
+			bool end = false;
+			size_t count = 1;
+			std::string line;
+			std::stringstream stream;
+			std::vector<std::pair<uint16_t, std::vector<uint8_t>>> section;
+			std::vector<std::pair<uint16_t, std::vector<uint8_t>>>::iterator entry;
+
 			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p", data.size(), &data);
 
 			if(data.empty()) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_EMPTY);
 			}
 
-			// TODO: load hex data into memory
+			stream << data;
+
+			while(std::getline(stream, line)) {
+				std::vector<uint8_t> data;
+				std::stringstream substream;
+				uint16_t address, length, type;
+
+				if(line.empty()) {
+					continue;
+				}
+
+				if(end) {
+					THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_END, "(line=%u)", count);
+				}
+
+				if(line.size() < E65_HEX_LENGTH_MIN) {
+					THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_LENGTH, "%u (minimum=%u) (line=%u)",
+						line.size(), E65_HEX_LENGTH_MIN, count);
+				}
+
+				if(line.front() != E65_HEX_CHARACTER_START) {
+					THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_START,
+						"\'%c\'(%02x) (expecting=\'%c\'(%02x)) (line=%u)", line.front(), line.front(),
+						E65_HEX_CHARACTER_START, E65_HEX_CHARACTER_START, count);
+				}
+
+				substream << std::hex << line.substr(E65_HEX_LENGTH_ORIGIN, E65_HEX_LENGTH_OFFSET);
+				substream >> length;
+
+				if(line.size() < (length + E65_HEX_LENGTH_MIN)) {
+					THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_LENGTH, "%u (minimum=%u) (line=%u)",
+						line.size(), (length + E65_HEX_LENGTH_MIN), count);
+				}
+
+				substream.clear();
+				substream.str(std::string());
+				substream << std::hex << line.substr(E65_HEX_ADDRESS_ORIGIN, E65_HEX_ADDRESS_OFFSET);
+				substream >> address;
+
+				substream.clear();
+				substream.str(std::string());
+				substream << std::hex << line.substr(E65_HEX_TYPE_ORIGIN, E65_HEX_TYPE_OFFSET);
+				substream >> type;
+
+				switch(type) {
+					case E65_HEX_DATA:
+						break;
+					case E65_HEX_END:
+						end = true;
+						break;
+					default:
+						THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_UNSUPPORTED, "%u(%02x) (line=%u)",
+							type, type, count);
+				}
+
+				if(length) {
+					uint16_t byte, checksum, iter = 0, sum;
+
+					sum = (length + (address >> CHAR_BIT) + (address & UINT8_MAX) + type);
+
+					for(; iter < length; ++iter) {
+						substream.clear();
+						substream.str(std::string());
+						substream << std::hex << line.substr((iter * E65_HEX_DATA_OFFSET) + E65_HEX_DATA_ORIGIN,
+							E65_HEX_DATA_OFFSET);
+						substream >> byte;
+						data.push_back(byte);
+						sum += data.back();
+					}
+
+					substream.clear();
+					substream.str(std::string());
+					substream << std::hex << line.substr((length * E65_HEX_DATA_OFFSET) + E65_HEX_DATA_ORIGIN,
+						E65_HEX_DATA_OFFSET);
+					substream >> checksum;
+
+					checksum &= UINT8_MAX;
+					sum = (((~sum) + 1) & UINT8_MAX);
+
+					if(sum != checksum) {
+						THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_CHECKSUM,
+							"%u(%02x) (expecting=%u(%02x)) (line=%u)", sum, sum, checksum, checksum, count);
+					}
+
+					section.push_back(std::make_pair(address, data));
+				}
+
+				++count;
+			}
+
+			if(!end) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION_FORMAT(E65_SYSTEM_BUS_EXCEPTION_END, "(line=%u)", count);
+			}
+
+			for(entry = section.begin(); entry != section.end(); ++entry) {
+				m_memory.load(entry->second, entry->first);
+			}
 
 			E65_TRACE_EXIT();
 		}

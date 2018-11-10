@@ -355,6 +355,7 @@ namespace e65 {
 	{
 		int length;
 		std::ifstream file;
+		std::stringstream title;
 		std::vector<uint8_t> data;
 
 		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
@@ -386,6 +387,9 @@ namespace e65 {
 		}
 
 		m_bus.load(data, hex);
+
+		title << E65 << " -- " << path;
+		m_bus.video().display().set_title(title.str());
 
 		m_debug = debug;
 		if(!m_debug) {
@@ -468,7 +472,10 @@ namespace e65 {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
-		result = e65::type::thread::wait(timeout);
+		result = !m_debug;
+		if(result) {
+			result = e65::type::thread::wait(timeout);
+		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;

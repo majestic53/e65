@@ -70,6 +70,9 @@ namespace e65 {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Memory load", "%u(%04x), %.1f KB (%u bytes)", origin, origin,
+				data.size() / E65_BYTES_PER_KBYTE, data.size());
+
 			offset = (origin + data.size());
 			if(offset > m_memory.size()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_OFFSET, "%u(%x)", offset, offset);

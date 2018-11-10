@@ -146,6 +146,7 @@ namespace e65 {
 			}
 
 			m_display.show();
+			++m_frame;
 
 			E65_TRACE_EXIT();
 		}

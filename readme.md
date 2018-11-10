@@ -50,6 +50,10 @@ Changelog
 
 Version 0.1.1845
 ----------------
+*Updated: 11/9/2018*
+
+* Implemented bus load hex routine
+
 *Updated: 11/8/2018*
 
 * Implemented bus load binary routine
