@@ -29,13 +29,15 @@
 #endif // NDEBUG
 
 enum {
-	E65_EXCEPTION_ARGUMENT = 0,
+	E65_EXCEPTION_ALLOCATION = 0,
+	E65_EXCEPTION_ARGUMENT,
 	E65_EXCEPTION_COMMAND,
 };
 
 #define E65_EXCEPTION_MAX E65_EXCEPTION_COMMAND
 
 static const std::string E65_EXCEPTION_STR[] = {
+	E65_EXCEPTION_HEADER "Allocation failed",
 	E65_EXCEPTION_HEADER "Invalid argument",
 	E65_EXCEPTION_HEADER "Unsupported command",
 	};
@@ -55,6 +57,7 @@ static const std::string E65_COMMAND_STR[] = {
 	"Breakpoint-Clear",
 	"Breakpoint-Clear-All",
 	"Breakpoint-Set",
+	"Memory-Dump",
 	"Memory-Read",
 	"Memory-Write",
 	"Processor-Accumulator",
@@ -80,5 +83,9 @@ static const std::string E65_COMMAND_STR[] = {
 #define E65_COMMAND_STRING(_TYPE_) \
 	(((_TYPE_) > E65_COMMAND_MAX) ? E65_STRING_UNKNOWN : \
 		E65_STRING_CHECK(E65_COMMAND_STR[_TYPE_]))
+
+#define E65_DUMP_BLOCK_SIZE 0x10
+
+#define E65_DUMP_CHARACTER_FILL '.'
 
 #endif // E65_TYPE_H_

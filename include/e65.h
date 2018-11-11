@@ -23,6 +23,7 @@ enum {
 	E65_BREAKPOINT_CLEAR = 0,
 	E65_BREAKPOINT_CLEAR_ALL,
 	E65_BREAKPOINT_SET,
+	E65_MEMORY_DUMP,
 	E65_MEMORY_READ,
 	E65_MEMORY_WRITE,
 	E65_PROCESSOR_ACCUMULATOR,
@@ -46,31 +47,22 @@ enum {
 };
 
 typedef struct {
-	int type;
 	unsigned short address;
+	int result;
 
 	union {
-		unsigned char u8;
-		unsigned short u16;
+		unsigned char byte;
+		unsigned short word;
+		unsigned int dword;
+		char *literal;
 	} payload;
-} e65_req_t;
-
-typedef struct {
-	int type;
-
-	union {
-		unsigned char u8;
-		unsigned short u16;
-		unsigned int u32;
-		int i;
-	} payload;
-} e65_rsp_t;
+} e65_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
-extern int e65_command(const e65_req_t *request, e65_rsp_t *response);
+extern int e65_command(int command, const e65_t *request, e65_t *response);
 
 extern const char *e65_error(void);
 

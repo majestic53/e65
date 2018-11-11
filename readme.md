@@ -50,6 +50,10 @@ Changelog
 
 Version 0.1.1845
 ----------------
+*Updated: 11/11/2018*
+
+* Added interface memory dump command
+
 *Updated: 11/9/2018*
 
 * Implemented bus load hex routine
