@@ -400,6 +400,23 @@ namespace e65 {
 	}
 
 	bool
+	runtime::running(void) const
+	{
+		bool result;
+
+		E65_TRACE_ENTRY();
+
+		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		result = e65::type::thread::active();
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
 	runtime::step(void)
 	{
 		bool result;

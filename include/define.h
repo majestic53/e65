@@ -42,6 +42,9 @@ namespace e65 {
 
 	#define E65_BYTES_PER_KBYTE 1024.f
 
+	#define E65_COLUMN_WIDTH(_WIDTH_) \
+		std::left << std::setw(_WIDTH_)
+
 	#define E65_EXCEPTION(_MESSAGE_) \
 		e65::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
 
@@ -110,7 +113,7 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 6
+	#define E65_VERSION_REVISION 7
 	#define E65_VERSION_WEEK 1845
 
 	enum {
@@ -132,12 +135,32 @@ namespace e65 {
 		E65_COLOR_LIGHT_GREY,
 	};
 
+	static const std::string E65_LEVEL_COL[] = {
+		"\x1b[91m", "\x1b[93m", "\x1b[94m", "\x1b[90m",
+		};
+
+	#define E65_LEVEL_COLOR(_TYPE_) \
+		(((_TYPE_) > E65_LEVEL_MAX) ? E65_LEVEL_COLOR_RESET : \
+			E65_STRING_CHECK(e65::E65_LEVEL_COL[_TYPE_]))
+
+	#define E65_LEVEL_COLOR_RESET "\x1b[0m"
+
 	enum {
 		E65_LEVEL_ERROR = 0,
 		E65_LEVEL_WARNING,
 		E65_LEVEL_INFORMATION,
 		E65_LEVEL_VERBOSE,
 	};
+
+	#define E65_LEVEL_MAX e65::E65_LEVEL_VERBOSE
+
+	static const std::string E65_LEVEL_STR[] = {
+		"Error", "Warning", "Information", "Verbose",
+		};
+
+	#define E65_LEVEL_STRING(_TYPE_) \
+		(((_TYPE_) > E65_LEVEL_MAX) ? E65_STRING_UNKNOWN : \
+			E65_STRING_CHECK(e65::E65_LEVEL_STR[_TYPE_]))
 }
 
 #endif // E65_DEFINE_H_

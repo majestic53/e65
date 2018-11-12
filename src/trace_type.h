@@ -54,26 +54,6 @@ namespace e65 {
 	#define THROW_E65_TRACE_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 		E65_EXCEPTION_THROW_FORMAT(E65_TRACE_EXCEPTION_STRING(_EXCEPT_), _FORMAT_, __VA_ARGS__)
 
-	#define E65_LEVEL_MAX E65_LEVEL_VERBOSE
-
-	static const std::string E65_LEVEL_COL[] = {
-		"\x1b[91m", "\x1b[93m", "\x1b[94m", "\x1b[90m",
-		};
-
-	#define E65_LEVEL_COLOR(_TYPE_) \
-		(((_TYPE_) > E65_LEVEL_MAX) ? E65_LEVEL_COLOR_RESET : \
-			E65_STRING_CHECK(E65_LEVEL_COL[_TYPE_]))
-
-	#define E65_LEVEL_COLOR_RESET "\x1b[0m"
-
-	static const std::string E65_LEVEL_STR[] = {
-		"Error", "Warning", "Information", "Verbose",
-		};
-
-	#define E65_LEVEL_STRING(_TYPE_) \
-		(((_TYPE_) > E65_LEVEL_MAX) ? E65_STRING_UNKNOWN : \
-			E65_STRING_CHECK(E65_LEVEL_STR[_TYPE_]))
-
 	#define E65_TRACE_QUEUE_MAX 4096
 
 	#define E65_TRACE_TIMESTAMP_FORMAT "%Y-%m-%d %H:%M:%S"

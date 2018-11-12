@@ -42,7 +42,25 @@ Launch from the project root directory:
 ### Interface
 
 ```
-TBD
+e65 [-d|-h|-i|-v] input
+
+-d|--debug     Enter debug mode
+-h|--help      Display help information
+-i|--ihex      Load ihex file
+-v|--version   Display version information
+```
+
+### Debug Interface
+
+```
+c|cycle         Display processor cycle
+q|exit          Exit debug mode
+f|frame         Display video frame
+h|help          Display help information
+i|irq           Signal processor with IRQ
+n|nmi           Signal processor with NMI
+s|step          Step processor through a single cycle
+v|version       Display version information
 ```
 
 Changelog
@@ -52,6 +70,7 @@ Version 0.1.1845
 ----------------
 *Updated: 11/11/2018*
 
+* Added debug interface
 * Added interface memory dump command
 
 *Updated: 11/9/2018*

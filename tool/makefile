@@ -16,7 +16,7 @@
 
 CC=clang++
 CC_FLAGS=-march=native -std=gnu++11 -Wall -Werror
-CC_FLAGS_EXT=-pthread -lSDL2 -lSDL2main
+CC_FLAGS_EXT=-pthread -lreadline -lSDL2 -lSDL2main
 DIR_BIN=./../bin/
 DIR_BIN_LIB=./../bin/lib/
 DIR_BUILD=./../build/

@@ -381,7 +381,7 @@ e65_wait(void)
 	int result = EXIT_SUCCESS;
 
 	try {
-		result = e65::runtime::acquire().wait();
+		result = (e65::runtime::acquire().wait() ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;

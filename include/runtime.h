@@ -63,6 +63,8 @@ namespace e65 {
 				__in_opt bool debug = false
 				);
 
+			bool running(void) const;
+
 			bool step(void);
 
 			std::string to_string(void) const override;
