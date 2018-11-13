@@ -26,6 +26,30 @@ static std::string g_error;
 static std::string g_version;
 
 int
+e65_breakpoint_list(
+	__inout char **output
+	)
+{
+	std::string buffer;
+	int result = EXIT_SUCCESS;
+
+	if(!output) {
+		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", output);
+	}
+
+	buffer = e65::runtime::acquire().breakpoint_list();
+
+	*output = (char *) std::calloc(buffer.size() + 1, sizeof(char));
+	if(!*output) {
+		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ALLOCATION, "%p, %p", *output, *output);
+	}
+
+	std::memcpy(*output, &buffer[0], buffer.size());
+
+	return result;
+}
+
+int
 e65_dump(
 	__inout char **output,
 	__in uint16_t address,
@@ -147,6 +171,9 @@ e65_command(
 			case E65_BREAKPOINT_CLEAR_ALL:
 				e65::runtime::acquire().breakpoints_clear();
 				break;
+			case E65_BREAKPOINT_LIST:
+				response->result = e65_breakpoint_list(&response->payload.literal);
+				break;
 			case E65_BREAKPOINT_SET:
 				address = request->address;
 
@@ -221,6 +248,8 @@ e65_command(
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", command, E65_COMMAND_STRING(command));
 		}
+
+		result = response->result;
 	} catch(e65::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;

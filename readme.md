@@ -44,27 +44,55 @@ Launch from the project root directory:
 ```
 e65 [-d|-h|-i|-v] input
 
--d|--debug     Enter debug mode
--h|--help      Display help information
--i|--ihex      Load ihex file
--v|--version   Display version information
+-d|--debug             Enter debug mode
+-h|--help              Display help information
+-i|--ihex              Load ihex file
+-v|--version           Display version information
 ```
 
 ### Debug Interface
 
 ```
-c|cycle         Display processor cycle
-q|exit          Exit debug mode
-f|frame         Display video frame
-h|help          Display help information
-i|irq           Signal processor with IRQ
-n|nmi           Signal processor with NMI
-s|step          Step processor through a single cycle
-v|version       Display version information
+bc|breakpoint-clear                   <address|*>             Clear breakpoint at a given address
+bl|breakpoint-list                                            List all breakpoints
+bs|breakpoint-set                     <address>               Set breakpoint at a given address
+md|memory-dump                        <address> <offset>      Dump memory at an address for a given offset
+mr|memory-read                        <address>               Read from a given memory address
+mw|memory-write                       <address> <value>       Write to a given memory address
+pa|processor-accumulator                                      Display processor accumulator
+pas|processor-accumulator-set         <value>                 Set processor accumulator to given value
+pcy|processor-cycle                                           Display current processor cycle
+pf|processor-flags                                            Display processor flags
+pfs|processor-flags-set               <value>                 Set processor flags to given value
+phs|processor-halt                                            Halt processor
+phc|processor-halt-clear                                      Clear processor halt
+px|processor-index-x                                          Display processor index-x
+pxs|processor-index-x-set             <value>                 Set processor index-x to given value
+py|processor-index-y                                          Display processor index-y
+pys|processor-index-y-set             <value>                 Set processor index-y to given value
+pi|processor-irq                                              Signal processor with a maskable interrupt
+pn|processor-nmi                                              Signal processor with a non-maskable interrupt
+ppc|processor-program-counter                                 Display processor program counter
+ppcs|processor-program-counter-set    <value>                 Set processor program counter to given value
+psp|processor-stack-pointer                                   Display processor stack pointer
+psps|processor-stack-pointer-set      <value>                 Set processor stack pointer to given value
+ps|processor-step                                             Step processor through a single cycle
+pss|processor-stop                                            Stop processor
+psc|processor-stop-clear                                      Clear processor stop
+vf|video-frame                                                Display current video frame
+q|exit                                                        Exit debug mode
+h|help                                                        Display help information
+v|version                                                     Display version information
 ```
 
 Changelog
 =========
+
+Version 0.1.1846
+----------------
+*Updated: 11/12/2018*
+
+* Added additional debug commands
 
 Version 0.1.1845
 ----------------
@@ -95,37 +123,6 @@ Version 0.1.1845
 
 * Added input/processor/video singleton
 * Code reorg
-
-Version 0.1.1844
-----------------
-*Updated: 11/4/2018*
-
-* Added c-style interface
-* Added debug stepping support
-* <s>Added cpu/mmu singletons</s>
-
-*Updated: 11/3/2018*
-
-* Added bus singleton
-* Integrated bus into runtime
-
-*Updated: 11/2/2018*
-
-* Added display singleton
-* Integrated display into runtime
-
-*Updated: 11/1/2018*
-
-* Implemented runtime main loop
-* Integrated SDL into runtime
-
-*Updated: 10/31/2018*
-
-* Added trace singleton
-
-*Updated: 10/28/2018*
-
-* Added signal/thread types
 
 *Changelog truncated (see file history for full log)*
 

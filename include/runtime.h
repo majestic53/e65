@@ -43,6 +43,8 @@ namespace e65 {
 				__in uint16_t address
 				);
 
+			std::string breakpoint_list(void) const;
+
 			bool breakpoint_set(
 				__in uint16_t address
 				);

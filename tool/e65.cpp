@@ -28,14 +28,23 @@ display_command_usage(void)
 	std::stringstream result;
 
 	for(int command = 0; command <= E65_COMMAND_MAX; ++command) {
-		std::stringstream stream;
+		std::stringstream stream_arguments, stream_command;
 
 		if(command) {
 			result << std::endl;
 		}
 
-		stream << E65_COMMAND_SHORT_STRING(command) << "|" << E65_COMMAND_LONG_STRING(command);
-		result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_WIDTH) << stream.str() << E65_COMMAND_DESCRIPTION(command);
+		stream_command << E65_COMMAND_SHORT_STRING(command) << "|" << E65_COMMAND_LONG_STRING(command);
+
+		if(E65_COMMAND_LENGTH(command)) {
+			stream_arguments << E65_COMMAND_ARGUMENTS(command);
+		} else {
+			stream_arguments << " ";
+		}
+
+		result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_LONG_WIDTH) << stream_command.str()
+			<< E65_COLUMN_WIDTH(E65_USAGE_COLUMN_SHORT_WIDTH) << stream_arguments.str()
+			<< E65_COMMAND_DESCRIPTION(command);
 	}
 
 	return result.str();
@@ -68,7 +77,7 @@ display_usage(
 			std::stringstream stream;
 
 			stream << std::endl << E65_FLAG_SHORT_STRING(flag) << "|" << E65_FLAG_LONG_STRING(flag);
-			result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_WIDTH) << stream.str() << E65_FLAG_DESCRIPTION(flag);
+			result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_SHORT_WIDTH) << stream.str() << E65_FLAG_DESCRIPTION(flag);
 		}
 	}
 
@@ -174,18 +183,241 @@ exit:
 }
 
 int
+prompt_command(
+	__in int command,
+	__in const std::vector<std::string> &arguments,
+	__inout bool &terminate
+	)
+{
+	std::stringstream stream;
+	int id, result = EXIT_SUCCESS;
+	e65_t request = {}, response = {};
+
+	terminate = false;
+
+	switch(command) {
+		case E65_COMMAND_BREAKPOINT_CLEAR:
+			id = E65_BREAKPOINT_CLEAR;
+
+			if(arguments.front() != E65_ARGUMENT_WILDCARD) {
+				stream << std::hex << arguments.front();
+				stream >> request.address;
+			} else {
+				id = E65_BREAKPOINT_CLEAR_ALL;
+			}
+
+			result = e65_command(id, &request, &response);
+			break;
+		case E65_COMMAND_BREAKPOINT_LIST:
+
+			result = e65_command(E65_BREAKPOINT_LIST, &request, &response);
+			if(result == EXIT_SUCCESS) {
+
+				char *literal = response.payload.literal;
+				if(literal) {
+					std::cout << literal << std::endl;
+					std::free(response.payload.literal);
+					response.payload.literal = nullptr;
+					literal = nullptr;
+				} else {
+					std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_RESPONSE) << std::endl;
+					result = EXIT_FAILURE;
+				}
+			}
+			break;
+		case E65_COMMAND_BREAKPOINT_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			result = e65_command(E65_BREAKPOINT_SET, &request, &response);
+			break;
+		case E65_COMMAND_MEMORY_DUMP:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::hex << arguments.back();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_MEMORY_DUMP, &request, &response);
+			if(result == EXIT_SUCCESS) {
+
+				char *literal = response.payload.literal;
+				if(literal) {
+					std::cout << literal << std::endl;
+					std::free(response.payload.literal);
+					response.payload.literal = nullptr;
+					literal = nullptr;
+				} else {
+					std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_RESPONSE) << std::endl;
+					result = EXIT_FAILURE;
+				}
+			}
+			break;
+		case E65_COMMAND_MEMORY_READ:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			result = e65_command(E65_MEMORY_READ, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "[" << E65_STRING_HEX(uint16_t, request.address) << "] --> "
+					<< E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_MEMORY_WRITE:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::hex << arguments.back();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_MEMORY_WRITE, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_ACCUMULATOR:
+
+			result = e65_command(E65_PROCESSOR_ACCUMULATOR, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "A --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_ACCUMULATOR_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_ACCUMULATOR_SET, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_CYCLE:
+
+			result = e65_command(E65_PROCESSOR_CYCLE, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << response.payload.dword << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_FLAGS:
+
+			result = e65_command(E65_PROCESSOR_FLAGS, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "F --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_FLAGS_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_FLAGS_SET, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_HALT:
+			result = e65_command(E65_PROCESSOR_HALT, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_HALT_CLEAR:
+			result = e65_command(E65_PROCESSOR_HALT_CLEAR, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_INDEX_X:
+
+			result = e65_command(E65_PROCESSOR_INDEX_X, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "X --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_INDEX_X_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_INDEX_X_SET, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_INDEX_Y:
+
+			result = e65_command(E65_PROCESSOR_INDEX_Y, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "Y --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_INDEX_Y_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_INDEX_Y_SET, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_IRQ:
+		case E65_COMMAND_PROCESSOR_NMI:
+			result = e65_interrupt(command == E65_COMMAND_PROCESSOR_IRQ);
+			break;
+		case E65_COMMAND_PROCESSOR_PROGRAM_COUNTER:
+
+			result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "PC --> " << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_PROGRAM_COUNTER_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER_SET, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_STACK_POINTER:
+
+			result = e65_command(E65_PROCESSOR_STACK_POINTER, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << "SP --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_STACK_POINTER_SET:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_STACK_POINTER_SET, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_STEP:
+			result = e65_step();
+			break;
+		case E65_COMMAND_PROCESSOR_STOP:
+			result = e65_command(E65_PROCESSOR_STOP, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_STOP_CLEAR:
+			result = e65_command(E65_PROCESSOR_STOP_CLEAR, &request, &response);
+			break;
+		case E65_COMMAND_VIDEO_FRAME:
+
+			result = e65_command(E65_VIDEO_FRAME, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << response.payload.dword << std::endl;
+			}
+			break;
+		case E65_COMMAND_EXIT:
+			terminate = true;
+			break;
+		case E65_COMMAND_HELP:
+			std::cout << display_command_usage() << std::endl;
+			break;
+		case E65_COMMAND_VERSION:
+			std::cout << display_version(false) << std::endl;
+			break;
+		default:
+			result = EXIT_FAILURE;
+			break;
+	}
+
+	return result;
+}
+
+int
 prompt(void)
 {
 	int result = EXIT_SUCCESS;
 
 	while(e65::runtime::acquire().running()) {
-		int type;
+		int id;
 		char *input;
 		size_t length;
+		bool terminate = false;
 		std::string command, input_str;
 		std::stringstream prompt, stream;
-		e65_t request = {}, response = {};
 		std::vector<std::string> arguments;
+		std::vector<std::string>::iterator argument;
 
 #ifdef TRACE_COLOR
 		prompt << E65_LEVEL_COLOR(e65::E65_LEVEL_INFORMATION);
@@ -240,9 +472,9 @@ prompt(void)
 			continue;
 		}
 
-		type = E65_COMMAND_ID(command);
+		id = E65_COMMAND_ID(command);
 
-		length = E65_COMMAND_LENGTH(type);
+		length = E65_COMMAND_LENGTH(id);
 		if(length != arguments.size()) {
 #ifdef TRACE_COLOR
 			std::cerr << E65_LEVEL_COLOR(e65::E65_LEVEL_WARNING);
@@ -255,56 +487,35 @@ prompt(void)
 			continue;
 		}
 
-		switch(type) {
-			case E65_COMMAND_CYCLE:
-				result = e65_command(E65_PROCESSOR_CYCLE, &request, &response);
-				if(result != EXIT_SUCCESS) {
-					goto exit;
-				}
-
-				std::cout << response.payload.dword << std::endl;
-				break;
-			case E65_COMMAND_EXIT:
-				goto exit;
-			case E65_COMMAND_FRAME:
-				result = e65_command(E65_VIDEO_FRAME, &request, &response);
-				if(result != EXIT_SUCCESS) {
-					goto exit;
-				}
-
-				std::cout << response.payload.dword << std::endl;
-				break;
-			case E65_COMMAND_HELP:
-				std::cout << display_command_usage() << std::endl;
-				break;
-			case E65_COMMAND_IRQ:
-			case E65_COMMAND_NMI:
-				result = e65_interrupt(type == E65_COMMAND_IRQ);
-				break;
-			case E65_COMMAND_STEP:
-				result = e65_step();
-				break;
-			case E65_COMMAND_VERSION:
-				std::cout << display_version(false) << std::endl;
-				break;
-			default:
-				result = EXIT_FAILURE;
-				break;
-		}
-
+		result = prompt_command(id, arguments, terminate);
 		if(result != EXIT_SUCCESS) {
+			std::string error_str;
+
 #ifdef TRACE_COLOR
 			std::cerr << E65_LEVEL_COLOR(e65::E65_LEVEL_ERROR);
 #endif // TRACE_COLOR
-			std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_ERROR) << ": " << E65_STRING_CHECK(command)
-				<< ": " << e65_error() << std::endl;
+			std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_ERROR) << ": " << E65_STRING_CHECK(command);
+
+			for(argument = arguments.begin(); argument != arguments.end(); ++argument) {
+				std::cerr << " " << *argument;
+			}
+
+			error_str = e65_error();
+			if(!error_str.empty() && (error_str != E65_STRING_EMPTY)) {
+				std::cerr << " (" << error_str << ")";
+			}
+
+			std::cerr << std::endl;
 #ifdef TRACE_COLOR
 			std::cerr << E65_LEVEL_COLOR_RESET;
 #endif // TRACE_COLOR
 		}
+
+		if(terminate) {
+			break;
+		}
 	}
 
-exit:
 	return result;
 }
 

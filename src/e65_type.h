@@ -56,6 +56,7 @@ static const std::string E65_EXCEPTION_STR[] = {
 static const std::string E65_COMMAND_STR[] = {
 	"Breakpoint-Clear",
 	"Breakpoint-Clear-All",
+	"Breakpoint-List",
 	"Breakpoint-Set",
 	"Memory-Dump",
 	"Memory-Read",

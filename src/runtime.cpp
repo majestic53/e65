@@ -91,6 +91,37 @@ namespace e65 {
 		return result;
 	}
 
+	std::string
+	runtime::breakpoint_list(void) const
+	{
+		std::stringstream result;
+		std::set<uint16_t>::const_iterator entry;
+
+		E65_TRACE_ENTRY();
+
+		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		if(!m_breakpoint.empty()) {
+			size_t count = 1;
+
+			for(entry = m_breakpoint.begin(); entry != m_breakpoint.end(); ++count, ++entry) {
+
+				if(entry != m_breakpoint.begin()) {
+					result << std::endl;
+				}
+
+				result << "[" << count << "] " << E65_STRING_HEX(uint16_t, *entry);
+			}
+		} else {
+			result << E65_STRING_EMPTY;
+		}
+
+		E65_TRACE_EXIT();
+		return result.str();
+	}
+
 	bool
 	runtime::breakpoint_set(
 		__in uint16_t address
