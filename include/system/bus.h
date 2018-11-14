@@ -50,6 +50,10 @@ namespace e65 {
 
 				e65::interface::system::processor &processor(void) override;
 
+				void reset(
+					__in e65::interface::runtime &runtime
+					);
+
 				uint8_t step(
 					__in e65::interface::runtime &runtime
 					);

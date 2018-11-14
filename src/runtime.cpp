@@ -181,25 +181,6 @@ namespace e65 {
 	}
 
 	bool
-	runtime::interrupt(
-		__in bool maskable
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Maskable=%x", maskable);
-
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		m_bus.processor().interrupt(m_bus.memory(), maskable);
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	bool
 	runtime::on_initialize(
 		__in const void *context,
 		__in size_t length
@@ -243,7 +224,7 @@ namespace e65 {
 		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime main loop entry");
 
 		if(!m_debug) {
-			uint32_t begin = 0, current = 0;
+			uint32_t begin = 0, current = 0, previous = 0;
 
 			while(e65::type::thread::active()) {
 				float delta, rate;
@@ -265,7 +246,7 @@ namespace e65 {
 					break;
 				}
 
-				m_bus.step_frame(*this);
+				previous = m_bus.step_frame(*this, previous);
 
 				delta = (SDL_GetTicks() - end);
 				if(delta < E65_RUNTIME_FRAME_DELTA) {
@@ -372,6 +353,23 @@ namespace e65 {
 					break;
 			}
 		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
+	runtime::reset(void)
+	{
+		bool result = true;
+
+		E65_TRACE_ENTRY();
+
+		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		m_bus.reset(*this);
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;

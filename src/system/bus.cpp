@@ -303,6 +303,20 @@ namespace e65 {
 			return m_processor;
 		}
 
+		void
+		bus::reset(
+			__in e65::interface::runtime &runtime
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
+
+			m_input.step(m_memory);
+			m_processor.reset(m_memory);
+			m_video.step(m_memory);
+
+			E65_TRACE_EXIT();
+		}
+
 		uint8_t
 		bus::step(
 			__in e65::interface::runtime &runtime
@@ -332,6 +346,9 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Previous=%u", &runtime, previous);
 
 			remaining = (E65_PROCESSOR_CYCLES_PER_FRAME - previous);
+
+			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_VERBOSE, "Frame", "[%u] Cycles=%u (Previous=%u)", m_video.frame(), remaining, previous);
+
 			while(remaining > 0) {
 				m_input.step(m_memory);
 				remaining -= m_processor.step(m_memory);

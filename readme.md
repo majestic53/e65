@@ -74,6 +74,7 @@ pi|processor-irq                                              Signal processor w
 pn|processor-nmi                                              Signal processor with a non-maskable interrupt
 ppc|processor-program-counter                                 Display processor program counter
 ppcs|processor-program-counter-set    <value>                 Set processor program counter to given value
+pr|processor-reset                                            Reset processor
 psp|processor-stack-pointer                                   Display processor stack pointer
 psps|processor-stack-pointer-set      <value>                 Set processor stack pointer to given value
 ps|processor-step                                             Step processor through a single cycle
@@ -90,6 +91,11 @@ Changelog
 
 Version 0.1.1846
 ----------------
+*Updated: 11/13/2018*
+
+* Added processor interrupt handler
+* Added processor reset debug command
+
 *Updated: 11/12/2018*
 
 * Added additional debug commands

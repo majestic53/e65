@@ -297,7 +297,26 @@ e65_interrupt(
 	int result = EXIT_SUCCESS;
 
 	try {
-		result = (e65::runtime::acquire().interrupt(maskable) ? EXIT_SUCCESS : EXIT_FAILURE);
+		e65::runtime::acquire().bus().processor().interrupt(maskable);
+	} catch(e65::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
+e65_reset(void)
+{
+	int result = EXIT_SUCCESS;
+
+	try {
+		result = (e65::runtime::acquire().reset() ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;

@@ -55,9 +55,7 @@ namespace e65 {
 
 			e65::interface::system::bus &bus(void) override;
 
-			bool interrupt(
-				__in bool maskable
-				);
+			bool reset(void);
 
 			void run(
 				__in const std::string &path,

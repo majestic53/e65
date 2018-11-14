@@ -60,7 +60,6 @@ namespace e65 {
 				uint8_t index_y(void) const override;
 
 				void interrupt(
-					__in e65::interface::system::memory &memory,
 					__in bool maskable
 					) override;
 
@@ -133,6 +132,8 @@ namespace e65 {
 					__in size_t length
 					) override;
 
+				void on_interrupt(void);
+
 				void on_uninitialize(void) override;
 
 				uint8_t m_accumulator;
@@ -148,6 +149,10 @@ namespace e65 {
 				uint8_t m_index_x;
 
 				uint8_t m_index_y;
+
+				bool m_interrupt_irq;
+
+				bool m_interrupt_nmi;
 
 				uint16_t m_program_counter;
 

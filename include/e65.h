@@ -73,6 +73,8 @@ extern int e65_interrupt(int maskable);
 
 extern void e65_uninitialize(void);
 
+extern int e65_reset(void);
+
 extern int e65_run(const char *path, int hex, int debug);
 
 extern int e65_step(void);

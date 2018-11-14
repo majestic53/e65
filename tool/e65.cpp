@@ -358,6 +358,9 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER_SET, &request, &response);
 			break;
+		case E65_COMMAND_PROCESSOR_RESET:
+			result = e65_reset();
+			break;
 		case E65_COMMAND_PROCESSOR_STACK_POINTER:
 
 			result = e65_command(E65_PROCESSOR_STACK_POINTER, &request, &response);

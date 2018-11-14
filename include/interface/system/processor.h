@@ -44,7 +44,6 @@ namespace e65 {
 					virtual uint8_t index_y(void) const = 0;
 
 					virtual void interrupt(
-						__in e65::interface::system::memory &memory,
 						__in bool maskable
 						) = 0;
 

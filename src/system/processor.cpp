@@ -33,6 +33,8 @@ namespace e65 {
 			m_halt(false),
 			m_index_x(0),
 			m_index_y(0),
+			m_interrupt_irq(false),
+			m_interrupt_nmi(false),
 			m_program_counter(0),
 			m_stack_pointer(0),
 			m_stop(false)
@@ -127,21 +129,24 @@ namespace e65 {
 
 		void
 		processor::interrupt(
-			__in e65::interface::system::memory &memory,
 			__in bool maskable
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Memory=%p, Type=%s", &memory, maskable ? "IRQ" : "NMI");
+			E65_TRACE_ENTRY_FORMAT("Type=%s", maskable ? "IRQ" : "NMI");
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
 			if(!maskable || !m_flags.irq_disable) {
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Processor servicing interrupt", "%s", maskable ? "IRQ" : "NMI");
 
-				// TODO: service interrupt
-
+				if(maskable) {
+					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor IRQ interrupt request");
+					m_interrupt_irq = true;
+				} else {
+					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor NMI interrupt request");
+					m_interrupt_nmi = true;
+				}
 			}
 
 			E65_TRACE_EXIT();
@@ -163,6 +168,32 @@ namespace e65 {
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
+		}
+
+		void
+		processor::on_interrupt(void)
+		{
+			E65_TRACE_ENTRY();
+
+			if(m_interrupt_nmi) {
+				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
+
+				// TODO: service nmi interrupt
+
+				m_cycle_last += E65_PROCESSOR_INTERRUPT_NMI_CYCLES;
+				m_halt = false;
+				m_interrupt_nmi = false;
+			} else if(m_interrupt_irq) {
+				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
+
+				// TODO: service irq interrupt
+
+				m_cycle_last += E65_PROCESSOR_INTERRUPT_IRQ_CYCLES;
+				m_halt = false;
+				m_interrupt_irq = false;
+			}
+
+			E65_TRACE_EXIT();
 		}
 
 		void
@@ -365,9 +396,15 @@ namespace e65 {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			// TODO: step processor through a single instruction
-			m_cycle_last = 1;
-			// ---
+			m_cycle_last = 0;
+			on_interrupt();
+
+			if(!m_halt && !m_stop) {
+
+				// TODO: step processor through a single instruction
+				m_cycle_last += (std::rand() % 10 + 2);
+				// ---
+			}
 
 			m_cycle += m_cycle_last;
 
@@ -400,6 +437,8 @@ namespace e65 {
 				result << ", Cycle=" << m_cycle << " (Last=" << m_cycle_last << ")"
 					<< ", Halt=" << m_halt
 					<< ", Stop=" << m_stop
+					<< ", IRQ=" << m_interrupt_irq
+					<< ", NMI=" << m_interrupt_nmi
 					<< ", PC=" << (int) m_program_counter << "(" << E65_STRING_HEX(uint16_t, m_program_counter) << ")"
 					<< ", SP=" << (int) m_stack_pointer << "(" << E65_STRING_HEX(uint8_t, m_stack_pointer) << ")"
 					<< ", F=" << (int) m_flags.raw << "(" << E65_STRING_HEX(uint8_t, m_flags.raw) << ")"
