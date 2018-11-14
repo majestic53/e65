@@ -132,9 +132,11 @@ namespace e65 {
 					__in size_t length
 					) override;
 
-				void on_interrupt(void);
-
 				void on_uninitialize(void) override;
+
+				void process(void);
+
+				void service(void);
 
 				uint8_t m_accumulator;
 

@@ -171,32 +171,6 @@ namespace e65 {
 		}
 
 		void
-		processor::on_interrupt(void)
-		{
-			E65_TRACE_ENTRY();
-
-			if(m_interrupt_nmi) {
-				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
-
-				// TODO: service nmi interrupt
-
-				m_cycle_last += E65_PROCESSOR_INTERRUPT_NMI_CYCLES;
-				m_halt = false;
-				m_interrupt_nmi = false;
-			} else if(m_interrupt_irq) {
-				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
-
-				// TODO: service irq interrupt
-
-				m_cycle_last += E65_PROCESSOR_INTERRUPT_IRQ_CYCLES;
-				m_halt = false;
-				m_interrupt_irq = false;
-			}
-
-			E65_TRACE_EXIT();
-		}
-
-		void
 		processor::on_uninitialize(void)
 		{
 			E65_TRACE_ENTRY();
@@ -204,6 +178,22 @@ namespace e65 {
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor uninitializing");
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor uninitialized");
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::process(void)
+		{
+			E65_TRACE_ENTRY();
+
+			if(!m_halt && !m_stop) {
+
+				// TODO: step processor through a single instruction
+				m_cycle_last += (std::rand() % 10 + 2);
+				// ---
+
+			}
 
 			E65_TRACE_EXIT();
 		}
@@ -240,6 +230,32 @@ namespace e65 {
 			// ---
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor reset");
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::service(void)
+		{
+			E65_TRACE_ENTRY();
+
+			if(m_interrupt_nmi) {
+				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
+
+				// TODO: service nmi interrupt
+
+				m_cycle_last += E65_PROCESSOR_INTERRUPT_NMI_CYCLES;
+				m_halt = false;
+				m_interrupt_nmi = false;
+			} else if(m_interrupt_irq) {
+				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
+
+				// TODO: service irq interrupt
+
+				m_cycle_last += E65_PROCESSOR_INTERRUPT_IRQ_CYCLES;
+				m_halt = false;
+				m_interrupt_irq = false;
+			}
 
 			E65_TRACE_EXIT();
 		}
@@ -397,14 +413,9 @@ namespace e65 {
 			}
 
 			m_cycle_last = 0;
-			on_interrupt();
 
-			if(!m_halt && !m_stop) {
-
-				// TODO: step processor through a single instruction
-				m_cycle_last += (std::rand() % 10 + 2);
-				// ---
-			}
+			service();
+			process();
 
 			m_cycle += m_cycle_last;
 
