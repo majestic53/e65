@@ -113,7 +113,7 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 2
+	#define E65_VERSION_REVISION 3
 	#define E65_VERSION_WEEK 1846
 
 	#define E65_VIDEO_FRAME_RATE 60
@@ -163,6 +163,29 @@ namespace e65 {
 	#define E65_LEVEL_STRING(_TYPE_) \
 		(((_TYPE_) > E65_LEVEL_MAX) ? E65_STRING_UNKNOWN : \
 			E65_STRING_CHECK(e65::E65_LEVEL_STR[_TYPE_]))
+
+	enum {
+		E65_PFLAG_CARRY = 0,
+		E65_PFLAG_ZERO,
+		E65_PFLAG_IRQ_DISABLE,
+		E65_PFLAG_DECIMAL_ENABLE,
+		E65_PFLAG_BREAKPOINT,
+		E65_PFLAG_UNUSED,
+		E65_PFLAG_OVERFLOW,
+		E65_PFLAG_SIGN,
+	};
+
+	#define E65_PFLAG_MAX e65::E65_PFLAG_SIGN
+
+	#define E65_PFLAG(_TYPE_) (1 << (_TYPE_))
+
+	static const std::string E65_PFLAG_STR[] = {
+		"C", "Z", "I", "D", "B", "-", "V", "N",
+		};
+
+	#define E65_PFLAG_STRING(_TYPE_) \
+		(((_TYPE_) > E65_PFLAG_MAX) ? E65_STRING_UNKNOWN : \
+			E65_STRING_CHECK(e65::E65_PFLAG_STR[_TYPE_]))
 }
 
 #endif // E65_DEFINE_H_

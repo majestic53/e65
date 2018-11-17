@@ -76,14 +76,21 @@ enum {
 #define E65_USAGE_COLUMN_SHORT_WIDTH 24
 
 enum {
+
+	// breakpoint
 	E65_COMMAND_BREAKPOINT_CLEAR = 0,
 	E65_COMMAND_BREAKPOINT_LIST,
 	E65_COMMAND_BREAKPOINT_SET,
+
+	// memory
 	E65_COMMAND_MEMORY_DUMP,
 	E65_COMMAND_MEMORY_READ,
 	E65_COMMAND_MEMORY_WRITE,
+
+	// processor
 	E65_COMMAND_PROCESSOR_ACCUMULATOR,
 	E65_COMMAND_PROCESSOR_ACCUMULATOR_SET,
+	E65_COMMAND_PROCESSOR_CORE,
 	E65_COMMAND_PROCESSOR_CYCLE,
 	E65_COMMAND_PROCESSOR_FLAGS,
 	E65_COMMAND_PROCESSOR_FLAGS_SET,
@@ -103,30 +110,33 @@ enum {
 	E65_COMMAND_PROCESSOR_STEP,
 	E65_COMMAND_PROCESSOR_STOP,
 	E65_COMMAND_PROCESSOR_STOP_CLEAR,
+
+	// video
 	E65_COMMAND_VIDEO_FRAME,
+
+	// built-in
 	E65_COMMAND_EXIT,
 	E65_COMMAND_HELP,
 	E65_COMMAND_VERSION,
 };
 
+#define E65_COMMAND_BUILT_IN E65_COMMAND_EXIT
+
 #define E65_COMMAND_MAX E65_COMMAND_VERSION
 
 static const std::string E65_COMMAND_ARG[] = {
+
+	// breakpoint
 	"<address|*>",
 	"",
 	"<address>",
+
+	// memory
 	"<address> <offset>",
 	"<address>",
 	"<address> <value>",
-	"",
-	"<value>",
-	"",
-	"",
-	"<value>",
-	"",
-	"",
-	"",
-	"<value>",
+
+	// processor
 	"",
 	"<value>",
 	"",
@@ -135,11 +145,25 @@ static const std::string E65_COMMAND_ARG[] = {
 	"<value>",
 	"",
 	"",
+	"",
+	"<value>",
+	"",
 	"<value>",
 	"",
 	"",
 	"",
+	"<value>",
 	"",
+	"",
+	"<value>",
+	"",
+	"",
+	"",
+
+	// video
+	"",
+
+	// built-in
 	"",
 	"",
 	"",
@@ -150,14 +174,21 @@ static const std::string E65_COMMAND_ARG[] = {
 		E65_STRING_CHECK(E65_COMMAND_ARG[_TYPE_]))
 
 static const std::string E65_COMMAND_DESC[] = {
+
+	// breakpoint
 	"Clear breakpoint at a given address",
 	"List all breakpoints",
 	"Set breakpoint at a given address",
+
+	// memory
 	"Dump memory at an address for a given offset",
 	"Read from a given memory address",
 	"Write to a given memory address",
+
+	// processor
 	"Display processor accumulator",
 	"Set processor accumulator to given value",
+	"Display processor core",
 	"Display current processor cycle",
 	"Display processor flags",
 	"Set processor flags to given value",
@@ -177,7 +208,11 @@ static const std::string E65_COMMAND_DESC[] = {
 	"Step processor through a single cycle",
 	"Stop processor",
 	"Clear processor stop",
+
+	// video
 	"Display current video frame",
+
+	// built-in
 	"Exit debug mode",
 	"Display help information",
 	"Display version information",
@@ -188,14 +223,21 @@ static const std::string E65_COMMAND_DESC[] = {
 		E65_STRING_CHECK(E65_COMMAND_DESC[_TYPE_]))
 
 static const std::string E65_COMMAND_LONG_STR[] = {
+
+	// breakpoint
 	"breakpoint-clear",
 	"breakpoint-list",
 	"breakpoint-set",
+
+	// memory
 	"memory-dump",
 	"memory-read",
 	"memory-write",
+
+	// processor
 	"processor-accumulator",
 	"processor-accumulator-set",
+	"processor-core",
 	"processor-cycle",
 	"processor-flags",
 	"processor-flags-set",
@@ -215,7 +257,11 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 	"processor-step",
 	"processor-stop",
 	"processor-stop-clear",
+
+	// video
 	"video-frame",
+
+	// built-in
 	"exit",
 	"help",
 	"version",
@@ -226,14 +272,21 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 		E65_STRING_CHECK(E65_COMMAND_LONG_STR[_TYPE_]))
 
 static const std::string E65_COMMAND_SHORT_STR[] = {
+
+	// breakpoint
 	"bc",
 	"bl",
 	"bs",
+
+	// memory
 	"md",
 	"mr",
 	"mw",
+
+	// processor
 	"pa",
 	"pas",
+	"pc",
 	"pcy",
 	"pf",
 	"pfs",
@@ -253,7 +306,11 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 	"ps",
 	"pss",
 	"psc",
+
+	// video
 	"vf",
+
+	// built-in
 	"q",
 	"h",
 	"v",
@@ -264,22 +321,30 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 		E65_STRING_CHECK(E65_COMMAND_SHORT_STR[_TYPE_]))
 
 std::map<std::string, int> E65_COMMAND_MAP = {
+
+	// breakpoint
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_BREAKPOINT_CLEAR), E65_COMMAND_BREAKPOINT_CLEAR),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_BREAKPOINT_CLEAR), E65_COMMAND_BREAKPOINT_CLEAR),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_BREAKPOINT_LIST), E65_COMMAND_BREAKPOINT_LIST),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_BREAKPOINT_LIST), E65_COMMAND_BREAKPOINT_LIST),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_BREAKPOINT_SET), E65_COMMAND_BREAKPOINT_SET),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_BREAKPOINT_SET), E65_COMMAND_BREAKPOINT_SET),
+
+	// memory
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_DUMP), E65_COMMAND_MEMORY_DUMP),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_DUMP), E65_COMMAND_MEMORY_DUMP),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_READ), E65_COMMAND_MEMORY_READ),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_READ), E65_COMMAND_MEMORY_READ),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_WRITE), E65_COMMAND_MEMORY_WRITE),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_WRITE), E65_COMMAND_MEMORY_WRITE),
+
+	// processor
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_ACCUMULATOR), E65_COMMAND_PROCESSOR_ACCUMULATOR),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_ACCUMULATOR), E65_COMMAND_PROCESSOR_ACCUMULATOR),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_ACCUMULATOR_SET), E65_COMMAND_PROCESSOR_ACCUMULATOR_SET),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_ACCUMULATOR_SET), E65_COMMAND_PROCESSOR_ACCUMULATOR_SET),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_CORE), E65_COMMAND_PROCESSOR_CORE),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_CORE), E65_COMMAND_PROCESSOR_CORE),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_CYCLE), E65_COMMAND_PROCESSOR_CYCLE),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_CYCLE), E65_COMMAND_PROCESSOR_CYCLE),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_FLAGS), E65_COMMAND_PROCESSOR_FLAGS),
@@ -318,8 +383,12 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_STOP), E65_COMMAND_PROCESSOR_STOP),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_STOP_CLEAR), E65_COMMAND_PROCESSOR_STOP_CLEAR),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_STOP_CLEAR), E65_COMMAND_PROCESSOR_STOP_CLEAR),
+
+	// video
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
+
+	// built-in
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_EXIT), E65_COMMAND_EXIT),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_EXIT), E65_COMMAND_EXIT),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_HELP), E65_COMMAND_HELP),
@@ -335,14 +404,21 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	E65_COMMAND_MAP.find(_STRING_)->second
 
 std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
+
+	// breakpoint
 	std::make_pair(E65_COMMAND_BREAKPOINT_CLEAR, 1),
 	std::make_pair(E65_COMMAND_BREAKPOINT_LIST, 0),
 	std::make_pair(E65_COMMAND_BREAKPOINT_SET, 1),
+
+	// memory
 	std::make_pair(E65_COMMAND_MEMORY_DUMP, 2),
 	std::make_pair(E65_COMMAND_MEMORY_READ, 1),
 	std::make_pair(E65_COMMAND_MEMORY_WRITE, 2),
+
+	// processor
 	std::make_pair(E65_COMMAND_PROCESSOR_ACCUMULATOR, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_ACCUMULATOR_SET, 1),
+	std::make_pair(E65_COMMAND_PROCESSOR_CORE, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_CYCLE, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_FLAGS, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_FLAGS_SET, 1),
@@ -362,7 +438,11 @@ std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
 	std::make_pair(E65_COMMAND_PROCESSOR_STEP, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_STOP, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_STOP_CLEAR, 0),
+
+	// video
 	std::make_pair(E65_COMMAND_VIDEO_FRAME, 0),
+
+	// built-in
 	std::make_pair(E65_COMMAND_EXIT, 0),
 	std::make_pair(E65_COMMAND_HELP, 0),
 	std::make_pair(E65_COMMAND_VERSION, 0),

@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <climits>
 #include "../../include/system/processor.h"
 #include "../../include/trace.h"
 #include "./processor_type.h"
@@ -73,6 +74,19 @@ namespace e65 {
 
 			E65_TRACE_EXIT_FORMAT("Result=%u", m_cycle);
 			return m_cycle;
+		}
+
+		uint8_t
+		processor::cycle_last(void) const
+		{
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%u", m_cycle_last);
+			return m_cycle_last;
 		}
 
 		uint8_t
@@ -153,6 +167,29 @@ namespace e65 {
 		}
 
 		bool
+		processor::interrupted(
+			__in bool maskable
+			) const
+		{
+			bool result;
+
+			E65_TRACE_ENTRY_FORMAT("Type=%s", maskable ? "IRQ" : "NMI");
+
+			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(maskable) {
+				result = m_interrupt_irq;
+			} else {
+				result = m_interrupt_nmi;
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%x", result);
+			return result;
+		}
+
+		bool
 		processor::on_initialize(
 			__in const void *context,
 			__in size_t length
@@ -182,10 +219,43 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
-		void
-		processor::process(void)
+		uint8_t
+		processor::pop(
+			__in e65::interface::system::memory &memory
+			)
 		{
-			E65_TRACE_ENTRY();
+			uint8_t result;
+
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			result = read(memory, E65_PROCESSOR_REGISTER_STACK_POINTER_BASE + ++m_stack_pointer);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%02x)", result, result);
+			return result;
+		}
+
+		uint16_t
+		processor::pop_word(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			uint16_t result = 0;
+
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			result |= read(memory, E65_PROCESSOR_REGISTER_STACK_POINTER_BASE + ++m_stack_pointer);
+			result |= (read(memory, E65_PROCESSOR_REGISTER_STACK_POINTER_BASE + ++m_stack_pointer) << CHAR_BIT);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%04x)", result, result);
+			return result;
+		}
+
+		void
+		processor::process(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			if(!m_halt && !m_stop) {
 
@@ -212,6 +282,65 @@ namespace e65 {
 		}
 
 		void
+		processor::push(
+			__in e65::interface::system::memory &memory,
+			__in uint8_t value
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Value=%u(%02x)", &memory, value, value);
+
+			write(memory, E65_PROCESSOR_REGISTER_STACK_POINTER_BASE + m_stack_pointer--, value);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::push_word(
+			__in e65::interface::system::memory &memory,
+			__in uint16_t value
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Value=%u(%04x)", &memory, value, value);
+
+			write(memory, E65_PROCESSOR_REGISTER_STACK_POINTER_BASE + m_stack_pointer--, value >> CHAR_BIT);
+			write(memory, E65_PROCESSOR_REGISTER_STACK_POINTER_BASE + m_stack_pointer--, value);
+
+			E65_TRACE_EXIT();
+		}
+
+		uint8_t
+		processor::read(
+			__in e65::interface::system::memory &memory,
+			__in uint16_t address
+			) const
+		{
+			uint8_t result;
+
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Address=%u(%04x)", &memory, address, address);
+
+			result = memory.read(address);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%02x)", result, result);
+			return result;
+		}
+
+		uint16_t
+		processor::read_word(
+			__in e65::interface::system::memory &memory,
+			__in uint16_t address
+			) const
+		{
+			uint16_t result;
+
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Address=%u(%04x)", &memory, address, address);
+
+			result = memory.read_word(address);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%04x)", result, result);
+			return result;
+		}
+
+		void
 		processor::reset(
 			__in e65::interface::system::memory &memory
 			)
@@ -224,10 +353,18 @@ namespace e65 {
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor resetting");
 
-			// TODO: reset registers to default values
-			m_cycle = 0;
-			m_cycle_last = 0;
-			// ---
+			m_accumulator = E65_PROCESSOR_REGISTER_ACCUMULATOR;
+			m_cycle = E65_PROCESSOR_INTERRUPT_CYCLES;
+			m_cycle_last = E65_PROCESSOR_INTERRUPT_CYCLES;
+			m_flags.raw = E65_PROCESSOR_REGISTER_FLAGS;
+			m_halt = false;
+			m_index_x = E65_PROCESSOR_REGISTER_INDEX_X;
+			m_index_y = E65_PROCESSOR_REGISTER_INDEX_Y;
+			m_interrupt_irq = false;
+			m_interrupt_nmi = false;
+			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_RESET_INTERRUPT);
+			m_stack_pointer = E65_PROCESSOR_REGISTER_STACK_POINTER;
+			m_stop = false;
 
 			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor reset");
 
@@ -235,26 +372,33 @@ namespace e65 {
 		}
 
 		void
-		processor::service(void)
+		processor::service(
+			__in e65::interface::system::memory &memory
+			)
 		{
-			E65_TRACE_ENTRY();
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(m_interrupt_nmi) {
-				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
+			if(m_interrupt_irq || m_interrupt_nmi) {
 
-				// TODO: service nmi interrupt
+				if(m_interrupt_nmi) {
+					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
+				} else if(m_interrupt_irq) {
+					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
+				}
 
-				m_cycle_last += E65_PROCESSOR_INTERRUPT_NMI_CYCLES;
+				push_word(memory, m_program_counter);
+				push(memory, m_flags.raw & ~E65_PFLAG(E65_PFLAG_BREAKPOINT));
+
+				if(m_interrupt_nmi) {
+					m_interrupt_nmi = false;
+					m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_NON_MASKABLE_INTERRUPT);
+				} else if(m_interrupt_irq) {
+					m_interrupt_irq = false;
+					m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_MASKABLE_INTERRUPT);
+				}
+
+				m_cycle_last += E65_PROCESSOR_INTERRUPT_CYCLES;
 				m_halt = false;
-				m_interrupt_nmi = false;
-			} else if(m_interrupt_irq) {
-				E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
-
-				// TODO: service irq interrupt
-
-				m_cycle_last += E65_PROCESSOR_INTERRUPT_IRQ_CYCLES;
-				m_halt = false;
-				m_interrupt_irq = false;
 			}
 
 			E65_TRACE_EXIT();
@@ -414,8 +558,8 @@ namespace e65 {
 
 			m_cycle_last = 0;
 
-			service();
-			process();
+			service(memory);
+			process(memory);
 
 			m_cycle += m_cycle_last;
 
@@ -445,7 +589,7 @@ namespace e65 {
 				<< " Interface=" << e65::interface::singleton<e65::system::processor>::to_string();
 
 			if(e65::interface::singleton<e65::system::processor>::initialized()) {
-				result << ", Cycle=" << m_cycle << " (Last=" << m_cycle_last << ")"
+				result << ", Cycle=" << m_cycle << " (Last=" << (int) m_cycle_last << ")"
 					<< ", Halt=" << m_halt
 					<< ", Stop=" << m_stop
 					<< ", IRQ=" << m_interrupt_irq
@@ -453,20 +597,48 @@ namespace e65 {
 					<< ", PC=" << (int) m_program_counter << "(" << E65_STRING_HEX(uint16_t, m_program_counter) << ")"
 					<< ", SP=" << (int) m_stack_pointer << "(" << E65_STRING_HEX(uint8_t, m_stack_pointer) << ")"
 					<< ", F=" << (int) m_flags.raw << "(" << E65_STRING_HEX(uint8_t, m_flags.raw) << ")"
-					<< " [" << (m_flags.sign ? "N" : "-")
-						<< (m_flags.overflow ? "V" : "-")
-						<< "-"
-						<< (m_flags.breakpoint ? "B" : "-")
-						<< (m_flags.decimal_enable ? "D" : "-")
-						<< (m_flags.irq_disable ? "I" : "-")
-						<< (m_flags.zero ? "Z" : "-")
-						<< (m_flags.carry ? "C" : "-") << "]"
+					<< " [" << (m_flags.sign ? E65_PFLAG_STRING(E65_PFLAG_SIGN) : "-")
+						<< (m_flags.overflow ? E65_PFLAG_STRING(E65_PFLAG_OVERFLOW) : "-")
+						<< E65_PFLAG_STRING(E65_PFLAG_UNUSED)
+						<< (m_flags.breakpoint ? E65_PFLAG_STRING(E65_PFLAG_BREAKPOINT) : "-")
+						<< (m_flags.decimal_enable ? E65_PFLAG_STRING(E65_PFLAG_DECIMAL_ENABLE) : "-")
+						<< (m_flags.irq_disable ? E65_PFLAG_STRING(E65_PFLAG_IRQ_DISABLE) : "-")
+						<< (m_flags.zero ? E65_PFLAG_STRING(E65_PFLAG_ZERO) : "-")
+						<< (m_flags.carry ? E65_PFLAG_STRING(E65_PFLAG_CARRY) : "-") << "]"
 					<< ", A=" << (int) m_accumulator << "(" << E65_STRING_HEX(uint8_t, m_accumulator) << ")"
 					<< ", X=" << (int) m_index_x << "(" << E65_STRING_HEX(uint8_t, m_index_x) << ")"
 					<< ", Y=" << (int) m_index_y << "(" << E65_STRING_HEX(uint8_t, m_index_y) << ")";
 			}
 
 			return result.str();
+		}
+
+		void
+		processor::write(
+			__in e65::interface::system::memory &memory,
+			__in uint16_t address,
+			__in uint8_t value
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Address=%u(%04x), Value=%u(%02x)", &memory, address, address, value, value);
+
+			memory.write(address, value);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::write_word(
+			__in e65::interface::system::memory &memory,
+			__in uint16_t address,
+			__in uint16_t value
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Address=%u(%04x), Value=%u(%04x)", &memory, address, address, value, value);
+
+			memory.write_word(address, value);
+
+			E65_TRACE_EXIT();
 		}
 	}
 }

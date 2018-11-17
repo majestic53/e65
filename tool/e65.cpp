@@ -32,6 +32,12 @@ display_command_usage(void)
 
 		if(command) {
 			result << std::endl;
+
+			if(command == E65_COMMAND_BUILT_IN) {
+				result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_LONG_WIDTH) << "---"
+					<< E65_COLUMN_WIDTH(E65_USAGE_COLUMN_SHORT_WIDTH) << "---"
+					<< "---" << std::endl;
+			}
 		}
 
 		stream_command << E65_COMMAND_SHORT_STRING(command) << "|" << E65_COMMAND_LONG_STRING(command);
@@ -289,6 +295,24 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_ACCUMULATOR_SET, &request, &response);
 			break;
+		case E65_COMMAND_PROCESSOR_CORE:
+
+			result = e65_command(E65_PROCESSOR_CORE, &request, &response);
+			if(result == EXIT_SUCCESS) {
+
+				char *literal = response.payload.literal;
+				if(literal) {
+					std::cout << literal << std::endl;
+					std::free(response.payload.literal);
+					response.payload.literal = nullptr;
+					literal = nullptr;
+				} else {
+					std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_RESPONSE) << std::endl;
+					result = EXIT_FAILURE;
+				}
+			}
+
+			break;
 		case E65_COMMAND_PROCESSOR_CYCLE:
 
 			result = e65_command(E65_PROCESSOR_CYCLE, &request, &response);
@@ -300,7 +324,15 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_FLAGS, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "F --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+				int flag;
+
+				std::cout << "F --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << " [";
+
+				for(flag = E65_PFLAG_MAX; flag >= 0; flag--) {
+					std::cout << ((response.payload.byte & E65_PFLAG(flag)) ? E65_PFLAG_STRING(flag) : "-");
+				}
+
+				std::cout << "]" << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_FLAGS_SET:

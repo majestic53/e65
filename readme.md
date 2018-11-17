@@ -61,6 +61,7 @@ mr|memory-read                        <address>               Read from a given 
 mw|memory-write                       <address> <value>       Write to a given memory address
 pa|processor-accumulator                                      Display processor accumulator
 pas|processor-accumulator-set         <value>                 Set processor accumulator to given value
+pc|processor-core                                             Display processor core
 pcy|processor-cycle                                           Display current processor cycle
 pf|processor-flags                                            Display processor flags
 pfs|processor-flags-set               <value>                 Set processor flags to given value
@@ -81,6 +82,7 @@ ps|processor-step                                             Step processor thr
 pss|processor-stop                                            Stop processor
 psc|processor-stop-clear                                      Clear processor stop
 vf|video-frame                                                Display current video frame
+---                                   ---                     ---
 q|exit                                                        Exit debug mode
 h|help                                                        Display help information
 v|version                                                     Display version information
@@ -91,6 +93,12 @@ Changelog
 
 Version 0.1.1846
 ----------------
+*Updated: 11/17/2018*
+
+* Added processor core command
+* Implemented processor interrupt handler
+* Documented e65 public header file
+
 *Updated: 11/13/2018*
 
 * Added processor interrupt handler

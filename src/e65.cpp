@@ -50,6 +50,58 @@ e65_breakpoint_list(
 }
 
 int
+e65_core(
+	__inout char **output
+	)
+{
+	uint8_t flags;
+	std::string buffer;
+	int flag, result = EXIT_SUCCESS;
+	std::stringstream stream, substream;
+
+	if(!output) {
+		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", output);
+	}
+
+	e65::interface::system::processor &processor = e65::runtime::acquire().bus().processor();
+
+	stream << "CYC --> " << processor.cycle() << " (" << (int) processor.cycle_last() << ")"
+		<< std::endl << "HLT --> " << processor.halted()
+		<< std::endl << "STP --> " << processor.stopped()
+		<< std::endl << "IRQ --> " << processor.interrupted(true)
+		<< std::endl << "NMI --> " << processor.interrupted(false);
+
+	stream << std::endl << "PC  --> " << E65_STRING_HEX(uint16_t, processor.program_counter())
+		<< std::endl << "SP  --> " << E65_STRING_HEX(uint8_t, processor.stack_pointer());
+
+	flags = processor.flags();
+	stream << std::endl << "F   --> " << E65_STRING_HEX(uint8_t, flags) << " [";
+
+	for(flag = E65_PFLAG_MAX; flag >= 0; flag--) {
+		stream << ((flags & E65_PFLAG(flag)) ? E65_PFLAG_STRING(flag) : "-");
+	}
+
+	stream << "]"
+		<< std::endl << "A   --> " << E65_STRING_HEX(uint8_t, processor.accumulator())
+		<< std::endl << "X   --> "  << E65_STRING_HEX(uint8_t, processor.index_x())
+		<< std::endl << "Y   --> "  << E65_STRING_HEX(uint8_t, processor.index_y());
+
+	buffer = stream.str();
+	if(buffer.empty()) {
+		buffer = E65_STRING_EMPTY;
+	}
+
+	*output = (char *) std::calloc(buffer.size() + 1, sizeof(char));
+	if(!*output) {
+		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ALLOCATION, "%p, %p", *output, *output);
+	}
+
+	std::memcpy(*output, &buffer[0], buffer.size());
+
+	return result;
+}
+
+int
 e65_dump(
 	__inout char **output,
 	__in uint16_t address,
@@ -130,6 +182,9 @@ e65_dump(
 	}
 
 	buffer = stream.str();
+	if(buffer.empty()) {
+		buffer = E65_STRING_EMPTY;
+	}
 
 	*output = (char *) std::calloc(buffer.size() + 1, sizeof(char));
 	if(!*output) {
@@ -196,6 +251,9 @@ e65_command(
 				break;
 			case E65_PROCESSOR_ACCUMULATOR_SET:
 				e65::runtime::acquire().bus().processor().set_accumulator(request->payload.byte);
+				break;
+			case E65_PROCESSOR_CORE:
+				response->result = e65_core(&response->payload.literal);
 				break;
 			case E65_PROCESSOR_CYCLE:
 				response->payload.dword = e65::runtime::acquire().bus().processor().cycle();

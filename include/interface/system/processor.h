@@ -35,6 +35,8 @@ namespace e65 {
 
 					virtual uint32_t cycle(void) const = 0;
 
+					virtual uint8_t cycle_last(void) const = 0;
+
 					virtual uint8_t flags(void) const = 0;
 
 					virtual bool halted(void) const = 0;
@@ -46,6 +48,10 @@ namespace e65 {
 					virtual void interrupt(
 						__in bool maskable
 						) = 0;
+
+					virtual bool interrupted(
+						__in bool maskable
+						) const = 0;
 
 					virtual uint16_t program_counter(void) const = 0;
 

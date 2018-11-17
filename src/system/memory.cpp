@@ -159,7 +159,7 @@ namespace e65 {
 			}
 
 			result = m_memory.at(address);
-			result |= (m_memory.at(address) << CHAR_BIT);
+			result |= (m_memory.at(address + 1) << CHAR_BIT);
 
 			E65_TRACE_EXIT_FORMAT("Result=%u(%04x)", result, result);
 			return result;

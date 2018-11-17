@@ -53,6 +53,8 @@ namespace e65 {
 
 				uint32_t cycle(void) const override;
 
+				uint8_t cycle_last(void) const override;
+
 				uint8_t flags(void) const override;
 
 				uint8_t index_x(void) const override;
@@ -62,6 +64,10 @@ namespace e65 {
 				void interrupt(
 					__in bool maskable
 					) override;
+
+				bool interrupted(
+					__in bool maskable
+					) const override;
 
 				bool halted(void) const override;
 
@@ -134,9 +140,53 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				void process(void);
+				uint8_t pop(
+					__in e65::interface::system::memory &memory
+					);
 
-				void service(void);
+				uint16_t pop_word(
+					__in e65::interface::system::memory &memory
+					);
+
+				void process(
+					__in e65::interface::system::memory &memory
+					);
+
+				void push(
+					__in e65::interface::system::memory &memory,
+					__in uint8_t value
+					);
+
+				void push_word(
+					__in e65::interface::system::memory &memory,
+					__in uint16_t value
+					);
+
+				uint8_t read(
+					__in e65::interface::system::memory &memory,
+					__in uint16_t address
+					) const;
+
+				uint16_t read_word(
+					__in e65::interface::system::memory &memory,
+					__in uint16_t address
+					) const;
+
+				void service(
+					__in e65::interface::system::memory &memory
+					);
+
+				void write(
+					__in e65::interface::system::memory &memory,
+					__in uint16_t address,
+					__in uint8_t value
+					);
+
+				void write_word(
+					__in e65::interface::system::memory &memory,
+					__in uint16_t address,
+					__in uint16_t value
+					);
 
 				uint8_t m_accumulator;
 

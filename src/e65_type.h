@@ -63,6 +63,7 @@ static const std::string E65_COMMAND_STR[] = {
 	"Memory-Write",
 	"Processor-Accumulator",
 	"Processor-Accumulator-Set",
+	"Processor-Core",
 	"Processor-Cycle",
 	"Processor-Flags",
 	"Processor-Flags-Set",
