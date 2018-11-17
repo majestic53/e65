@@ -56,8 +56,8 @@ e65_core(
 {
 	uint8_t flags;
 	std::string buffer;
+	std::stringstream stream;
 	int flag, result = EXIT_SUCCESS;
-	std::stringstream stream, substream;
 
 	if(!output) {
 		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", output);
