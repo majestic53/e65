@@ -245,8 +245,8 @@ namespace e65 {
 #endif // TRACE_COLOR
 
 		switch(level) {
-			case E65_LEVEL_ERROR:
-			case E65_LEVEL_WARNING:
+			case e65::type::E65_LEVEL_ERROR:
+			case e65::type::E65_LEVEL_WARNING:
 				std::cerr << result.str() << std::endl;
 				break;
 			default:

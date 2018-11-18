@@ -502,11 +502,11 @@ prompt(void)
 		std::vector<std::string>::iterator argument;
 
 #ifdef TRACE_COLOR
-		prompt << E65_LEVEL_COLOR(e65::E65_LEVEL_INFORMATION);
+		prompt << E65_LEVEL_COLOR(e65::type::E65_LEVEL_INFORMATION);
 #endif // TRACE_COLOR
 		prompt << E65;
 #ifdef TRACE_COLOR
-		prompt << E65_LEVEL_COLOR(e65::E65_LEVEL_WARNING);
+		prompt << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
 #endif // TRACE_COLOR
 		prompt << E65_PROMPT;
 #ifdef TRACE_COLOR
@@ -544,7 +544,7 @@ prompt(void)
 
 		if(!E65_IS_COMMAND(command)) {
 #ifdef TRACE_COLOR
-			std::cerr << E65_LEVEL_COLOR(e65::E65_LEVEL_WARNING);
+			std::cerr << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
 #endif // TRACE_COLOR
 			std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMAMND_UNSUPPORTED) << ": " << E65_STRING_CHECK(command)
 				<< std::endl;
@@ -559,7 +559,7 @@ prompt(void)
 		length = E65_COMMAND_LENGTH(id);
 		if(length != arguments.size()) {
 #ifdef TRACE_COLOR
-			std::cerr << E65_LEVEL_COLOR(e65::E65_LEVEL_WARNING);
+			std::cerr << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
 #endif // TRACE_COLOR
 			std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_ARGUMENT) << ": " << input_str
 				<< std::endl;
@@ -574,7 +574,7 @@ prompt(void)
 			std::string error_str;
 
 #ifdef TRACE_COLOR
-			std::cerr << E65_LEVEL_COLOR(e65::E65_LEVEL_ERROR);
+			std::cerr << E65_LEVEL_COLOR(e65::type::E65_LEVEL_ERROR);
 #endif // TRACE_COLOR
 			std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_ERROR) << ": " << E65_STRING_CHECK(command);
 

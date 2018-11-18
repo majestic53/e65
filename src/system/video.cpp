@@ -55,15 +55,15 @@ namespace e65 {
 				THROW_E65_SYSTEM_VIDEO_EXCEPTION(E65_SYSTEM_VIDEO_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Video clearing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video clearing");
 
 			for(offset = E65_VIDEO_ADDRESS_MIN; offset <= E65_VIDEO_ADDRESS_MAX; ++offset) {
-				memory.write(offset, E65_COLOR_BLACK);
+				memory.write(offset, e65::type::E65_COLOR_BLACK);
 			}
 
 			m_frame = 0;
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Video cleared");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video cleared");
 
 			E65_TRACE_EXIT();
 		}
@@ -104,11 +104,11 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Video initializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video initializing");
 
 			m_display.initialize(context, length);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Video initialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -119,11 +119,11 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Video uninitializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video uninitializing");
 
 			m_display.uninitialize();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Video uninitialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video uninitialized");
 
 			E65_TRACE_EXIT();
 		}

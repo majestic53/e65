@@ -32,7 +32,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY();
 
-		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime created", "%s", E65_STRING_CHECK(version()));
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime created", "%s", E65_STRING_CHECK(version()));
 
 		E65_TRACE_EXIT();
 	}
@@ -41,7 +41,7 @@ namespace e65 {
 	{
 		E65_TRACE_ENTRY();
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime destroyed");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime destroyed");
 
 		E65_TRACE_EXIT();
 
@@ -191,12 +191,13 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initializing");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime initializing");
 
 		m_breakpoint.clear();
 
 		SDL_GetVersion(&version);
-		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime library created", "%u.%u.%u", version.major, version.minor, version.patch);
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime library created", "%u.%u.%u", version.major, version.minor,
+			version.patch);
 
 		if(SDL_Init(E65_RUNTIME_SDL_FLAGS)) {
 			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_EXTERNAL, "SDL_Init failed! %s", SDL_GetError());
@@ -205,7 +206,7 @@ namespace e65 {
 		m_bus.initialize(context, length);
 		e65::type::thread::start(true, context, length);
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime initialized");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime initialized");
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
@@ -221,7 +222,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime main loop entry");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop entry");
 
 		if(!m_debug) {
 			uint32_t begin = 0, current = 0, previous = 0;
@@ -234,7 +235,8 @@ namespace e65 {
 				if(rate >= E65_MILLISECONDS_PER_SECOND) {
 					rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
 
-					E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f", (rate > 0.f) ? rate : 0.f);
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f",
+						(rate > 0.f) ? rate : 0.f);
 
 					m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
 					begin = end;
@@ -263,7 +265,7 @@ namespace e65 {
 			}
 		}
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime main loop exit");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop exit");
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
@@ -279,9 +281,9 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime starting");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime starting");
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime started");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime started");
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
@@ -292,9 +294,9 @@ namespace e65 {
 	{
 		E65_TRACE_ENTRY();
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stopping");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime stopping");
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime stopped");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime stopped");
 
 		E65_TRACE_EXIT();
 	}
@@ -304,16 +306,16 @@ namespace e65 {
 	{
 		E65_TRACE_ENTRY();
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime uninitializing");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime uninitializing");
 
 		e65::type::thread::stop();
 
 		m_bus.uninitialize();
 		SDL_Quit();
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime library destroyed");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime library destroyed");
 
-		E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime uninitialized");
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime uninitialized");
 
 		E65_TRACE_EXIT();
 	}
@@ -346,7 +348,7 @@ namespace e65 {
 					}
 					break;
 				case SDL_QUIT:
-					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Runtime quit event");
+					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime quit event");
 					result = false;
 					break;
 				default:
@@ -393,7 +395,8 @@ namespace e65 {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
-		E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime running", "%s, %s", debug ? "Debug" : "Normal", E65_STRING_CHECK(path));
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime running", "%s, %s", debug ? "Debug" : "Normal",
+			E65_STRING_CHECK(path));
 
 		file = std::ifstream(path.c_str(), std::ios::binary | std::ios::in);
 		if(!file) {
@@ -461,10 +464,10 @@ namespace e65 {
 			uint16_t address = m_bus.processor().program_counter();
 
 			if(breakpoint_contains(address)) {
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime breakpoint", "%u(%04x)", address, address);
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpoint", "%u(%04x)", address, address);
 				result = false;
 			} else {
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Runtime stepping", "%u(%04x)", address, address);
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime stepping", "%u(%04x)", address, address);
 				e65::type::thread::notify();
 			}
 		}

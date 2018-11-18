@@ -16,39 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_DEFINE_COLOR_H_
-#define E65_DEFINE_COLOR_H_
+#ifndef E65_TYPE_LEVEL_H_
+#define E65_TYPE_LEVEL_H_
 
 namespace e65 {
 
-	enum {
-		E65_COLOR_BLACK = 0,
-		E65_COLOR_WHITE,
-		E65_COLOR_RED,
-		E65_COLOR_CYAN,
-		E65_COLOR_PURPLE,
-		E65_COLOR_GREEN,
-		E65_COLOR_BLUE,
-		E65_COLOR_YELLOW,
-		E65_COLOR_ORANGE,
-		E65_COLOR_BROWN,
-		E65_COLOR_LIGHT_RED,
-		E65_COLOR_DARK_GREY,
-		E65_COLOR_GREY,
-		E65_COLOR_LIGHT_GREEN,
-		E65_COLOR_LIGHT_BLUE,
-		E65_COLOR_LIGHT_GREY,
-	};
+	namespace type {
 
-	static const std::string E65_LEVEL_COL[] = {
-		"\x1b[91m", "\x1b[93m", "\x1b[94m", "\x1b[90m",
+		enum {
+			E65_LEVEL_ERROR = 0,
+			E65_LEVEL_WARNING,
+			E65_LEVEL_INFORMATION,
+			E65_LEVEL_VERBOSE,
 		};
 
-	#define E65_LEVEL_COLOR(_TYPE_) \
-		(((_TYPE_) > E65_LEVEL_MAX) ? E65_LEVEL_COLOR_RESET : \
-			E65_STRING_CHECK(e65::E65_LEVEL_COL[_TYPE_]))
+		#define E65_LEVEL_MAX e65::type::E65_LEVEL_VERBOSE
 
-	#define E65_LEVEL_COLOR_RESET "\x1b[0m"
+		static const std::string E65_LEVEL_STR[] = {
+			"Error", "Warning", "Information", "Verbose",
+			};
+
+		#define E65_LEVEL_STRING(_TYPE_) \
+			(((_TYPE_) > E65_LEVEL_MAX) ? E65_STRING_UNKNOWN : \
+				E65_STRING_CHECK(e65::type::E65_LEVEL_STR[_TYPE_]))
+	}
 }
 
-#endif // E65_DEFINE_COLOR_H_
+#endif // E65_TYPE_LEVEL_H_

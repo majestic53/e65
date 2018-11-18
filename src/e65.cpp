@@ -121,8 +121,8 @@ e65_dump(
 	if(iter) {
 		end = iter;
 
-		E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Address is not block-aligned", "%u(%04x) (correction=%u(%04x))", address, address,
-			end, end);
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Address is not block-aligned", "%u(%04x) (correction=%u(%04x))",
+			address, address, end, end);
 
 		address -= end;
 	}
@@ -131,7 +131,7 @@ e65_dump(
 	if(iter) {
 		end = (E65_DUMP_BLOCK_SIZE - iter);
 
-		E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Offset is not block-aligned", "%u(%04x) (correction=%u(%04x))", offset, offset,
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Offset is not block-aligned", "%u(%04x) (correction=%u(%04x))", offset, offset,
 			end, end);
 
 		offset += end;
@@ -220,7 +220,8 @@ e65_command(
 
 				response->result = (e65::runtime::acquire().breakpoint_clear(address) ? EXIT_SUCCESS : EXIT_FAILURE);
 				if(response->result != EXIT_SUCCESS) {
-					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to clear breakpoint", "%u(%04x)", address, address);
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Failed to clear breakpoint", "%u(%04x)",
+						address, address);
 				}
 				break;
 			case E65_BREAKPOINT_CLEAR_ALL:
@@ -234,7 +235,8 @@ e65_command(
 
 				response->result = (e65::runtime::acquire().breakpoint_set(address) ? EXIT_SUCCESS : EXIT_FAILURE);
 				if(response->result != EXIT_SUCCESS) {
-					E65_TRACE_MESSAGE_FORMAT(e65::E65_LEVEL_WARNING, "Failed to set breakpoint", "%u(%04x)", address, address);
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Failed to set breakpoint", "%u(%04x)",
+						address, address);
 				}
 				break;
 			case E65_MEMORY_DUMP:

@@ -155,10 +155,10 @@ namespace e65 {
 			if(!maskable || !m_flags.irq_disable) {
 
 				if(maskable) {
-					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor IRQ interrupt request");
+					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor IRQ interrupt request");
 					m_interrupt_irq = true;
 				} else {
-					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor NMI interrupt request");
+					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor NMI interrupt request");
 					m_interrupt_nmi = true;
 				}
 			}
@@ -199,9 +199,9 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor initializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor initializing");
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor initialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -212,9 +212,9 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor uninitializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor uninitializing");
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor uninitialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor uninitialized");
 
 			E65_TRACE_EXIT();
 		}
@@ -351,7 +351,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor resetting");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor resetting");
 
 			m_accumulator = E65_PROCESSOR_REGISTER_ACCUMULATOR;
 			m_cycle = E65_PROCESSOR_INTERRUPT_CYCLES;
@@ -366,7 +366,7 @@ namespace e65 {
 			m_stack_pointer = E65_PROCESSOR_REGISTER_STACK_POINTER;
 			m_stop = false;
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor reset");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor reset");
 
 			E65_TRACE_EXIT();
 		}
@@ -381,13 +381,13 @@ namespace e65 {
 			if(m_interrupt_irq || m_interrupt_nmi) {
 
 				if(m_interrupt_nmi) {
-					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
+					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
 				} else if(m_interrupt_irq) {
-					E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
+					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
 				}
 
 				push_word(memory, m_program_counter);
-				push(memory, m_flags.raw & ~E65_PFLAG(E65_PFLAG_BREAKPOINT));
+				push(memory, m_flags.raw & ~E65_PFLAG(e65::type::E65_PFLAG_BREAKPOINT));
 
 				if(m_interrupt_nmi) {
 					m_interrupt_nmi = false;
@@ -597,14 +597,14 @@ namespace e65 {
 					<< ", PC=" << (int) m_program_counter << "(" << E65_STRING_HEX(uint16_t, m_program_counter) << ")"
 					<< ", SP=" << (int) m_stack_pointer << "(" << E65_STRING_HEX(uint8_t, m_stack_pointer) << ")"
 					<< ", F=" << (int) m_flags.raw << "(" << E65_STRING_HEX(uint8_t, m_flags.raw) << ")"
-					<< " [" << (m_flags.sign ? E65_PFLAG_STRING(E65_PFLAG_SIGN) : "-")
-						<< (m_flags.overflow ? E65_PFLAG_STRING(E65_PFLAG_OVERFLOW) : "-")
-						<< E65_PFLAG_STRING(E65_PFLAG_UNUSED)
-						<< (m_flags.breakpoint ? E65_PFLAG_STRING(E65_PFLAG_BREAKPOINT) : "-")
-						<< (m_flags.decimal_enable ? E65_PFLAG_STRING(E65_PFLAG_DECIMAL_ENABLE) : "-")
-						<< (m_flags.irq_disable ? E65_PFLAG_STRING(E65_PFLAG_IRQ_DISABLE) : "-")
-						<< (m_flags.zero ? E65_PFLAG_STRING(E65_PFLAG_ZERO) : "-")
-						<< (m_flags.carry ? E65_PFLAG_STRING(E65_PFLAG_CARRY) : "-") << "]"
+					<< " [" << (m_flags.sign ? E65_PFLAG_STRING(e65::type::E65_PFLAG_SIGN) : "-")
+						<< (m_flags.overflow ? E65_PFLAG_STRING(e65::type::E65_PFLAG_OVERFLOW) : "-")
+						<< E65_PFLAG_STRING(e65::type::E65_PFLAG_UNUSED)
+						<< (m_flags.breakpoint ? E65_PFLAG_STRING(e65::type::E65_PFLAG_BREAKPOINT) : "-")
+						<< (m_flags.decimal_enable ? E65_PFLAG_STRING(e65::type::E65_PFLAG_DECIMAL_ENABLE) : "-")
+						<< (m_flags.irq_disable ? E65_PFLAG_STRING(e65::type::E65_PFLAG_IRQ_DISABLE) : "-")
+						<< (m_flags.zero ? E65_PFLAG_STRING(e65::type::E65_PFLAG_ZERO) : "-")
+						<< (m_flags.carry ? E65_PFLAG_STRING(e65::type::E65_PFLAG_CARRY) : "-") << "]"
 					<< ", A=" << (int) m_accumulator << "(" << E65_STRING_HEX(uint8_t, m_accumulator) << ")"
 					<< ", X=" << (int) m_index_x << "(" << E65_STRING_HEX(uint8_t, m_index_x) << ")"
 					<< ", Y=" << (int) m_index_y << "(" << E65_STRING_HEX(uint8_t, m_index_y) << ")";

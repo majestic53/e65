@@ -16,33 +16,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_DEFINE_PFLAG_H_
-#define E65_DEFINE_PFLAG_H_
+#ifndef E65_TYPE_CONSTANT_H_
+#define E65_TYPE_CONSTANT_H_
 
 namespace e65 {
 
-	enum {
-		E65_PFLAG_CARRY = 0,
-		E65_PFLAG_ZERO,
-		E65_PFLAG_IRQ_DISABLE,
-		E65_PFLAG_DECIMAL_ENABLE,
-		E65_PFLAG_BREAKPOINT,
-		E65_PFLAG_UNUSED,
-		E65_PFLAG_OVERFLOW,
-		E65_PFLAG_SIGN,
-	};
+	namespace type {
 
-	#define E65_PFLAG_MAX e65::E65_PFLAG_SIGN
+		#define E65_BYTES_PER_KBYTE 1024.f
 
-	#define E65_PFLAG(_TYPE_) (1 << (_TYPE_))
+		#define E65_EXCEPTION_UNKNOWN "Unknown exception"
 
-	static const std::string E65_PFLAG_STR[] = {
-		"C", "Z", "I", "D", "B", "-", "V", "N",
-		};
+		#define E65_MEMORY_FILL 0xea
+		#define E65_MEMORY_LENGTH 0x10000
 
-	#define E65_PFLAG_STRING(_TYPE_) \
-		(((_TYPE_) > E65_PFLAG_MAX) ? E65_STRING_UNKNOWN : \
-			E65_STRING_CHECK(e65::E65_PFLAG_STR[_TYPE_]))
+		#define E65_MILLISECONDS_PER_SECOND 1000.f
+
+		#define E65_PROCESSOR_CYCLES_PER_FRAME (E65_PROCESSOR_FREQUENCY / E65_VIDEO_FRAME_RATE)
+		#define E65_PROCESSOR_FREQUENCY 1000000
+
+		#define E65_STRING_EMPTY "Empty"
+		#define E65_STRING_UNKNOWN "Unknown"
+
+		#define E65_VIDEO_FRAME_RATE 60
+	}
 }
 
-#endif // E65_DEFINE_PFLAG_H_
+#endif // E65_TYPE_CONSTANT_H_

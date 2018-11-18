@@ -51,13 +51,13 @@ namespace e65 {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus clearing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Bus clearing");
 
 			m_memory.clear();
 			m_input.clear(m_memory);
 			m_video.clear(m_memory);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus cleared");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Bus cleared");
 
 			E65_TRACE_EXIT();
 		}
@@ -86,7 +86,7 @@ namespace e65 {
 
 			clear();
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
 				data.size() / E65_BYTES_PER_KBYTE, data.size());
 
 			if(hex) {
@@ -260,14 +260,14 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Bus initializing");
 
 			m_memory.initialize(context, length);
 			m_input.initialize(context, length);
 			m_processor.initialize(context, length);
 			m_video.initialize(context, length);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus initialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Bus initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -278,14 +278,14 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Bus uninitializing");
 
 			m_video.uninitialize();
 			m_processor.uninitialize();
 			m_input.uninitialize();
 			m_memory.uninitialize();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Bus uninitialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Bus uninitialized");
 
 			E65_TRACE_EXIT();
 		}
@@ -347,7 +347,8 @@ namespace e65 {
 
 			remaining = (E65_PROCESSOR_CYCLES_PER_FRAME - previous);
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_VERBOSE, "Frame", "[%u] Cycles=%u (Previous=%u)", m_video.frame(), remaining, previous);
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Frame", "[%u] Cycles=%u (Previous=%u)", m_video.frame(), remaining,
+				previous);
 
 			while(remaining > 0) {
 				m_input.step(m_memory);

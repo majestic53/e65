@@ -28,18 +28,6 @@ namespace e65 {
 
 	namespace system {
 
-		typedef union {
-
-			struct {
-				uint32_t blue : 8;
-				uint32_t green : 8;
-				uint32_t red : 8;
-				uint32_t alpha : 8;
-			};
-
-			uint32_t raw;
-		} color_t;
-
 		class display :
 				public e65::interface::singleton<e65::system::display>,
 				public e65::interface::system::display {
@@ -113,7 +101,7 @@ namespace e65 {
 
 				void on_uninitialize(void) override;
 
-				std::vector<e65::system::color_t> m_pixel;
+				std::vector<e65::type::color_t> m_pixel;
 
 				SDL_Renderer *m_renderer;
 

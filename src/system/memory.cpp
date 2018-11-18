@@ -47,11 +47,11 @@ namespace e65 {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory clearing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Memory clearing");
 
 			m_memory.resize(E65_MEMORY_LENGTH, E65_MEMORY_FILL);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory cleared");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Memory cleared");
 
 			E65_TRACE_EXIT();
 		}
@@ -70,7 +70,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Memory load", "%u(%04x), %.1f KB (%u bytes)", origin, origin,
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Memory load", "%u(%04x), %.1f KB (%u bytes)", origin, origin,
 				data.size() / E65_BYTES_PER_KBYTE, data.size());
 
 			offset = (origin + data.size());
@@ -95,12 +95,12 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Memory initializing", "%.1f KB (%u bytes)",
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Memory initializing", "%.1f KB (%u bytes)",
 				E65_MEMORY_LENGTH / E65_BYTES_PER_KBYTE, E65_MEMORY_LENGTH);
 
 			m_memory.resize(E65_MEMORY_LENGTH, E65_MEMORY_FILL);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory initialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Memory initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -111,9 +111,9 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory uninitializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Memory uninitializing");
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Memory uninitialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Memory uninitialized");
 
 			E65_TRACE_EXIT();
 		}

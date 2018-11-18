@@ -69,9 +69,9 @@ namespace e65 {
 		#define E65_DISPLAY_PIXEL_INDEX(_X_, _Y_) \
 			((E65_DISPLAY_WIDTH * (_Y_)) + (_X_))
 
-		#define E65_COLOR_MAX E65_COLOR_LIGHT_GREY
+		#define E65_COLOR_MAX e65::type::E65_COLOR_LIGHT_GREY
 
-		static const e65::system::color_t E65_DISPLAY_COL[] = {
+		static const e65::type::color_t E65_DISPLAY_COL[] = {
 			{{ 0, 0, 0, 255, }},
 			{{ 255, 255, 255, 255, }},
 			{{ 0, 0, 204, 255, }},
@@ -91,7 +91,7 @@ namespace e65 {
 			};
 
 		#define E65_DISPLAY_COLOR(_TYPE_) \
-			(((_TYPE_) > E65_COLOR_MAX) ? E65_DISPLAY_COL[E65_COLOR_BLACK] : \
+			(((_TYPE_) > E65_COLOR_MAX) ? E65_DISPLAY_COL[e65::type::E65_COLOR_BLACK] : \
 				E65_DISPLAY_COL[_TYPE_])
 
 		static const std::string E65_DISPLAY_COL_STR[] = {
@@ -103,7 +103,7 @@ namespace e65 {
 			(((_TYPE_) > E65_COLOR_MAX) ? E65_STRING_UNKNOWN : \
 				E65_STRING_CHECK(E65_DISPLAY_COL_STR[_TYPE_]))
 
-		#define E65_DISPLAY_COLOR_BACKGROUND E65_DISPLAY_COLOR(E65_COLOR_BLACK)
+		#define E65_DISPLAY_COLOR_BACKGROUND E65_DISPLAY_COLOR(e65::type::E65_COLOR_BLACK)
 	}
 }
 

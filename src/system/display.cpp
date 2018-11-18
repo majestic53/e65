@@ -49,11 +49,11 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display clearing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display clearing");
 
 			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display cleared");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display cleared");
 
 			E65_TRACE_EXIT();
 		}
@@ -102,7 +102,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Display initializing", "{%u, %u} Scale=%.1f",
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Display initializing", "{%u, %u} Scale=%.1f",
 				E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT, E65_DISPLAY_SCALE);
 
 			m_title = E65;
@@ -153,7 +153,7 @@ namespace e65 {
 
 			SDL_RenderPresent(m_renderer);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display initialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -164,7 +164,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display uninitializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display uninitializing");
 
 			if(m_texture) {
 				SDL_DestroyTexture(m_texture);
@@ -181,7 +181,7 @@ namespace e65 {
 				m_window = nullptr;
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Display uninitialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display uninitialized");
 
 			E65_TRACE_EXIT();
 		}
@@ -242,7 +242,8 @@ namespace e65 {
 			}
 
 			if((SDL_GetWindowFlags(m_window) & E65_DISPLAY_FULLSCREEN_FLAGS) != fullscreen) {
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Display mode change", "%s", fullscreen ? "Fullscreen" : "Window");
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Display mode change", "%s",
+					fullscreen ? "Fullscreen" : "Window");
 
 				SDL_ShowCursor(!fullscreen);
 
@@ -270,7 +271,7 @@ namespace e65 {
 
 			is_hidden = (SDL_GetWindowFlags(m_window) & SDL_WINDOW_HIDDEN);
 			if(is_hidden != hidden) {
-				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Display mode change", "%s", hidden ? "Hidden" : "Shown");
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Display mode change", "%s", hidden ? "Hidden" : "Shown");
 
 				SDL_ShowCursor(hidden);
 
@@ -346,7 +347,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_DISPLAY_WIDTH * sizeof(e65::system::color_t))) {
+			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_DISPLAY_WIDTH * sizeof(e65::type::color_t))) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_UpdateTexture failed! %s",
 					SDL_GetError());
 			}

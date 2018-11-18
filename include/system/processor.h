@@ -26,21 +26,6 @@ namespace e65 {
 
 	namespace system {
 
-		typedef union {
-			struct {
-				uint8_t carry : 1;
-				uint8_t zero : 1;
-				uint8_t irq_disable : 1;
-				uint8_t decimal_enable : 1;
-				uint8_t breakpoint : 1;
-				uint8_t unused : 1;
-				uint8_t overflow : 1;
-				uint8_t sign : 1;
-			};
-
-			uint8_t raw;
-		} e65_flag_t;
-
 		class processor :
 				public e65::interface::singleton<e65::system::processor>,
 				public e65::interface::system::processor {
@@ -194,7 +179,7 @@ namespace e65 {
 
 				uint8_t m_cycle_last;
 
-				e65::system::e65_flag_t m_flags;
+				e65::type::pflag_t m_flags;
 
 				bool m_halt;
 

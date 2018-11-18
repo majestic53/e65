@@ -51,12 +51,12 @@ namespace e65 {
 				THROW_E65_SYSTEM_INPUT_EXCEPTION(E65_SYSTEM_INPUT_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Input clearing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Input clearing");
 
 			memory.write(E65_INPUT_ADDRESS_KEY, 0);
 			memory.write(E65_INPUT_ADDRESS_RANDOM, 0);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Input cleared");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Input cleared");
 
 			E65_TRACE_EXIT();
 		}
@@ -73,7 +73,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_INPUT_EXCEPTION(E65_SYSTEM_INPUT_EXCEPTION_UNINITIALIZED);
 			}
 
-			E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Input key event", "%u(%x)", value, value);
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Input key event", "%u(%x)", value, value);
 
 			memory.write(E65_INPUT_ADDRESS_KEY, value);
 
@@ -90,9 +90,9 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Input initializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Input initializing");
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Input initialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Input initialized");
 
 			E65_TRACE_EXIT_FORMAT("Result=%x", result);
 			return result;
@@ -103,9 +103,9 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Input uninitializing");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Input uninitializing");
 
-			E65_TRACE_MESSAGE(E65_LEVEL_INFORMATION, "Input uninitialized");
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Input uninitialized");
 
 			E65_TRACE_EXIT();
 		}

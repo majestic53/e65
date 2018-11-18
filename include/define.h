@@ -25,12 +25,12 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "./define/color.h"
-#include "./define/constant.h"
-#include "./define/level.h"
-#include "./define/macro.h"
-#include "./define/pcommand.h"
-#include "./define/pflag.h"
+#include "./type/color.h"
+#include "./type/constant.h"
+#include "./type/level.h"
+#include "./type/macro.h"
+#include "./type/pcommand.h"
+#include "./type/pflag.h"
 
 namespace e65 {
 
