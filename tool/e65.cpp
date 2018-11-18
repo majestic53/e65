@@ -33,10 +33,18 @@ display_command_usage(void)
 		if(command) {
 			result << std::endl;
 
-			if(command == E65_COMMAND_BUILT_IN) {
-				result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_LONG_WIDTH) << "---"
-					<< E65_COLUMN_WIDTH(E65_USAGE_COLUMN_SHORT_WIDTH) << "---"
-					<< "---" << std::endl;
+			switch(command) {
+				case E65_COMMAND_BUILT_IN:
+				case E65_COMMAND_BREAKPOINT:
+				case E65_COMMAND_MEMORY:
+				case E65_COMMAND_PROCESSOR:
+				case E65_COMMAND_VIDEO:
+					result << E65_COLUMN_WIDTH(E65_USAGE_COLUMN_LONG_WIDTH) << "---"
+						<< E65_COLUMN_WIDTH(E65_USAGE_COLUMN_SHORT_WIDTH) << "---"
+						<< "---" << std::endl;
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -267,8 +275,16 @@ prompt_command(
 
 			result = e65_command(E65_MEMORY_READ, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "[" << E65_STRING_HEX(uint16_t, request.address) << "] --> "
-					<< E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+			}
+			break;
+		case E65_COMMAND_MEMORY_READ_WORD:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			result = e65_command(E65_MEMORY_READ_WORD, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
 			}
 			break;
 		case E65_COMMAND_MEMORY_WRITE:
@@ -282,11 +298,22 @@ prompt_command(
 
 			result = e65_command(E65_MEMORY_WRITE, &request, &response);
 			break;
+		case E65_COMMAND_MEMORY_WRITE_WORD:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::hex << arguments.back();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_MEMORY_WRITE_WORD, &request, &response);
+			break;
 		case E65_COMMAND_PROCESSOR_ACCUMULATOR:
 
 			result = e65_command(E65_PROCESSOR_ACCUMULATOR, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "A --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_ACCUMULATOR_SET:
@@ -326,7 +353,7 @@ prompt_command(
 			if(result == EXIT_SUCCESS) {
 				int flag;
 
-				std::cout << "F --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << " [";
+				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << " [";
 
 				for(flag = E65_PFLAG_MAX; flag >= 0; flag--) {
 					std::cout << ((response.payload.byte & E65_PFLAG(flag)) ? E65_PFLAG_STRING(flag) : "-");
@@ -351,7 +378,7 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_INDEX_X, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "X --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_INDEX_X_SET:
@@ -364,7 +391,7 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_INDEX_Y, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "Y --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_INDEX_Y_SET:
@@ -381,7 +408,7 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "PC --> " << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
+				std::cout << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_PROGRAM_COUNTER_SET:
@@ -397,7 +424,7 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_STACK_POINTER, &request, &response);
 			if(result == EXIT_SUCCESS) {
-				std::cout << "SP --> " << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
+				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_STACK_POINTER_SET:
@@ -407,7 +434,15 @@ prompt_command(
 			result = e65_command(E65_PROCESSOR_STACK_POINTER_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_STEP:
+
 			result = e65_step();
+			if(result != EXIT_SUCCESS) {
+
+				result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
+				if(result == EXIT_SUCCESS) {
+					std::cout << "Breakpoint " << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
+				}
+			}
 			break;
 		case E65_COMMAND_PROCESSOR_STOP:
 			result = e65_command(E65_PROCESSOR_STOP, &request, &response);
@@ -421,6 +456,18 @@ prompt_command(
 			if(result == EXIT_SUCCESS) {
 				std::cout << response.payload.dword << std::endl;
 			}
+			break;
+		case E65_COMMAND_VIDEO_FULLSCREEN:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.dword;
+
+			result = e65_command(E65_VIDEO_FULLSCREEN, &request, &response);
+			break;
+		case E65_COMMAND_VIDEO_HIDE:
+			stream << std::hex << arguments.front();
+			stream >> request.payload.dword;
+
+			result = e65_command(E65_VIDEO_HIDE, &request, &response);
 			break;
 		case E65_COMMAND_EXIT:
 			terminate = true;

@@ -65,26 +65,26 @@ e65_core(
 
 	e65::interface::system::processor &processor = e65::runtime::acquire().bus().processor();
 
-	stream << "CYC --> " << processor.cycle() << " (" << (int) processor.cycle_last() << ")"
-		<< std::endl << "HLT --> " << processor.halted()
-		<< std::endl << "STP --> " << processor.stopped()
-		<< std::endl << "IRQ --> " << processor.interrupted(true)
-		<< std::endl << "NMI --> " << processor.interrupted(false);
+	stream << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "CYC" << processor.cycle() << " (" << (int) processor.cycle_last() << ")"
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "HLT" << processor.halted()
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "STP" << processor.stopped()
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "IRQ" << processor.interrupted(true)
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "NMI" << processor.interrupted(false);
 
-	stream << std::endl << "PC  --> " << E65_STRING_HEX(uint16_t, processor.program_counter())
-		<< std::endl << "SP  --> " << E65_STRING_HEX(uint8_t, processor.stack_pointer());
+	stream << std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "PC" << E65_STRING_HEX(uint16_t, processor.program_counter())
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "SP" << E65_STRING_HEX(uint8_t, processor.stack_pointer());
 
 	flags = processor.flags();
-	stream << std::endl << "F   --> " << E65_STRING_HEX(uint8_t, flags) << " [";
+	stream << std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "F" << E65_STRING_HEX(uint8_t, flags) << " [";
 
 	for(flag = E65_PFLAG_MAX; flag >= 0; flag--) {
 		stream << ((flags & E65_PFLAG(flag)) ? E65_PFLAG_STRING(flag) : "-");
 	}
 
 	stream << "]"
-		<< std::endl << "A   --> " << E65_STRING_HEX(uint8_t, processor.accumulator())
-		<< std::endl << "X   --> "  << E65_STRING_HEX(uint8_t, processor.index_x())
-		<< std::endl << "Y   --> "  << E65_STRING_HEX(uint8_t, processor.index_y());
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "A" << E65_STRING_HEX(uint8_t, processor.accumulator())
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "X"  << E65_STRING_HEX(uint8_t, processor.index_x())
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "Y"  << E65_STRING_HEX(uint8_t, processor.index_y());
 
 	buffer = stream.str();
 	if(buffer.empty()) {
@@ -243,8 +243,14 @@ e65_command(
 			case E65_MEMORY_READ:
 				response->payload.byte = e65::runtime::acquire().bus().memory().read(request->address);
 				break;
+			case E65_MEMORY_READ_WORD:
+				response->payload.word = e65::runtime::acquire().bus().memory().read_word(request->address);
+				break;
 			case E65_MEMORY_WRITE:
 				e65::runtime::acquire().bus().memory().write(request->address, request->payload.byte);
+				break;
+			case E65_MEMORY_WRITE_WORD:
+				e65::runtime::acquire().bus().memory().write_word(request->address, request->payload.word);
 				break;
 			case E65_PROCESSOR_ACCUMULATOR:
 				response->payload.byte = e65::runtime::acquire().bus().processor().accumulator();
@@ -302,6 +308,12 @@ e65_command(
 				break;
 			case E65_VIDEO_FRAME:
 				response->payload.dword = e65::runtime::acquire().bus().video().frame();
+				break;
+			case E65_VIDEO_FULLSCREEN:
+				e65::runtime::acquire().bus().video().display().set_fullscreen(request->payload.dword);
+				break;
+			case E65_VIDEO_HIDE:
+				e65::runtime::acquire().bus().video().display().set_hidden(request->payload.dword);
 				break;
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", command, E65_COMMAND_STRING(command));

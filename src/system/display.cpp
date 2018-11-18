@@ -76,6 +76,23 @@ namespace e65 {
 		}
 
 		bool
+		display::hidden(void) const
+		{
+			bool result;
+
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
+			}
+
+			result = (SDL_GetWindowFlags(m_window) & SDL_WINDOW_HIDDEN);
+
+			E65_TRACE_EXIT_FORMAT("Result=%x", result);
+			return result;
+		}
+
+		bool
 		display::on_initialize(
 			__in const void *context,
 			__in size_t length
@@ -232,6 +249,35 @@ namespace e65 {
 				if(SDL_SetWindowFullscreen(m_window, fullscreen ? E65_DISPLAY_FULLSCREEN_FLAGS : 0) < 0) {
 					THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL,
 						"SDL_SetWindowFullscreen failed! %s", SDL_GetError());
+				}
+			}
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		display::set_hidden(
+			__in bool hidden
+			)
+		{
+			bool is_hidden;
+
+			E65_TRACE_ENTRY_FORMAT("Hidden=%x", hidden);
+
+			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
+			}
+
+			is_hidden = (SDL_GetWindowFlags(m_window) & SDL_WINDOW_HIDDEN);
+			if(is_hidden != hidden) {
+				E65_TRACE_MESSAGE_FORMAT(E65_LEVEL_INFORMATION, "Display mode change", "%s", hidden ? "Hidden" : "Shown");
+
+				SDL_ShowCursor(hidden);
+
+				if(is_hidden) {
+					SDL_ShowWindow(m_window);
+				} else {
+					SDL_HideWindow(m_window);
 				}
 			}
 

@@ -85,7 +85,9 @@ enum {
 	// memory
 	E65_COMMAND_MEMORY_DUMP,
 	E65_COMMAND_MEMORY_READ,
+	E65_COMMAND_MEMORY_READ_WORD,
 	E65_COMMAND_MEMORY_WRITE,
+	E65_COMMAND_MEMORY_WRITE_WORD,
 
 	// processor
 	E65_COMMAND_PROCESSOR_ACCUMULATOR,
@@ -113,6 +115,8 @@ enum {
 
 	// video
 	E65_COMMAND_VIDEO_FRAME,
+	E65_COMMAND_VIDEO_FULLSCREEN,
+	E65_COMMAND_VIDEO_HIDE,
 
 	// built-in
 	E65_COMMAND_EXIT,
@@ -121,6 +125,10 @@ enum {
 };
 
 #define E65_COMMAND_BUILT_IN E65_COMMAND_EXIT
+#define E65_COMMAND_BREAKPOINT E65_COMMAND_BREAKPOINT_CLEAR
+#define E65_COMMAND_MEMORY E65_COMMAND_MEMORY_DUMP
+#define E65_COMMAND_PROCESSOR E65_COMMAND_PROCESSOR_ACCUMULATOR
+#define E65_COMMAND_VIDEO E65_COMMAND_VIDEO_FRAME
 
 #define E65_COMMAND_MAX E65_COMMAND_VERSION
 
@@ -134,34 +142,38 @@ static const std::string E65_COMMAND_ARG[] = {
 	// memory
 	"<address> <offset>",
 	"<address>",
-	"<address> <value>",
+	"<address>",
+	"<address> <byte>",
+	"<address> <word>",
 
 	// processor
 	"",
-	"<value>",
+	"<byte>",
 	"",
 	"",
 	"",
-	"<value>",
+	"<byte>",
 	"",
 	"",
 	"",
-	"<value>",
+	"<byte>",
 	"",
-	"<value>",
-	"",
-	"",
-	"",
-	"<value>",
+	"<byte>",
 	"",
 	"",
-	"<value>",
+	"",
+	"<word>",
+	"",
+	"",
+	"<byte>",
 	"",
 	"",
 	"",
 
 	// video
 	"",
+	"<bool>",
+	"<bool>",
 
 	// built-in
 	"",
@@ -182,8 +194,10 @@ static const std::string E65_COMMAND_DESC[] = {
 
 	// memory
 	"Dump memory at an address for a given offset",
-	"Read from a given memory address",
-	"Write to a given memory address",
+	"Read byte from a given memory address",
+	"Read word from a given memory address",
+	"Write byte to a given memory address",
+	"Write word to a given memory address",
 
 	// processor
 	"Display processor accumulator",
@@ -211,6 +225,8 @@ static const std::string E65_COMMAND_DESC[] = {
 
 	// video
 	"Display current video frame",
+	"Fullscreen display window",
+	"Hide display window",
 
 	// built-in
 	"Exit debug mode",
@@ -232,7 +248,9 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 	// memory
 	"memory-dump",
 	"memory-read",
+	"memory-read-word",
 	"memory-write",
+	"memory-write-word",
 
 	// processor
 	"processor-accumulator",
@@ -260,6 +278,8 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 
 	// video
 	"video-frame",
+	"video-fullscreen",
+	"video-hide",
 
 	// built-in
 	"exit",
@@ -281,7 +301,9 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 	// memory
 	"md",
 	"mr",
+	"mrw",
 	"mw",
+	"mww",
 
 	// processor
 	"pa",
@@ -309,6 +331,8 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 
 	// video
 	"vf",
+	"vfs",
+	"vh",
 
 	// built-in
 	"q",
@@ -335,8 +359,12 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_DUMP), E65_COMMAND_MEMORY_DUMP),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_READ), E65_COMMAND_MEMORY_READ),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_READ), E65_COMMAND_MEMORY_READ),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_READ_WORD), E65_COMMAND_MEMORY_READ_WORD),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_READ_WORD), E65_COMMAND_MEMORY_READ_WORD),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_WRITE), E65_COMMAND_MEMORY_WRITE),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_WRITE), E65_COMMAND_MEMORY_WRITE),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_MEMORY_WRITE_WORD), E65_COMMAND_MEMORY_WRITE_WORD),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_MEMORY_WRITE_WORD), E65_COMMAND_MEMORY_WRITE_WORD),
 
 	// processor
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_ACCUMULATOR), E65_COMMAND_PROCESSOR_ACCUMULATOR),
@@ -387,6 +415,10 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	// video
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FULLSCREEN), E65_COMMAND_VIDEO_FULLSCREEN),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FULLSCREEN), E65_COMMAND_VIDEO_FULLSCREEN),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_HIDE), E65_COMMAND_VIDEO_HIDE),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_HIDE), E65_COMMAND_VIDEO_HIDE),
 
 	// built-in
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_EXIT), E65_COMMAND_EXIT),
@@ -413,7 +445,9 @@ std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
 	// memory
 	std::make_pair(E65_COMMAND_MEMORY_DUMP, 2),
 	std::make_pair(E65_COMMAND_MEMORY_READ, 1),
+	std::make_pair(E65_COMMAND_MEMORY_READ_WORD, 1),
 	std::make_pair(E65_COMMAND_MEMORY_WRITE, 2),
+	std::make_pair(E65_COMMAND_MEMORY_WRITE_WORD, 2),
 
 	// processor
 	std::make_pair(E65_COMMAND_PROCESSOR_ACCUMULATOR, 0),
@@ -441,6 +475,8 @@ std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
 
 	// video
 	std::make_pair(E65_COMMAND_VIDEO_FRAME, 0),
+	std::make_pair(E65_COMMAND_VIDEO_FULLSCREEN, 1),
+	std::make_pair(E65_COMMAND_VIDEO_HIDE, 1),
 
 	// built-in
 	std::make_pair(E65_COMMAND_EXIT, 0),

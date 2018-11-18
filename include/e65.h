@@ -35,8 +35,10 @@ enum {
 
 	/* Memory commands */
 	E65_MEMORY_DUMP,			/* Dump memory at a specified address to offset (caller must free response) */
-	E65_MEMORY_READ,			/* Read from a specified memory address */
-	E65_MEMORY_WRITE,			/* Write to a specified memory address */
+	E65_MEMORY_READ,			/* Read a byte from a specified memory address */
+	E65_MEMORY_READ_WORD,			/* Read a word from a specified memory address */
+	E65_MEMORY_WRITE,			/* Write a byte to a specified memory address */
+	E65_MEMORY_WRITE_WORD,			/* Write a word to a specified memory address */
 
 	/* Processor commands */
 	E65_PROCESSOR_ACCUMULATOR,		/* Retrieve the processors accumulator register */
@@ -60,6 +62,8 @@ enum {
 
 	/* Video commands */
 	E65_VIDEO_FRAME,			/* Retrieve the video frame count */
+	E65_VIDEO_FULLSCREEN,			/* Fullscreen video display */
+	E65_VIDEO_HIDE,				/* Hide video display */
 };
 
 typedef struct {
@@ -106,16 +110,6 @@ extern int e65_initialize(void);
 extern void e65_uninitialize(void);
 
 /**
- * Library run routine
- * @brief This routine allows the caller to run a binary/ihex file in an active library session
- * @param path A pointer to a valid, caller allocated file path (Supports binary (.bin) and Intel Hex (.hex) formats)
- * @param hex A flag that defines whether the file is a binary or ihex file (ie. binary=0, ihex=1)
- * @param debug A flag the defines whether or not the session is run in debug mode (ie. non-debug=0, debug=1)
- * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
- */
-extern int e65_run(const char *path, int hex, int debug);
-
-/**
  * ========================================================
  * RUNTIME ROUTINES
  * ========================================================
@@ -146,6 +140,16 @@ extern int e65_interrupt(int maskable);
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
 extern int e65_reset(void);
+
+/**
+ * Library runtime run routine
+ * @brief This routine allows the caller to run a binary/ihex file in an active library session
+ * @param path A pointer to a valid, caller allocated file path (Supports binary (.bin) and Intel Hex (.hex) formats)
+ * @param hex A flag that defines whether the file is a binary or ihex file (ie. binary=0, ihex=1)
+ * @param debug A flag the defines whether or not the session is run in debug mode (ie. non-debug=0, debug=1)
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
+ */
+extern int e65_run(const char *path, int hex, int debug);
 
 /**
  * Library runtime step routine

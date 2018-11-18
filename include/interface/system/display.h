@@ -33,6 +33,8 @@ namespace e65 {
 
 					virtual bool fullscreen(void) const = 0;
 
+					virtual bool hidden(void) const = 0;
+
 					virtual uint32_t pixel(
 						__in uint32_t x,
 						__in uint32_t y
@@ -44,6 +46,10 @@ namespace e65 {
 
 					virtual void set_fullscreen(
 						__in bool fullscreen
+						) = 0;
+
+					virtual void set_hidden(
+						__in bool hidden
 						) = 0;
 
 					virtual void set_pixel(

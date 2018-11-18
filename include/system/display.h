@@ -52,6 +52,8 @@ namespace e65 {
 
 				bool fullscreen(void) const override;
 
+				bool hidden(void) const override;
+
 				uint32_t pixel(
 					__in uint32_t x,
 					__in uint32_t y
@@ -63,6 +65,10 @@ namespace e65 {
 
 				void set_fullscreen(
 					__in bool fullscreen
+					) override;
+
+				void set_hidden(
+					__in bool hidden
 					) override;
 
 				void set_pixel(

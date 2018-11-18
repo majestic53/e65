@@ -51,16 +51,24 @@ static const std::string E65_EXCEPTION_STR[] = {
 #define THROW_E65_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 	E65_EXCEPTION_THROW_FORMAT(E65_EXCEPTION_STRING(_EXCEPT_), _FORMAT_, __VA_ARGS__)
 
-#define E65_COMMAND_MAX E65_VIDEO_FRAME
+#define E65_COMMAND_MAX E65_VIDEO_HIDE
 
 static const std::string E65_COMMAND_STR[] = {
+
+	// breakpoint
 	"Breakpoint-Clear",
 	"Breakpoint-Clear-All",
 	"Breakpoint-List",
 	"Breakpoint-Set",
+
+	// memory
 	"Memory-Dump",
 	"Memory-Read",
+	"Memory-Read-Word",
 	"Memory-Write",
+	"Memory-Write-Word",
+
+	// processor
 	"Processor-Accumulator",
 	"Processor-Accumulator-Set",
 	"Processor-Core",
@@ -79,12 +87,18 @@ static const std::string E65_COMMAND_STR[] = {
 	"Processor-Stack-Pointer-Set",
 	"Processor-Stop",
 	"Processor-Stop-Clear",
+
+	// video
 	"Video-Frame",
+	"Video-Fullscreen",
+	"Video-Hide",
 	};
 
 #define E65_COMMAND_STRING(_TYPE_) \
 	(((_TYPE_) > E65_COMMAND_MAX) ? E65_STRING_UNKNOWN : \
 		E65_STRING_CHECK(E65_COMMAND_STR[_TYPE_]))
+
+#define E65_CORE_COLUMN_WIDTH 6
 
 #define E65_DUMP_BLOCK_SIZE 0x10
 
