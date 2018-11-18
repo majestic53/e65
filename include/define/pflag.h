@@ -16,41 +16,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_DEFINE_H_
-#define E65_DEFINE_H_
-
-#include <cstdint>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include "./define/color.h"
-#include "./define/constant.h"
-#include "./define/level.h"
-#include "./define/macro.h"
-#include "./define/pcommand.h"
-#include "./define/pflag.h"
+#ifndef E65_DEFINE_PFLAG_H_
+#define E65_DEFINE_PFLAG_H_
 
 namespace e65 {
 
-#ifndef __in
-	#define __in
-#endif // __in
-#ifndef __in_opt
-	#define __in_opt
-#endif // __in_opt
-#ifndef __inout
-	#define __inout
-#endif // __inout
+	enum {
+		E65_PFLAG_CARRY = 0,
+		E65_PFLAG_ZERO,
+		E65_PFLAG_IRQ_DISABLE,
+		E65_PFLAG_DECIMAL_ENABLE,
+		E65_PFLAG_BREAKPOINT,
+		E65_PFLAG_UNUSED,
+		E65_PFLAG_OVERFLOW,
+		E65_PFLAG_SIGN,
+	};
 
-	#define E65 "E65"
+	#define E65_PFLAG_MAX e65::E65_PFLAG_SIGN
 
-	#define E65_VERSION_MAJOR 0
-	#define E65_VERSION_MINOR 1
-	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 5
-	#define E65_VERSION_WEEK 1846
+	#define E65_PFLAG(_TYPE_) (1 << (_TYPE_))
+
+	static const std::string E65_PFLAG_STR[] = {
+		"C", "Z", "I", "D", "B", "-", "V", "N",
+		};
+
+	#define E65_PFLAG_STRING(_TYPE_) \
+		(((_TYPE_) > E65_PFLAG_MAX) ? E65_STRING_UNKNOWN : \
+			E65_STRING_CHECK(e65::E65_PFLAG_STR[_TYPE_]))
 }
 
-#endif // E65_DEFINE_H_
+#endif // E65_DEFINE_PFLAG_H_

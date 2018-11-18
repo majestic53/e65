@@ -16,41 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_DEFINE_H_
-#define E65_DEFINE_H_
-
-#include <cstdint>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include "./define/color.h"
-#include "./define/constant.h"
-#include "./define/level.h"
-#include "./define/macro.h"
-#include "./define/pcommand.h"
-#include "./define/pflag.h"
+#ifndef E65_DEFINE_CONSTANT_H_
+#define E65_DEFINE_CONSTANT_H_
 
 namespace e65 {
 
-#ifndef __in
-	#define __in
-#endif // __in
-#ifndef __in_opt
-	#define __in_opt
-#endif // __in_opt
-#ifndef __inout
-	#define __inout
-#endif // __inout
+	#define E65_BYTES_PER_KBYTE 1024.f
 
-	#define E65 "E65"
+	#define E65_EXCEPTION_UNKNOWN "Unknown exception"
 
-	#define E65_VERSION_MAJOR 0
-	#define E65_VERSION_MINOR 1
-	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 5
-	#define E65_VERSION_WEEK 1846
+	#define E65_MEMORY_FILL 0xea
+	#define E65_MEMORY_LENGTH 0x10000
+
+	#define E65_MILLISECONDS_PER_SECOND 1000.f
+
+	#define E65_PROCESSOR_CYCLES_PER_FRAME (E65_PROCESSOR_FREQUENCY / E65_VIDEO_FRAME_RATE)
+	#define E65_PROCESSOR_FREQUENCY 1000000
+
+	#define E65_STRING_EMPTY "Empty"
+	#define E65_STRING_UNKNOWN "Unknown"
+
+	#define E65_VIDEO_FRAME_RATE 60
 }
 
-#endif // E65_DEFINE_H_
+#endif // E65_DEFINE_CONSTANT_H_
