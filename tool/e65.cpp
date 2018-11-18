@@ -487,9 +487,26 @@ prompt_command(
 }
 
 int
+prompt_done(void)
+{
+	bool result;
+
+	e65::runtime &instance = e65::runtime::acquire();
+
+	result = instance.initialized();
+	if(result) {
+		result = instance.running();
+	}
+
+	return result;
+}
+
+int
 prompt(void)
 {
 	int result = EXIT_SUCCESS;
+
+	rl_event_hook = prompt_done;
 
 	while(e65::runtime::acquire().running()) {
 		int id;

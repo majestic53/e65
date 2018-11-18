@@ -219,50 +219,48 @@ namespace e65 {
 		)
 	{
 		bool result = true;
+		uint32_t begin = 0, current = 0, previous = 0;
 
 		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop entry");
 
-		if(!m_debug) {
-			uint32_t begin = 0, current = 0, previous = 0;
+		while(e65::type::thread::active()) {
+			float delta, rate;
+			uint32_t end = SDL_GetTicks();
 
-			while(e65::type::thread::active()) {
-				float delta, rate;
-				uint32_t end = SDL_GetTicks();
+			rate = (end - begin);
+			if(rate >= E65_MILLISECONDS_PER_SECOND) {
+				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
 
-				rate = (end - begin);
-				if(rate >= E65_MILLISECONDS_PER_SECOND) {
-					rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f",
+					(rate > 0.f) ? rate : 0.f);
 
-					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f",
-						(rate > 0.f) ? rate : 0.f);
-
-					m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
-					begin = end;
-					current = 0;
-				}
-
-				result = poll();
-				if(!result) {
-					break;
-				}
-
-				previous = m_bus.step_frame(*this, previous);
-
-				delta = (SDL_GetTicks() - end);
-				if(delta < E65_RUNTIME_FRAME_DELTA) {
-					SDL_Delay(E65_RUNTIME_FRAME_DELTA - delta);
-				}
-
-				++current;
+				m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
+				begin = end;
+				current = 0;
 			}
-		} else {
 
 			result = poll();
-			if(result) {
-				m_bus.step(*this);
+			if(!result) {
+				break;
 			}
+
+			if(!m_debug) {
+				previous = m_bus.step_frame(*this, previous);
+			} else {
+
+				if(!m_bus.video().display().hidden()) {
+					m_bus.video().display().show();
+				}
+			}
+
+			delta = (SDL_GetTicks() - end);
+			if(delta < E65_RUNTIME_FRAME_DELTA) {
+				SDL_Delay(E65_RUNTIME_FRAME_DELTA - delta);
+			}
+
+			++current;
 		}
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop exit");
@@ -420,13 +418,15 @@ namespace e65 {
 
 		m_bus.load(data, hex);
 
-		title << E65 << " -- " << path;
+		m_debug = debug;
+		title << E65 << " -- " << path << (m_debug ? " [Debug]" : "");
 		m_bus.video().display().set_title(title.str());
 
-		m_debug = debug;
-		if(!m_debug) {
-			e65::type::thread::notify();
+		if(m_debug) {
+			m_bus.video().display().set_hidden(true);
 		}
+
+		e65::type::thread::notify();
 
 		E65_TRACE_EXIT();
 	}
@@ -468,7 +468,7 @@ namespace e65 {
 				result = false;
 			} else {
 				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime stepping", "%u(%04x)", address, address);
-				e65::type::thread::notify();
+				m_bus.step(*this);
 			}
 		}
 

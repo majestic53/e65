@@ -74,7 +74,7 @@ namespace e65 {
 					__in const std::string &title
 					) override;
 
-				void show(void) const;
+				void show(void) const override;
 
 				std::string title(void) const override;
 

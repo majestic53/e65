@@ -52,6 +52,7 @@ namespace e65 {
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display clearing");
 
 			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
+			show();
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display cleared");
 
@@ -245,12 +246,14 @@ namespace e65 {
 				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Display mode change", "%s",
 					fullscreen ? "Fullscreen" : "Window");
 
-				SDL_ShowCursor(!fullscreen);
+				SDL_ShowCursor(!fullscreen && !SDL_ShowCursor(SDL_QUERY));
 
 				if(SDL_SetWindowFullscreen(m_window, fullscreen ? E65_DISPLAY_FULLSCREEN_FLAGS : 0) < 0) {
 					THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL,
 						"SDL_SetWindowFullscreen failed! %s", SDL_GetError());
 				}
+
+				show();
 			}
 
 			E65_TRACE_EXIT();
@@ -273,10 +276,11 @@ namespace e65 {
 			if(is_hidden != hidden) {
 				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Display mode change", "%s", hidden ? "Hidden" : "Shown");
 
-				SDL_ShowCursor(hidden);
+				set_fullscreen(false);
 
 				if(is_hidden) {
 					SDL_ShowWindow(m_window);
+					show();
 				} else {
 					SDL_HideWindow(m_window);
 				}

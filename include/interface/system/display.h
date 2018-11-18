@@ -67,6 +67,8 @@ namespace e65 {
 						__in const std::string &title
 						) = 0;
 
+					virtual void show(void) const = 0;
+
 					virtual std::string title(void) const = 0;
 			};
 		}
