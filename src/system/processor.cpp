@@ -258,11 +258,30 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			if(!m_halt && !m_stop) {
+				int command;
+				uint8_t code;
+				//uint16_t operand;
 
-				// TODO: step processor through a single instruction
-				m_cycle_last += (std::rand() % 10 + 2);
-				// ---
+				code = read(memory, m_program_counter++);
+				if(!E65_PCOMMAND_VALID(code)) {
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Illegal command", "%u(%02x)", code, code);
+					command = e65::type::E65_PCOMMAND_NOP;
+				} else {
+					command = E65_PCOMMAND_ID(code);
+				}
 
+				switch(command) {
+					case e65::type::E65_PCOMMAND_NOP:
+						m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(command);
+						break;
+					default:
+
+// TODO: step processor through a single instruction
+m_cycle_last += (std::rand() % 10 + 2);
+// ---
+
+						break;
+				}
 			}
 
 			E65_TRACE_EXIT();

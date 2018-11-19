@@ -19,6 +19,8 @@
 #ifndef E65_TYPE_PCOMMAND_H_
 #define E65_TYPE_PCOMMAND_H_
 
+#include <map>
+
 namespace e65 {
 
 	namespace type {
@@ -141,6 +143,71 @@ namespace e65 {
 		#define E65_PCOMMAND_STRING(_TYPE_) \
 			(((_TYPE_) > E65_PCOMMAND_MAX) ? E65_STRING_UNKNOWN : \
 				E65_STRING_CHECK(e65::type::E65_PCOMMAND_STR[_TYPE_]))
+
+		enum {
+			E65_PCOMMAND_MODE_ABSOLUTE = 0,
+			E65_PCOMMAND_MODE_ABSOLUTE_INDEX_INDIRECT,
+			E65_PCOMMAND_MODE_ABSOLUTE_INDEX_X,
+			E65_PCOMMAND_MODE_ABSOLUTE_INDEX_Y,
+			E65_PCOMMAND_MODE_ABSOLUTE_INDIRECT,
+			E65_PCOMMAND_MODE_ACCUMULATOR,
+			E65_PCOMMAND_MODE_IMMEDIATE,
+			E65_PCOMMAND_MODE_IMPLIED,
+			E65_PCOMMAND_MODE_RELATIVE,
+			E65_PCOMMAND_MODE_ZEROPAGE,
+			E65_PCOMMAND_MODE_ZEROPAGE_INDEX_INDIRECT,
+			E65_PCOMMAND_MODE_ZEROPAGE_INDEX_X,
+			E65_PCOMMAND_MODE_ZEROPAGE_INDEX_Y,
+			E65_PCOMMAND_MODE_ZEROPAGE_INDIRECT,
+			E65_PCOMMAND_MODE_ZEROPAGE_INDIRECT_INDEX,
+		};
+
+		#define E65_PCOMMAND_MODE_MAX E65_PCOMMAND_MODE_ZEROPAGE_INDIRECT_INDEX
+
+		static const std::string E65_PCOMMAND_MODE_STR[] = {
+			"abs", "[abs, x]", "abs, x", "abs, y", "[abs]", "acc", "imm", "imp", "rel", "zp", "[zp, x]",
+			"zp, x", "zp, y", "[zp]", "[zp], y",
+			};
+
+		#define E65_PCOMMAND_MODE_STRING(_TYPE_) \
+			(((_TYPE_) > E65_PCOMMAND_MODE_MAX) ? A65_STRING_UNKNOWN : \
+				A65_STRING_CHECK(E65_PCOMMAND_MODE_STR[_TYPE_]))
+
+		static const std::map<uint8_t, std::pair<int, int>> E65_PCOMMAND_ID_MAP = {
+			std::make_pair(0xea, std::make_pair(e65::type::E65_PCOMMAND_NOP, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
+
+			// TODO: add additional commands/modes
+			};
+
+		#define E65_PCOMMAND_VALID(_TYPE_) \
+			(e65::type::E65_PCOMMAND_ID_MAP.find(_TYPE_) != e65::type::E65_PCOMMAND_ID_MAP.end())
+
+		#define E65_PCOMMAND_ID(_TYPE_) \
+			e65::type::E65_PCOMMAND_ID_MAP.find(_TYPE_)->second.first
+
+		#define E65_PCOMMAND_MODE(_TYPE_) \
+			e65::type::E65_PCOMMAND_MODE_MAP.find(_TYPE_)->second.second
+
+		static const std::map<int, std::pair<uint8_t, uint8_t>> E65_PCOMMAND_CYCLE_MAP = {
+			std::make_pair(e65::type::E65_PCOMMAND_NOP, std::make_pair(2, 0)),
+
+			// TODO: add additional command cycle counts
+			};
+
+		#define E65_PCOMMAND_CYCLE_NOT_TAKEN(_TYPE_) \
+			e65::type::E65_PCOMMAND_CYCLE_MAP.find(_TYPE_)->second.second
+
+		#define E65_PCOMMAND_CYCLE_TAKEN(_TYPE_) \
+			e65::type::E65_PCOMMAND_CYCLE_MAP.find(_TYPE_)->second.first
+
+		static const std::map<int, uint8_t> E65_PCOMMAND_LENGTH_MAP = {
+			std::make_pair(e65::type::E65_PCOMMAND_NOP, 1),
+
+			// TODO: add additional command lengths
+			};
+
+		#define E65_PCOMMAND_LENGTH(_TYPE_) \
+			e65::type::E65_PCOMMAND_LENGTH_MAP.find(_TYPE_)->second
 	}
 }
 
