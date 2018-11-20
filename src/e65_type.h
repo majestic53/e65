@@ -75,8 +75,6 @@ static const std::string E65_COMMAND_STR[] = {
 	"Processor-Cycle",
 	"Processor-Flags",
 	"Processor-Flags-Set",
-	"Processor-Halt",
-	"Processor-Halt-Clear",
 	"Processor-Index-X",
 	"Processor-Index-X-Set",
 	"Processor-Index-Y",
@@ -87,6 +85,8 @@ static const std::string E65_COMMAND_STR[] = {
 	"Processor-Stack-Pointer-Set",
 	"Processor-Stop",
 	"Processor-Stop-Clear",
+	"Processor-Wait",
+	"Processor-Wait-Clear",
 
 	// video
 	"Video-Frame",

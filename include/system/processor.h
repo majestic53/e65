@@ -54,8 +54,6 @@ namespace e65 {
 					__in bool maskable
 					) const override;
 
-				bool halted(void) const override;
-
 				uint16_t program_counter(void) const override;
 
 				void reset(
@@ -63,35 +61,35 @@ namespace e65 {
 					) override;
 
 				void set_accumulator(
-					__in uint8_t value
+					__in uint8_t accumulator
 					) override;
 
 				void set_flags(
-					__in uint8_t value
-					) override;
-
-				void set_halt(
-					__in bool value
+					__in uint8_t flags
 					) override;
 
 				void set_index_x(
-					__in uint8_t value
+					__in uint8_t index_x
 					) override;
 
 				void set_index_y(
-					__in uint8_t value
+					__in uint8_t index_y
 					) override;
 
 				void set_program_counter(
-					__in uint16_t value
+					__in uint16_t program_counter
 					) override;
 
 				void set_stack_pointer(
-					__in uint8_t value
+					__in uint8_t stack_pointer
 					) override;
 
 				void set_stop(
-					__in bool value
+					__in bool stop
+					) override;
+
+				void set_wait(
+					__in bool wait
 					) override;
 
 				uint8_t stack_pointer(void) const override;
@@ -103,6 +101,8 @@ namespace e65 {
 				bool stopped(void) const override;
 
 				std::string to_string(void) const override;
+
+				bool waiting(void) const override;
 
 			protected:
 
@@ -117,6 +117,16 @@ namespace e65 {
 				processor &operator=(
 					__in const processor &other
 					) = delete;
+
+				void execute_brk(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_nop(void);
+
+				void execute_stp(void);
+
+				void execute_wai(void);
 
 				bool on_initialize(
 					__in const void *context,
@@ -181,8 +191,6 @@ namespace e65 {
 
 				e65::type::pflag_t m_flags;
 
-				bool m_halt;
-
 				uint8_t m_index_x;
 
 				uint8_t m_index_y;
@@ -196,6 +204,8 @@ namespace e65 {
 				uint8_t m_stack_pointer;
 
 				bool m_stop;
+
+				bool m_wait;
 		};
 	}
 }

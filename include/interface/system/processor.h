@@ -39,8 +39,6 @@ namespace e65 {
 
 					virtual uint8_t flags(void) const = 0;
 
-					virtual bool halted(void) const = 0;
-
 					virtual uint8_t index_x(void) const = 0;
 
 					virtual uint8_t index_y(void) const = 0;
@@ -60,40 +58,42 @@ namespace e65 {
 						) = 0;
 
 					virtual void set_accumulator(
-						__in uint8_t value
+						__in uint8_t accumulator
 						) = 0;
 
 					virtual void set_flags(
-						__in uint8_t value
-						) = 0;
-
-					virtual void set_halt(
-						__in bool value
+						__in uint8_t flags
 						) = 0;
 
 					virtual void set_index_x(
-						__in uint8_t value
+						__in uint8_t index_x
 						) = 0;
 
 					virtual void set_index_y(
-						__in uint8_t value
+						__in uint8_t index_y
 						) = 0;
 
 					virtual void set_program_counter(
-						__in uint16_t value
+						__in uint16_t program_counter
 						) = 0;
 
 					virtual void set_stack_pointer(
-						__in uint8_t value
+						__in uint8_t stack_pointer
 						) = 0;
 
 					virtual void set_stop(
-						__in bool value
+						__in bool stop
+						) = 0;
+
+					virtual void set_wait(
+						__in bool wait
 						) = 0;
 
 					virtual uint8_t stack_pointer(void) const = 0;
 
 					virtual bool stopped(void) const = 0;
+
+					virtual bool waiting(void) const = 0;
 			};
 		}
 	}

@@ -69,8 +69,6 @@ pc|processor-core                                             Display processor 
 pcy|processor-cycle                                           Display current processor cycle
 pf|processor-flags                                            Display processor flags
 pfs|processor-flags-set               <byte>                  Set processor flags to given value
-phs|processor-halt                                            Halt processor
-phc|processor-halt-clear                                      Clear processor halt
 px|processor-index-x                                          Display processor index-x
 pxs|processor-index-x-set             <byte>                  Set processor index-x to given value
 py|processor-index-y                                          Display processor index-y
@@ -83,12 +81,14 @@ pr|processor-reset                                            Reset processor
 psp|processor-stack-pointer                                   Display processor stack pointer
 psps|processor-stack-pointer-set      <byte>                  Set processor stack pointer to given value
 ps|processor-step                                             Step processor through a single cycle
-pss|processor-stop                                            Stop processor
-psc|processor-stop-clear                                      Clear processor stop
+pss|processor-stop                                            Set processor stop flag
+psc|processor-stop-clear                                      Clear processor stop flag
+pws|processor-wait                                            Set processor wait flag
+pwc|processor-wait-clear                                      Clear processor wait flag
 ---                                   ---                     ---
 vf|video-frame                                                Display current video frame
-vfs|video-fullscreen                                          Fullscreen display window
-vh|video-hide                                                 Hide display window
+vfs|video-fullscreen                  <bool>                  Fullscreen display window
+vh|video-hide                         <bool>                  Hide display window
 ---                                   ---                     ---
 q|exit                                                        Exit debug mode
 h|help                                                        Display help information
@@ -97,6 +97,12 @@ v|version                                                     Display version in
 
 Changelog
 =========
+
+Version 0.1.1847
+----------------
+*Updated: 11/19/2018*
+
+* Added processor commands
 
 Version 0.1.1846
 ----------------
@@ -114,36 +120,6 @@ Version 0.1.1846
 *Updated: 11/12/2018*
 
 * Added additional debug commands
-
-Version 0.1.1845
-----------------
-*Updated: 11/11/2018*
-
-* Added debug interface
-* Added interface memory dump command
-
-*Updated: 11/9/2018*
-
-* Implemented bus load hex routine
-
-*Updated: 11/8/2018*
-
-* Implemented bus load binary routine
-* Added processor registers
-* Added additional interface commands
-
-*Updated: 11/7/2018*
-
-* Added additional interface routines
-
-*Updated: 11/6/2018*
-
-* Further code reorg/cleanup
-
-*Updated: 11/5/2018*
-
-* Added input/processor/video singleton
-* Code reorg
 
 *Changelog truncated (see file history for full log)*
 

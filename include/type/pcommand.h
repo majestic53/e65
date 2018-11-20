@@ -174,9 +174,12 @@ namespace e65 {
 				A65_STRING_CHECK(E65_PCOMMAND_MODE_STR[_TYPE_]))
 
 		static const std::map<uint8_t, std::pair<int, int>> E65_PCOMMAND_ID_MAP = {
+			std::make_pair(0x00, std::make_pair(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
 			std::make_pair(0xea, std::make_pair(e65::type::E65_PCOMMAND_NOP, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
+			std::make_pair(0xdb, std::make_pair(e65::type::E65_PCOMMAND_STP, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
+			std::make_pair(0x9a, std::make_pair(e65::type::E65_PCOMMAND_WAI, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
 
-			// TODO: add additional commands/modes
+			// TODO
 			};
 
 		#define E65_PCOMMAND_VALID(_TYPE_) \
@@ -189,9 +192,12 @@ namespace e65 {
 			e65::type::E65_PCOMMAND_MODE_MAP.find(_TYPE_)->second.second
 
 		static const std::map<int, std::pair<uint8_t, uint8_t>> E65_PCOMMAND_CYCLE_MAP = {
+			std::make_pair(e65::type::E65_PCOMMAND_BRK, std::make_pair(7, 0)),
 			std::make_pair(e65::type::E65_PCOMMAND_NOP, std::make_pair(2, 0)),
+			std::make_pair(e65::type::E65_PCOMMAND_STP, std::make_pair(3, 0)),
+			std::make_pair(e65::type::E65_PCOMMAND_WAI, std::make_pair(2, 0)),
 
-			// TODO: add additional command cycle counts
+			// TODO
 			};
 
 		#define E65_PCOMMAND_CYCLE_NOT_TAKEN(_TYPE_) \
@@ -200,10 +206,19 @@ namespace e65 {
 		#define E65_PCOMMAND_CYCLE_TAKEN(_TYPE_) \
 			e65::type::E65_PCOMMAND_CYCLE_MAP.find(_TYPE_)->second.first
 
-		static const std::map<int, uint8_t> E65_PCOMMAND_LENGTH_MAP = {
-			std::make_pair(e65::type::E65_PCOMMAND_NOP, 1),
+		enum {
+			E65_PCOMMAND_LENGTH_NONE = 1,
+			E65_PCOMMAND_LENGTH_BYTE,
+			E65_PCOMMAND_LENGTH_WORD,
+		};
 
-			// TODO: add additional command lengths
+		static const std::map<int, uint8_t> E65_PCOMMAND_LENGTH_MAP = {
+			std::make_pair(e65::type::E65_PCOMMAND_BRK, E65_PCOMMAND_LENGTH_NONE),
+			std::make_pair(e65::type::E65_PCOMMAND_NOP, E65_PCOMMAND_LENGTH_NONE),
+			std::make_pair(e65::type::E65_PCOMMAND_STP, E65_PCOMMAND_LENGTH_NONE),
+			std::make_pair(e65::type::E65_PCOMMAND_WAI, E65_PCOMMAND_LENGTH_NONE),
+
+			// TODO
 			};
 
 		#define E65_PCOMMAND_LENGTH(_TYPE_) \

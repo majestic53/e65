@@ -368,12 +368,6 @@ prompt_command(
 
 			result = e65_command(E65_PROCESSOR_FLAGS_SET, &request, &response);
 			break;
-		case E65_COMMAND_PROCESSOR_HALT:
-			result = e65_command(E65_PROCESSOR_HALT, &request, &response);
-			break;
-		case E65_COMMAND_PROCESSOR_HALT_CLEAR:
-			result = e65_command(E65_PROCESSOR_HALT_CLEAR, &request, &response);
-			break;
 		case E65_COMMAND_PROCESSOR_INDEX_X:
 
 			result = e65_command(E65_PROCESSOR_INDEX_X, &request, &response);
@@ -449,6 +443,12 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_STOP_CLEAR:
 			result = e65_command(E65_PROCESSOR_STOP_CLEAR, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_WAIT:
+			result = e65_command(E65_PROCESSOR_WAIT, &request, &response);
+			break;
+		case E65_COMMAND_PROCESSOR_WAIT_CLEAR:
+			result = e65_command(E65_PROCESSOR_WAIT_CLEAR, &request, &response);
 			break;
 		case E65_COMMAND_VIDEO_FRAME:
 

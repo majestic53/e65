@@ -31,14 +31,14 @@ namespace e65 {
 			m_cycle(0),
 			m_cycle_last(0),
 			m_flags({}),
-			m_halt(false),
 			m_index_x(0),
 			m_index_y(0),
 			m_interrupt_irq(false),
 			m_interrupt_nmi(false),
 			m_program_counter(0),
 			m_stack_pointer(0),
-			m_stop(false)
+			m_stop(false),
+			m_wait(false)
 		{
 			E65_TRACE_ENTRY();
 			E65_TRACE_EXIT();
@@ -89,6 +89,53 @@ namespace e65 {
 			return m_cycle_last;
 		}
 
+		void
+		processor::execute_brk(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			push_word(memory, m_program_counter);
+			push(memory, m_flags.raw | E65_PFLAG(e65::type::E65_PFLAG_BREAKPOINT));
+			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_MASKABLE_INTERRUPT);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_BRK);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_nop(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_NOP);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_stp(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_stop = true;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_STP);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_wai(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_wait = true;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_WAI);
+
+			E65_TRACE_EXIT();
+		}
+
 		uint8_t
 		processor::flags(void) const
 		{
@@ -100,19 +147,6 @@ namespace e65 {
 
 			E65_TRACE_EXIT_FORMAT("Result=%u(%02x)", m_flags.raw, m_flags.raw);
 			return m_flags.raw;
-		}
-
-		bool
-		processor::halted(void) const
-		{
-			E65_TRACE_ENTRY();
-
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
-				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
-			}
-
-			E65_TRACE_EXIT_FORMAT("Result=%x", m_halt);
-			return m_halt;
 		}
 
 		uint8_t
@@ -257,10 +291,10 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(!m_halt && !m_stop) {
-				int command;
+			if(!m_wait && !m_stop) {
+				int command, length;
 				uint8_t code;
-				//uint16_t operand;
+				uint16_t operand = 0;
 
 				code = read(memory, m_program_counter++);
 				if(!E65_PCOMMAND_VALID(code)) {
@@ -270,17 +304,38 @@ namespace e65 {
 					command = E65_PCOMMAND_ID(code);
 				}
 
-				switch(command) {
-					case e65::type::E65_PCOMMAND_NOP:
-						m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(command);
+				length = E65_PCOMMAND_LENGTH(command);
+				switch(length) {
+					case e65::type::E65_PCOMMAND_LENGTH_NONE:
+						break;
+					case e65::type::E65_PCOMMAND_LENGTH_BYTE:
+						operand = read(memory, m_program_counter++);
+						break;
+					case e65::type::E65_PCOMMAND_LENGTH_WORD:
+						operand = read_word(memory, m_program_counter);
+						m_program_counter += sizeof(uint16_t);
 						break;
 					default:
+						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_LENGTH,
+							"[%i] %i", command, length, length);
+				}
 
-// TODO: step processor through a single instruction
-m_cycle_last += (std::rand() % 10 + 2);
-// ---
-
+				switch(command) {
+					case e65::type::E65_PCOMMAND_BRK:
+						execute_brk(memory);
 						break;
+					case e65::type::E65_PCOMMAND_NOP:
+						execute_nop();
+						break;
+					case e65::type::E65_PCOMMAND_STP:
+						execute_stp();
+						break;
+					case e65::type::E65_PCOMMAND_WAI:
+						execute_wai();
+						break;
+					default:
+						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_CODE,
+							"[%i] %u(%02x)", command, code, code);
 				}
 			}
 
@@ -376,7 +431,6 @@ m_cycle_last += (std::rand() % 10 + 2);
 			m_cycle = E65_PROCESSOR_INTERRUPT_CYCLES;
 			m_cycle_last = E65_PROCESSOR_INTERRUPT_CYCLES;
 			m_flags.raw = E65_PROCESSOR_REGISTER_FLAGS;
-			m_halt = false;
 			m_index_x = E65_PROCESSOR_REGISTER_INDEX_X;
 			m_index_y = E65_PROCESSOR_REGISTER_INDEX_Y;
 			m_interrupt_irq = false;
@@ -384,6 +438,7 @@ m_cycle_last += (std::rand() % 10 + 2);
 			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_RESET_INTERRUPT);
 			m_stack_pointer = E65_PROCESSOR_REGISTER_STACK_POINTER;
 			m_stop = false;
+			m_wait = false;
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor reset");
 
@@ -417,7 +472,7 @@ m_cycle_last += (std::rand() % 10 + 2);
 				}
 
 				m_cycle_last += E65_PROCESSOR_INTERRUPT_CYCLES;
-				m_halt = false;
+				m_wait = false;
 			}
 
 			E65_TRACE_EXIT();
@@ -425,128 +480,128 @@ m_cycle_last += (std::rand() % 10 + 2);
 
 		void
 		processor::set_accumulator(
-			__in uint8_t value
+			__in uint8_t accumulator
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%u(%02x)", value, value);
+			E65_TRACE_ENTRY_FORMAT("Accumulator=%u(%02x)", accumulator, accumulator);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_accumulator = value;
+			m_accumulator = accumulator;
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::set_flags(
-			__in uint8_t value
+			__in uint8_t flags
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%u(%02x)", value, value);
+			E65_TRACE_ENTRY_FORMAT("Flags=%u(%02x)", flags, flags);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_flags.raw = value;
-
-			E65_TRACE_EXIT();
-		}
-
-		void
-		processor::set_halt(
-			__in bool value
-			)
-		{
-			E65_TRACE_ENTRY_FORMAT("Value=%x", value);
-
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
-				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
-			}
-
-			m_halt = value;
+			m_flags.raw = flags;
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::set_index_x(
-			__in uint8_t value
+			__in uint8_t index_x
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%u(%02x)", value, value);
+			E65_TRACE_ENTRY_FORMAT("Index-X=%u(%02x)", index_x, index_x);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_index_x = value;
+			m_index_x = index_x;
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::set_index_y(
-			__in uint8_t value
+			__in uint8_t index_y
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%u(%02x)", value, value);
+			E65_TRACE_ENTRY_FORMAT("Index-Y=%u(%02x)", index_y, index_y);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_index_y = value;
+			m_index_y = index_y;
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::set_program_counter(
-			__in uint16_t value
+			__in uint16_t program_counter
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%u(%04x)", value, value);
+			E65_TRACE_ENTRY_FORMAT("Program-Counter=%u(%04x)", program_counter, program_counter);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_program_counter = value;
+			m_program_counter = program_counter;
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::set_stack_pointer(
-			__in uint8_t value
+			__in uint8_t stack_pointer
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%u(%02x)", value, value);
+			E65_TRACE_ENTRY_FORMAT("Stack-Pointer=%u(%02x)", stack_pointer, stack_pointer);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_stack_pointer = value;
+			m_stack_pointer = stack_pointer;
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::set_stop(
-			__in bool value
+			__in bool stop
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Value=%x", value);
+			E65_TRACE_ENTRY_FORMAT("Stop=%x", stop);
 
 			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
-			m_stop = value;
+			m_stop = stop;
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::set_wait(
+			__in bool wait
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Wait=%x", wait);
+
+			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_wait = wait;
 
 			E65_TRACE_EXIT();
 		}
@@ -609,8 +664,8 @@ m_cycle_last += (std::rand() % 10 + 2);
 
 			if(e65::interface::singleton<e65::system::processor>::initialized()) {
 				result << ", Cycle=" << m_cycle << " (Last=" << (int) m_cycle_last << ")"
-					<< ", Halt=" << m_halt
-					<< ", Stop=" << m_stop
+					<< ", WAI=" << m_wait
+					<< ", STP=" << m_stop
 					<< ", IRQ=" << m_interrupt_irq
 					<< ", NMI=" << m_interrupt_nmi
 					<< ", PC=" << (int) m_program_counter << "(" << E65_STRING_HEX(uint16_t, m_program_counter) << ")"
@@ -630,6 +685,19 @@ m_cycle_last += (std::rand() % 10 + 2);
 			}
 
 			return result.str();
+		}
+
+		bool
+		processor::waiting(void) const
+		{
+			E65_TRACE_ENTRY();
+
+			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%x", m_wait);
+			return m_wait;
 		}
 
 		void

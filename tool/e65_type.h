@@ -96,8 +96,6 @@ enum {
 	E65_COMMAND_PROCESSOR_CYCLE,
 	E65_COMMAND_PROCESSOR_FLAGS,
 	E65_COMMAND_PROCESSOR_FLAGS_SET,
-	E65_COMMAND_PROCESSOR_HALT,
-	E65_COMMAND_PROCESSOR_HALT_CLEAR,
 	E65_COMMAND_PROCESSOR_INDEX_X,
 	E65_COMMAND_PROCESSOR_INDEX_X_SET,
 	E65_COMMAND_PROCESSOR_INDEX_Y,
@@ -112,6 +110,8 @@ enum {
 	E65_COMMAND_PROCESSOR_STEP,
 	E65_COMMAND_PROCESSOR_STOP,
 	E65_COMMAND_PROCESSOR_STOP_CLEAR,
+	E65_COMMAND_PROCESSOR_WAIT,
+	E65_COMMAND_PROCESSOR_WAIT_CLEAR,
 
 	// video
 	E65_COMMAND_VIDEO_FRAME,
@@ -154,8 +154,6 @@ static const std::string E65_COMMAND_ARG[] = {
 	"",
 	"<byte>",
 	"",
-	"",
-	"",
 	"<byte>",
 	"",
 	"<byte>",
@@ -166,6 +164,8 @@ static const std::string E65_COMMAND_ARG[] = {
 	"",
 	"",
 	"<byte>",
+	"",
+	"",
 	"",
 	"",
 	"",
@@ -206,8 +206,6 @@ static const std::string E65_COMMAND_DESC[] = {
 	"Display current processor cycle",
 	"Display processor flags",
 	"Set processor flags to given value",
-	"Halt processor",
-	"Clear processor halt",
 	"Display processor index-x",
 	"Set processor index-x to given value",
 	"Display processor index-y",
@@ -220,8 +218,10 @@ static const std::string E65_COMMAND_DESC[] = {
 	"Display processor stack pointer",
 	"Set processor stack pointer to given value",
 	"Step processor through a single cycle",
-	"Stop processor",
-	"Clear processor stop",
+	"Set processor stop flag",
+	"Clear processor stop flag",
+	"Set processor wait flag",
+	"Clear processor wait flag",
 
 	// video
 	"Display current video frame",
@@ -259,8 +259,6 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 	"processor-cycle",
 	"processor-flags",
 	"processor-flags-set",
-	"processor-halt",
-	"processor-halt-clear",
 	"processor-index-x",
 	"processor-index-x-set",
 	"processor-index-y",
@@ -275,6 +273,8 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 	"processor-step",
 	"processor-stop",
 	"processor-stop-clear",
+	"processor-wait",
+	"processor-wait-clear",
 
 	// video
 	"video-frame",
@@ -312,8 +312,6 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 	"pcy",
 	"pf",
 	"pfs",
-	"phs",
-	"phc",
 	"px",
 	"pxs",
 	"py",
@@ -328,6 +326,8 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 	"ps",
 	"pss",
 	"psc",
+	"pws",
+	"pwc",
 
 	// video
 	"vf",
@@ -379,10 +379,6 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_FLAGS), E65_COMMAND_PROCESSOR_FLAGS),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_FLAGS_SET), E65_COMMAND_PROCESSOR_FLAGS_SET),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_FLAGS_SET), E65_COMMAND_PROCESSOR_FLAGS_SET),
-	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_HALT), E65_COMMAND_PROCESSOR_HALT),
-	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_HALT), E65_COMMAND_PROCESSOR_HALT),
-	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_HALT_CLEAR), E65_COMMAND_PROCESSOR_HALT_CLEAR),
-	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_HALT_CLEAR), E65_COMMAND_PROCESSOR_HALT_CLEAR),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_INDEX_X), E65_COMMAND_PROCESSOR_INDEX_X),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_INDEX_X), E65_COMMAND_PROCESSOR_INDEX_X),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_INDEX_X_SET), E65_COMMAND_PROCESSOR_INDEX_X_SET),
@@ -411,6 +407,10 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_STOP), E65_COMMAND_PROCESSOR_STOP),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_STOP_CLEAR), E65_COMMAND_PROCESSOR_STOP_CLEAR),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_STOP_CLEAR), E65_COMMAND_PROCESSOR_STOP_CLEAR),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_WAIT), E65_COMMAND_PROCESSOR_WAIT),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_WAIT), E65_COMMAND_PROCESSOR_WAIT),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_PROCESSOR_WAIT_CLEAR), E65_COMMAND_PROCESSOR_WAIT_CLEAR),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_PROCESSOR_WAIT_CLEAR), E65_COMMAND_PROCESSOR_WAIT_CLEAR),
 
 	// video
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
@@ -456,8 +456,6 @@ std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
 	std::make_pair(E65_COMMAND_PROCESSOR_CYCLE, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_FLAGS, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_FLAGS_SET, 1),
-	std::make_pair(E65_COMMAND_PROCESSOR_HALT, 0),
-	std::make_pair(E65_COMMAND_PROCESSOR_HALT_CLEAR, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_INDEX_X, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_INDEX_X_SET, 1),
 	std::make_pair(E65_COMMAND_PROCESSOR_INDEX_Y, 0),
@@ -472,6 +470,8 @@ std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
 	std::make_pair(E65_COMMAND_PROCESSOR_STEP, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_STOP, 0),
 	std::make_pair(E65_COMMAND_PROCESSOR_STOP_CLEAR, 0),
+	std::make_pair(E65_COMMAND_PROCESSOR_WAIT, 0),
+	std::make_pair(E65_COMMAND_PROCESSOR_WAIT_CLEAR, 0),
 
 	// video
 	std::make_pair(E65_COMMAND_VIDEO_FRAME, 0),

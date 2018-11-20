@@ -66,7 +66,7 @@ e65_core(
 	e65::interface::system::processor &processor = e65::runtime::acquire().bus().processor();
 
 	stream << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "CYC" << processor.cycle() << " (" << (int) processor.cycle_last() << ")"
-		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "HLT" << processor.halted()
+		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "WAI" << processor.waiting()
 		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "STP" << processor.stopped()
 		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "IRQ" << processor.interrupted(true)
 		<< std::endl << E65_COLUMN_WIDTH(E65_CORE_COLUMN_WIDTH) << "NMI" << processor.interrupted(false);
@@ -272,12 +272,6 @@ e65_command(
 			case E65_PROCESSOR_FLAGS_SET:
 				e65::runtime::acquire().bus().processor().set_flags(request->payload.byte);
 				break;
-			case E65_PROCESSOR_HALT:
-				e65::runtime::acquire().bus().processor().set_halt(true);
-				break;
-			case E65_PROCESSOR_HALT_CLEAR:
-				e65::runtime::acquire().bus().processor().set_halt(false);
-				break;
 			case E65_PROCESSOR_INDEX_X:
 				response->payload.byte = e65::runtime::acquire().bus().processor().index_x();
 				break;
@@ -307,6 +301,12 @@ e65_command(
 				break;
 			case E65_PROCESSOR_STOP_CLEAR:
 				e65::runtime::acquire().bus().processor().set_stop(false);
+				break;
+			case E65_PROCESSOR_WAIT:
+				e65::runtime::acquire().bus().processor().set_wait(true);
+				break;
+			case E65_PROCESSOR_WAIT_CLEAR:
+				e65::runtime::acquire().bus().processor().set_wait(false);
 				break;
 			case E65_VIDEO_FRAME:
 				response->payload.dword = e65::runtime::acquire().bus().video().frame();

@@ -47,8 +47,6 @@ enum {
 	E65_PROCESSOR_CYCLE,			/* Retrieve the processors cycle count */
 	E65_PROCESSOR_FLAGS,			/* Retrieve the processors flags */
 	E65_PROCESSOR_FLAGS_SET,		/* Set the processors flags */
-	E65_PROCESSOR_HALT,			/* Set the processors halt flag */
-	E65_PROCESSOR_HALT_CLEAR,		/* Clear the processors halt flag */
 	E65_PROCESSOR_INDEX_X,			/* Retrieve the processors index-x register */
 	E65_PROCESSOR_INDEX_X_SET,		/* Set the processors index-x register */
 	E65_PROCESSOR_INDEX_Y,			/* Retrieve the processors index-y register */
@@ -59,6 +57,8 @@ enum {
 	E65_PROCESSOR_STACK_POINTER_SET,	/* Set the processors stack pointer register */
 	E65_PROCESSOR_STOP,			/* Set the processors stop flag */
 	E65_PROCESSOR_STOP_CLEAR,		/* Clear the processors stop flag */
+	E65_PROCESSOR_WAIT,			/* Set the processors wait flag */
+	E65_PROCESSOR_WAIT_CLEAR,		/* Clear the processors wait flag */
 
 	/* Video commands */
 	E65_VIDEO_FRAME,			/* Retrieve the video frame count */
