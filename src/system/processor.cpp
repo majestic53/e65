@@ -96,10 +96,107 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
+			m_flags.breakpoint = 1;
 			push_word(memory, m_program_counter);
-			push(memory, m_flags.raw | E65_PFLAG(e65::type::E65_PFLAG_BREAKPOINT));
+			push(memory, m_flags.raw);
 			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_MASKABLE_INTERRUPT);
 			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_BRK);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_clc(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.carry = 0;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLC);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_cld(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.decimal_enable = 0;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLD);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_cli(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.irq_disable = 0;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLI);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_clv(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.overflow = 0;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLV);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_dex(void)
+		{
+			E65_TRACE_ENTRY();
+
+			--m_index_x;
+			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.zero = (m_index_x == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_DEX);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_dey(void)
+		{
+			E65_TRACE_ENTRY();
+
+			--m_index_y;
+			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.zero = (m_index_y == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_DEY);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_inx(void)
+		{
+			E65_TRACE_ENTRY();
+
+			++m_index_x;
+			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.zero = (m_index_x == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_INX);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_iny(void)
+		{
+			E65_TRACE_ENTRY();
+
+			++m_index_y;
+			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.zero = (m_index_y == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_INY);
 
 			E65_TRACE_EXIT();
 		}
@@ -115,12 +212,258 @@ namespace e65 {
 		}
 
 		void
+		processor::execute_pha(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			push(memory, m_accumulator);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHA);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_php(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			push(memory, m_flags.raw);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHP);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_phx(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			push(memory, m_index_x);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHX);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_phy(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			push(memory, m_index_y);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHY);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_pla(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			m_accumulator = pop(memory);
+			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.zero = (m_accumulator == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLA);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_plp(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			m_flags.raw = pop(memory);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLP);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_plx(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			m_index_x = pop(memory);
+			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.zero = (m_index_x == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLX);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_ply(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			m_index_y = pop(memory);
+			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.zero = (m_index_y == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLY);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_rti(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			m_flags.raw = pop(memory);
+			m_program_counter = pop_word(memory);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_RTI);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_rts(
+			__in e65::interface::system::memory &memory
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+
+			m_program_counter = (pop_word(memory) - 1);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_RTS);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_sec(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.carry = 1;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_SEC);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_sed(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.decimal_enable = 1;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_SED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_sei(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_flags.irq_disable = 1;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_SEI);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
 		processor::execute_stp(void)
 		{
 			E65_TRACE_ENTRY();
 
 			m_stop = true;
 			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_STP);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_tax(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_index_x = m_accumulator;
+			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.zero = (m_index_x == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TAX);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_tay(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_index_y = m_accumulator;
+			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.zero = (m_index_y == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TAY);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_tsx(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_index_x = m_stack_pointer;
+			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.zero = (m_index_x == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TSX);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_txa(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_accumulator = m_index_x;
+			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.zero = (m_accumulator == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TXA);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_txs(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_stack_pointer = m_index_x;
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TXS);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_tya(void)
+		{
+			E65_TRACE_ENTRY();
+
+			m_accumulator = m_index_y;
+			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.zero = (m_accumulator == 0);
+			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TYA);
 
 			E65_TRACE_EXIT();
 		}
@@ -291,10 +634,10 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(!m_wait && !m_stop) {
-				int command, length;
+			if(!m_stop && !m_wait) {
 				uint8_t code;
 				uint16_t operand = 0;
+				int command, length, mode;
 
 				code = read(memory, m_program_counter++);
 				if(!E65_PCOMMAND_VALID(code)) {
@@ -320,15 +663,98 @@ namespace e65 {
 							"[%i] %i", command, length, length);
 				}
 
+				mode = E65_PCOMMAND_MODE(command);
+
 				switch(command) {
 					case e65::type::E65_PCOMMAND_BRK:
 						execute_brk(memory);
 						break;
+					case e65::type::E65_PCOMMAND_CLC:
+						execute_clc();
+						break;
+					case e65::type::E65_PCOMMAND_CLD:
+						execute_cld();
+						break;
+					case e65::type::E65_PCOMMAND_CLI:
+						execute_cli();
+						break;
+					case e65::type::E65_PCOMMAND_CLV:
+						execute_clv();
+						break;
+					case e65::type::E65_PCOMMAND_DEX:
+						execute_dex();
+						break;
+					case e65::type::E65_PCOMMAND_DEY:
+						execute_dey();
+						break;
+					case e65::type::E65_PCOMMAND_INX:
+						execute_inx();
+						break;
+					case e65::type::E65_PCOMMAND_INY:
+						execute_iny();
+						break;
 					case e65::type::E65_PCOMMAND_NOP:
 						execute_nop();
 						break;
+					case e65::type::E65_PCOMMAND_PHA:
+						execute_pha(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PHP:
+						execute_php(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PHX:
+						execute_phx(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PHY:
+						execute_phy(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PLA:
+						execute_pla(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PLP:
+						execute_plp(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PLX:
+						execute_plx(memory);
+						break;
+					case e65::type::E65_PCOMMAND_PLY:
+						execute_ply(memory);
+						break;
+					case e65::type::E65_PCOMMAND_RTI:
+						execute_rti(memory);
+						break;
+					case e65::type::E65_PCOMMAND_RTS:
+						execute_rts(memory);
+						break;
+					case e65::type::E65_PCOMMAND_SEC:
+						execute_sec();
+						break;
+					case e65::type::E65_PCOMMAND_SED:
+						execute_sed();
+						break;
+					case e65::type::E65_PCOMMAND_SEI:
+						execute_sei();
+						break;
 					case e65::type::E65_PCOMMAND_STP:
 						execute_stp();
+						break;
+					case e65::type::E65_PCOMMAND_TAX:
+						execute_tax();
+						break;
+					case e65::type::E65_PCOMMAND_TAY:
+						execute_tay();
+						break;
+					case e65::type::E65_PCOMMAND_TSX:
+						execute_tsx();
+						break;
+					case e65::type::E65_PCOMMAND_TXA:
+						execute_txa();
+						break;
+					case e65::type::E65_PCOMMAND_TXS:
+						execute_txs();
+						break;
+					case e65::type::E65_PCOMMAND_TYA:
+						execute_tya();
 						break;
 					case e65::type::E65_PCOMMAND_WAI:
 						execute_wai();
@@ -337,6 +763,8 @@ namespace e65 {
 						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_CODE,
 							"[%i] %u(%02x)", command, code, code);
 				}
+			} else {
+				execute_nop();
 			}
 
 			E65_TRACE_EXIT();

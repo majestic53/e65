@@ -100,6 +100,10 @@ Changelog
 
 Version 0.1.1847
 ----------------
+*Updated: 11/20/2018*
+
+* Added processor implied commands
+
 *Updated: 11/19/2018*
 
 * Added processor commands

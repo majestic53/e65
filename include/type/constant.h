@@ -23,6 +23,9 @@ namespace e65 {
 
 	namespace type {
 
+		#define E65_BIT_HIGH 0x80
+		#define E65_BIT_LOW 0x01
+
 		#define E65_BYTES_PER_KBYTE 1024.f
 
 		#define E65_EXCEPTION_UNKNOWN "Unknown exception"

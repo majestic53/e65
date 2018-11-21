@@ -122,9 +122,83 @@ namespace e65 {
 					__in e65::interface::system::memory &memory
 					);
 
+				void execute_clc(void);
+
+				void execute_cld(void);
+
+				void execute_cli(void);
+
+				void execute_clv(void);
+
+				void execute_dex(void);
+
+				void execute_dey(void);
+
+				void execute_inx(void);
+
+				void execute_iny(void);
+
 				void execute_nop(void);
 
+				void execute_pha(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_php(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_phx(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_phy(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_pla(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_plp(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_plx(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_ply(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_rti(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_rts(
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_sec(void);
+
+				void execute_sed(void);
+
+				void execute_sei(void);
+
 				void execute_stp(void);
+
+				void execute_tax(void);
+
+				void execute_tay(void);
+
+				void execute_tsx(void);
+
+				void execute_txa(void);
+
+				void execute_txs(void);
+
+				void execute_tya(void);
 
 				void execute_wai(void);
 
