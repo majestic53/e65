@@ -87,7 +87,7 @@ namespace e65 {
 						break;
 					}
 				}
-			} catch(e65::exception &exc) {
+			} catch(e65::type::exception &exc) {
 				m_exception = exc;
 			} catch(std::exception &exc) {
 				m_exception = E65_EXCEPTION(exc.what());

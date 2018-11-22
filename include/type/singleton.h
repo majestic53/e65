@@ -16,14 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_INTERFACE_SINGLETON_H_
-#define E65_INTERFACE_SINGLETON_H_
+#ifndef E65_TYPE_SINGLETON_H_
+#define E65_TYPE_SINGLETON_H_
 
 #include "./singleton_type.h"
 
 namespace e65 {
 
-	namespace interface {
+	namespace type {
 
 		template <class T> class singleton {
 
@@ -48,7 +48,7 @@ namespace e65 {
 				{
 
 					if(m_initialized) {
-						THROW_E65_INTERFACE_SINGLETON_EXCEPTION_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_INITIALIZED,
+						THROW_E65_TYPE_SINGLETON_EXCEPTION_FORMAT(E65_TYPE_SINGLETON_EXCEPTION_INITIALIZED,
 							"%u(%s)", m_type, E65_SINGLETON_STRING(m_type));
 					}
 
@@ -56,7 +56,7 @@ namespace e65 {
 
 					if(!on_initialize(context, length)) {
 						uninitialize();
-						THROW_E65_INTERFACE_SINGLETON_EXCEPTION_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_INITIALIZING,
+						THROW_E65_TYPE_SINGLETON_EXCEPTION_FORMAT(E65_TYPE_SINGLETON_EXCEPTION_INITIALIZING,
 							"%u(%s)", m_type, E65_SINGLETON_STRING(m_type));
 					}
 				}
@@ -70,7 +70,7 @@ namespace e65 {
 				{
 					std::stringstream result;
 
-					result << E65_INTERFACE_SINGLETON_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
+					result << E65_TYPE_SINGLETON_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
 						<< " Type=" << m_type << "(" << E65_SINGLETON_STRING(m_type) << ")"
 						<< ", State=" << m_initialized << "(" << (m_initialized ? "Initialized" : "Uninitialized") << ")";
 
@@ -86,7 +86,7 @@ namespace e65 {
 				{
 
 					if(!m_initialized) {
-						THROW_E65_INTERFACE_SINGLETON_EXCEPTION_FORMAT(E65_INTERFACE_SINGLETON_EXCEPTION_UNINITIALIZED,
+						THROW_E65_TYPE_SINGLETON_EXCEPTION_FORMAT(E65_TYPE_SINGLETON_EXCEPTION_UNINITIALIZED,
 							"%u(%s)", m_type, E65_SINGLETON_STRING(m_type));
 					}
 
@@ -127,4 +127,4 @@ namespace e65 {
 	}
 }
 
-#endif // E65_INTERFACE_SINGLETON_H_
+#endif // E65_TYPE_SINGLETON_H_

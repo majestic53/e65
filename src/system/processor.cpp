@@ -26,7 +26,7 @@ namespace e65 {
 	namespace system {
 
 		processor::processor(void) :
-			e65::interface::singleton<e65::system::processor>(e65::interface::E65_SINGLETON_PROCESSOR),
+			e65::type::singleton<e65::system::processor>(e65::type::E65_SINGLETON_PROCESSOR),
 			m_accumulator(0),
 			m_cycle(0),
 			m_cycle_last(0),
@@ -55,7 +55,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -68,7 +68,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -81,7 +81,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -484,7 +484,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -497,7 +497,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -510,7 +510,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -525,7 +525,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Type=%s", maskable ? "IRQ" : "NMI");
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -552,7 +552,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Type=%s", maskable ? "IRQ" : "NMI");
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -636,12 +636,13 @@ namespace e65 {
 
 			if(!m_stop && !m_wait) {
 				uint8_t code;
-				uint16_t operand = 0;
 				int command, length, mode;
+				uint16_t address = m_program_counter, operand = 0;
 
 				code = read(memory, m_program_counter++);
 				if(!E65_PCOMMAND_VALID(code)) {
-					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Illegal command", "%u(%02x)", code, code);
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Illegal command", "[%04x] %u(%02x)", address,
+						code, code);
 					command = e65::type::E65_PCOMMAND_NOP;
 				} else {
 					command = E65_PCOMMAND_ID(code);
@@ -660,7 +661,7 @@ namespace e65 {
 						break;
 					default:
 						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_LENGTH,
-							"[%i] %i", command, length, length);
+							"[%04x] %u(%02x)=%i", address, code, code, command);
 				}
 
 				mode = E65_PCOMMAND_MODE(command);
@@ -761,7 +762,7 @@ namespace e65 {
 						break;
 					default:
 						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_CODE,
-							"[%i] %u(%02x)", command, code, code);
+							"[%04x] %u(%02x)=%i", address, code, code, command);
 				}
 			} else {
 				execute_nop();
@@ -775,7 +776,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -849,7 +850,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -913,7 +914,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Accumulator=%u(%02x)", accumulator, accumulator);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -929,7 +930,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Flags=%u(%02x)", flags, flags);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -945,7 +946,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Index-X=%u(%02x)", index_x, index_x);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -961,7 +962,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Index-Y=%u(%02x)", index_y, index_y);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -977,7 +978,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Program-Counter=%u(%04x)", program_counter, program_counter);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -993,7 +994,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Stack-Pointer=%u(%02x)", stack_pointer, stack_pointer);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -1009,7 +1010,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Stop=%x", stop);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -1025,7 +1026,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Wait=%x", wait);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -1039,7 +1040,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -1054,7 +1055,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -1074,7 +1075,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -1088,9 +1089,9 @@ namespace e65 {
 			std::stringstream result;
 
 			result << E65_SYSTEM_PROCESSOR_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::system::processor>::to_string();
+				<< " Interface=" << e65::type::singleton<e65::system::processor>::to_string();
 
-			if(e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(e65::type::singleton<e65::system::processor>::initialized()) {
 				result << ", Cycle=" << m_cycle << " (Last=" << (int) m_cycle_last << ")"
 					<< ", WAI=" << m_wait
 					<< ", STP=" << m_stop
@@ -1120,7 +1121,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::processor>::initialized()) {
+			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
 			}
 

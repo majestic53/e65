@@ -21,15 +21,15 @@
 
 #include <vector>
 #include <SDL2/SDL.h>
-#include "../interface/singleton.h"
 #include "../interface/system/display.h"
+#include "../type/singleton.h"
 
 namespace e65 {
 
 	namespace system {
 
 		class display :
-				public e65::interface::singleton<e65::system::display>,
+				public e65::type::singleton<e65::system::display>,
 				public e65::interface::system::display {
 
 			public:
@@ -82,7 +82,7 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::system::display>;
+				friend class e65::type::singleton<e65::system::display>;
 
 				display(void);
 

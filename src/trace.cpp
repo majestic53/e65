@@ -23,7 +23,7 @@
 namespace e65 {
 
 	trace::trace(void) :
-		e65::interface::singleton<e65::trace>(e65::interface::E65_SINGLETON_TRACE)
+		e65::type::singleton<e65::trace>(e65::type::E65_SINGLETON_TRACE)
 	{
 		return;
 	}
@@ -62,7 +62,7 @@ namespace e65 {
 	trace::empty(void) const
 	{
 
-		if(!e65::interface::singleton<e65::trace>::initialized()) {
+		if(!e65::type::singleton<e65::trace>::initialized()) {
 			THROW_E65_TRACE_EXCEPTION(E65_TRACE_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -88,7 +88,7 @@ namespace e65 {
 	trace::flush(void)
 	{
 
-		if(!e65::interface::singleton<e65::trace>::initialized()) {
+		if(!e65::type::singleton<e65::trace>::initialized()) {
 			THROW_E65_TRACE_EXCEPTION(E65_TRACE_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -287,7 +287,7 @@ namespace e65 {
 		std::stringstream result;
 
 		result << E65_TRACE_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-			<< " Interface=" << e65::interface::singleton<e65::trace>::to_string();
+			<< " Interface=" << e65::type::singleton<e65::trace>::to_string();
 
 		if(m_initialized) {
 			result << ", Thread=" << e65::type::thread::to_string()

@@ -27,7 +27,7 @@ namespace e65 {
 	namespace system {
 
 		class input :
-				public e65::interface::singleton<e65::system::input>,
+				public e65::type::singleton<e65::system::input>,
 				public e65::interface::system::input {
 
 			public:
@@ -51,7 +51,7 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::system::input>;
+				friend class e65::type::singleton<e65::system::input>;
 
 				input(void);
 

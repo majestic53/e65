@@ -19,7 +19,7 @@
 #ifndef E65_TYPE_H_
 #define E65_TYPE_H_
 
-#include "../include/exception.h"
+#include "../include/type/exception.h"
 
 #define E65_HEADER "[E65]"
 #ifndef NDEBUG

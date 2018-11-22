@@ -21,7 +21,7 @@
 
 #include <ctime>
 #include <queue>
-#include "./interface/singleton.h"
+#include "./type/singleton.h"
 #include "./type/thread.h"
 
 namespace e65 {
@@ -29,7 +29,7 @@ namespace e65 {
 	typedef std::tuple<std::string, std::string, int, size_t, std::string, std::time_t> trace_t;
 
 	class trace :
-			public e65::interface::singleton<e65::trace>,
+			public e65::type::singleton<e65::trace>,
 			protected e65::type::thread {
 
 		public:
@@ -57,7 +57,7 @@ namespace e65 {
 
 		protected:
 
-			friend class e65::interface::singleton<e65::trace>;
+			friend class e65::type::singleton<e65::trace>;
 
 			trace(void);
 

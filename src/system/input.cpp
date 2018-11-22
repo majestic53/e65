@@ -25,7 +25,7 @@ namespace e65 {
 	namespace system {
 
 		input::input(void) :
-			e65::interface::singleton<e65::system::input>(e65::interface::E65_SINGLETON_INPUT)
+			e65::type::singleton<e65::system::input>(e65::type::E65_SINGLETON_INPUT)
 		{
 			E65_TRACE_ENTRY();
 
@@ -47,7 +47,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(!e65::interface::singleton<e65::system::input>::initialized()) {
+			if(!e65::type::singleton<e65::system::input>::initialized()) {
 				THROW_E65_SYSTEM_INPUT_EXCEPTION(E65_SYSTEM_INPUT_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -69,7 +69,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p, Value=%u(%x)", &memory, value, value);
 
-			if(!e65::interface::singleton<e65::system::input>::initialized()) {
+			if(!e65::type::singleton<e65::system::input>::initialized()) {
 				THROW_E65_SYSTEM_INPUT_EXCEPTION(E65_SYSTEM_INPUT_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -117,7 +117,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			if(!e65::interface::singleton<e65::system::input>::initialized()) {
+			if(!e65::type::singleton<e65::system::input>::initialized()) {
 				THROW_E65_SYSTEM_INPUT_EXCEPTION(E65_SYSTEM_INPUT_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -132,7 +132,7 @@ namespace e65 {
 			std::stringstream result;
 
 			result << E65_SYSTEM_INPUT_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::system::input>::to_string();
+				<< " Interface=" << e65::type::singleton<e65::system::input>::to_string();
 
 			return result.str();
 		}

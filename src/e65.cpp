@@ -322,7 +322,7 @@ e65_command(
 		}
 
 		result = response->result;
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
@@ -349,7 +349,7 @@ e65_initialize(void)
 
 	try {
 		e65::runtime::acquire().initialize();
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
@@ -370,7 +370,7 @@ e65_interrupt(
 
 	try {
 		e65::runtime::acquire().bus().processor().interrupt(maskable);
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
@@ -389,7 +389,7 @@ e65_reset(void)
 
 	try {
 		result = (e65::runtime::acquire().reset() ? EXIT_SUCCESS : EXIT_FAILURE);
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
@@ -417,7 +417,7 @@ e65_run(
 		}
 
 		e65::runtime::acquire().run(path, hex, debug);
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
@@ -436,7 +436,7 @@ e65_step(void)
 
 	try {
 		result = (e65::runtime::acquire().step() ? EXIT_SUCCESS : EXIT_FAILURE);
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {
@@ -454,7 +454,7 @@ e65_uninitialize(void)
 
 	try {
 		e65::runtime::acquire().uninitialize();
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 	} catch(std::exception &exc) {
 		g_error = exc.what();
@@ -502,7 +502,7 @@ e65_wait(void)
 
 	try {
 		result = (e65::runtime::acquire().wait() ? EXIT_SUCCESS : EXIT_FAILURE);
-	} catch(e65::exception &exc) {
+	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
 	} catch(std::exception &exc) {

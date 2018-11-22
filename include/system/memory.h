@@ -20,14 +20,14 @@
 #define E65_SYSTEM_MEMORY_H_
 
 #include "../interface/system/memory.h"
-#include "../interface/singleton.h"
+#include "../type/singleton.h"
 
 namespace e65 {
 
 	namespace system {
 
 		class memory :
-				public e65::interface::singleton<e65::system::memory>,
+				public e65::type::singleton<e65::system::memory>,
 				public e65::interface::system::memory {
 
 			public:
@@ -63,7 +63,7 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::system::memory>;
+				friend class e65::type::singleton<e65::system::memory>;
 
 				memory(void);
 

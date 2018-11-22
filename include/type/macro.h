@@ -27,10 +27,10 @@ namespace e65 {
 			std::left << std::setw(_WIDTH_)
 
 		#define E65_EXCEPTION(_MESSAGE_) \
-			e65::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
+			e65::type::exception(_MESSAGE_, __FILE__, __FUNCTION__, __LINE__)
 
 		#define E65_EXCEPTION_GENERATE(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, ...) \
-			e65::exception::generate(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, __VA_ARGS__)
+			e65::type::exception::generate(_MESSAGE_, _FILE_, _FUNCTION_, _LINE_, _FORMAT_, __VA_ARGS__)
 
 		#define E65_EXCEPTION_THROW(_MESSAGE_) \
 			E65_EXCEPTION_THROW_FORMAT(_MESSAGE_, "", "")

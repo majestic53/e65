@@ -34,10 +34,10 @@ all: build archive
 archive:
 	@echo ''
 	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BIN_LIB)$(LIB) $(DIR_BUILD)base_e65.o $(DIR_BUILD)base_exception.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o \
+	ar rcs $(DIR_BIN_LIB)$(LIB) $(DIR_BUILD)base_e65.o $(DIR_BUILD)base_runtime.o $(DIR_BUILD)base_trace.o \
 		$(DIR_BUILD)system_bus.o $(DIR_BUILD)system_display.o $(DIR_BUILD)system_input.o $(DIR_BUILD)system_memory.o \
 			$(DIR_BUILD)system_processor.o $(DIR_BUILD)system_video.o \
-		$(DIR_BUILD)type_signal.o $(DIR_BUILD)type_thread.o
+		$(DIR_BUILD)type_exception.o $(DIR_BUILD)type_signal.o $(DIR_BUILD)type_thread.o
 	cp $(DIR_INCLUDE)e65.h $(DIR_BIN_INCLUDE)
 	@echo '--- DONE -----------------------------------'
 	@echo ''
@@ -46,13 +46,10 @@ build: build_base build_system build_type
 
 ### BASE ###
 
-build_base: base_e65.o base_exception.o base_runtime.o base_trace.o
+build_base: base_e65.o base_runtime.o base_trace.o
 
 base_e65.o: $(DIR_SRC)e65.cpp $(DIR_INCLUDE)e65.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)e65.cpp -o $(DIR_BUILD)base_e65.o
-
-base_exception.o: $(DIR_SRC)exception.cpp $(DIR_INCLUDE)exception.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)exception.cpp -o $(DIR_BUILD)base_exception.o
 
 base_runtime.o: $(DIR_SRC)runtime.cpp $(DIR_INCLUDE)runtime.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC)runtime.cpp -o $(DIR_BUILD)base_runtime.o
@@ -84,7 +81,10 @@ system_video.o: $(DIR_SRC_SYSTEM)video.cpp $(DIR_INCLUDE_SYSTEM)video.h
 
 ### TYPE ###
 
-build_type: type_signal.o type_thread.o
+build_type: type_exception.o type_signal.o type_thread.o
+
+type_exception.o: $(DIR_SRC_TYPE)exception.cpp $(DIR_INCLUDE_TYPE)exception.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TYPE)exception.cpp -o $(DIR_BUILD)type_exception.o
 
 type_signal.o: $(DIR_SRC_TYPE)signal.cpp $(DIR_INCLUDE_TYPE)signal.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TYPE)signal.cpp -o $(DIR_BUILD)type_signal.o

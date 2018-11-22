@@ -19,7 +19,7 @@
 #ifndef E65_SYSTEM_VIDEO_TYPE_H_
 #define E65_SYSTEM_VIDEO_TYPE_H_
 
-#include "../../include/exception.h"
+#include "../../include/type/exception.h"
 
 namespace e65 {
 

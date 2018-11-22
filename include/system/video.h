@@ -27,7 +27,7 @@ namespace e65 {
 	namespace system {
 
 		class video :
-				public e65::interface::singleton<e65::system::video>,
+				public e65::type::singleton<e65::system::video>,
 				public e65::interface::system::video {
 
 			public:
@@ -50,7 +50,7 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::system::video>;
+				friend class e65::type::singleton<e65::system::video>;
 
 				video(void);
 

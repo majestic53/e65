@@ -27,7 +27,7 @@ namespace e65 {
 	namespace system {
 
 		class processor :
-				public e65::interface::singleton<e65::system::processor>,
+				public e65::type::singleton<e65::system::processor>,
 				public e65::interface::system::processor {
 
 			public:
@@ -106,7 +106,7 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::system::processor>;
+				friend class e65::type::singleton<e65::system::processor>;
 
 				processor(void);
 

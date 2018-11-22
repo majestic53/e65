@@ -20,7 +20,7 @@
 #define E65_TRACE_TYPE_H_
 
 #include <tuple>
-#include "../include/exception.h"
+#include "../include/type/exception.h"
 
 namespace e65 {
 

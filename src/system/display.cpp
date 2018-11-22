@@ -25,7 +25,7 @@ namespace e65 {
 	namespace system {
 
 		display::display(void) :
-			e65::interface::singleton<e65::system::display>(e65::interface::E65_SINGLETON_DISPLAY),
+			e65::type::singleton<e65::system::display>(e65::type::E65_SINGLETON_DISPLAY),
 			m_renderer(nullptr),
 			m_texture(nullptr),
 			m_window(nullptr)
@@ -45,7 +45,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -66,7 +66,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -83,7 +83,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -197,7 +197,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}", x, y);
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -221,7 +221,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Frame-rate=%.1f", frame_rate);
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -238,7 +238,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Fullscreen=%x", fullscreen);
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -268,7 +268,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Hidden=%x", hidden);
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -297,7 +297,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Index=%u, Color=%u(%s)", index, color, E65_DISPLAY_COLOR_STRING(color));
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -332,7 +332,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Title[%u]=%s", title.size(), E65_STRING_CHECK(title));
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -347,7 +347,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -376,7 +376,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::display>::initialized()) {
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -390,9 +390,9 @@ namespace e65 {
 			std::stringstream result;
 
 			result << E65_SYSTEM_DISPLAY_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::system::display>::to_string();
+				<< " Interface=" << e65::type::singleton<e65::system::display>::to_string();
 
-			if(e65::interface::singleton<e65::system::display>::initialized()) {
+			if(e65::type::singleton<e65::system::display>::initialized()) {
 				result << ", Title[" << m_title.size() << "]=" << E65_STRING_CHECK(m_title)
 					<< ", Pixel[" << m_pixel.size() << "]=" << E65_STRING_HEX(uintptr_t, &m_pixel)
 					<< ", Window=" << E65_STRING_HEX(uintptr_t, m_window)

@@ -26,7 +26,7 @@ namespace e65 {
 	namespace system {
 
 		bus::bus(void) :
-			e65::interface::singleton<e65::system::bus>(e65::interface::E65_SINGLETON_BUS),
+			e65::type::singleton<e65::system::bus>(e65::type::E65_SINGLETON_BUS),
 			m_input(e65::system::input::acquire()),
 			m_memory(e65::system::memory::acquire()),
 			m_processor(e65::system::processor::acquire()),
@@ -47,7 +47,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -67,7 +67,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -242,7 +242,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -295,7 +295,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -373,9 +373,9 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			result << E65_SYSTEM_BUS_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::system::bus>::to_string();
+				<< " Interface=" << e65::type::singleton<e65::system::bus>::to_string();
 
-			if(e65::interface::singleton<e65::system::bus>::initialized()) {
+			if(e65::type::singleton<e65::system::bus>::initialized()) {
 				result << ", Input=" << m_input.to_string()
 					<< ", Memory=" << m_memory.to_string()
 					<< ", Processor=" << m_processor.to_string()
@@ -391,7 +391,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::bus>::initialized()) {
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
 				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
 			}
 

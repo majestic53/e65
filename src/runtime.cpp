@@ -23,7 +23,7 @@
 namespace e65 {
 
 	runtime::runtime(void) :
-		e65::interface::singleton<e65::runtime>(e65::interface::E65_SINGLETON_RUNTIME),
+		e65::type::singleton<e65::runtime>(e65::type::E65_SINGLETON_RUNTIME),
 		m_bus(e65::system::bus::acquire()),
 		m_debug(false),
 		m_trace(e65::trace::acquire())
@@ -58,7 +58,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -81,7 +81,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -99,7 +99,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -145,7 +145,7 @@ namespace e65 {
 	{
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -158,7 +158,7 @@ namespace e65 {
 	{
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -172,7 +172,7 @@ namespace e65 {
 	{
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -365,7 +365,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -389,7 +389,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -438,7 +438,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -455,7 +455,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY();
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
@@ -484,9 +484,9 @@ namespace e65 {
 		E65_TRACE_ENTRY();
 
 		result << E65_RUNTIME_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-			<< " Interface=" << e65::interface::singleton<e65::runtime>::to_string();
+			<< " Interface=" << e65::type::singleton<e65::runtime>::to_string();
 
-		if(e65::interface::singleton<e65::runtime>::initialized()) {
+		if(e65::type::singleton<e65::runtime>::initialized()) {
 			result << ", Thread=" << e65::type::thread::to_string()
 				<< ", Bus=" << m_bus.to_string()
 				<< ", Trace=" << m_trace.to_string()
@@ -517,7 +517,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Timeout=%u", timeout);
 
-		if(!e65::interface::singleton<e65::runtime>::initialized()) {
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 

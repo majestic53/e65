@@ -26,7 +26,7 @@ namespace e65 {
 	namespace system {
 
 		memory::memory(void) :
-			e65::interface::singleton<e65::system::memory>(e65::interface::E65_SINGLETON_MEMORY)
+			e65::type::singleton<e65::system::memory>(e65::type::E65_SINGLETON_MEMORY)
 		{
 			E65_TRACE_ENTRY();
 			E65_TRACE_EXIT();
@@ -43,7 +43,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(!e65::type::singleton<e65::system::memory>::initialized()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -66,7 +66,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Origin=%u(%04x)", data.size(), &data, origin, origin);
 
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(!e65::type::singleton<e65::system::memory>::initialized()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -127,7 +127,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("%u(%04x)", address, address);
 
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(!e65::type::singleton<e65::system::memory>::initialized()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -150,7 +150,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("%u(%04x)", address, address);
 
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(!e65::type::singleton<e65::system::memory>::initialized()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -173,9 +173,9 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			result << E65_SYSTEM_MEMORY_HEADER << "(" << E65_STRING_HEX(uintptr_t, this) << ")"
-				<< " Interface=" << e65::interface::singleton<e65::system::memory>::to_string();
+				<< " Interface=" << e65::type::singleton<e65::system::memory>::to_string();
 
-			if(e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(e65::type::singleton<e65::system::memory>::initialized()) {
 				result << ", Memory[" << m_memory.size() << "]=" << E65_STRING_HEX(uintptr_t, &m_memory);
 			}
 
@@ -191,7 +191,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Address=%u(%04x), Value=%u(%02x)", address, address, value, value);
 
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(!e65::type::singleton<e65::system::memory>::initialized()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
@@ -212,7 +212,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Address=%u(%04x), Value=%u(%04x)", address, address, value, value);
 
-			if(!e65::interface::singleton<e65::system::memory>::initialized()) {
+			if(!e65::type::singleton<e65::system::memory>::initialized()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 

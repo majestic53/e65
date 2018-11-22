@@ -20,7 +20,7 @@
 #define E65_TYPE_THREAD_H_
 
 #include <thread>
-#include "../exception.h"
+#include "./exception.h"
 #include "./signal.h"
 
 namespace e65 {
@@ -90,7 +90,7 @@ namespace e65 {
 
 				bool m_active;
 
-				e65::exception m_exception;
+				e65::type::exception m_exception;
 
 				std::mutex m_mutex;
 

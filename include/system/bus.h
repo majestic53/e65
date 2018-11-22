@@ -29,7 +29,7 @@ namespace e65 {
 	namespace system {
 
 		class bus :
-				public e65::interface::singleton<e65::system::bus>,
+				public e65::type::singleton<e65::system::bus>,
 				public e65::interface::system::bus {
 
 			public:
@@ -69,7 +69,7 @@ namespace e65 {
 
 			protected:
 
-				friend class e65::interface::singleton<e65::system::bus>;
+				friend class e65::type::singleton<e65::system::bus>;
 
 				bus(void);
 

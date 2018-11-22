@@ -27,7 +27,7 @@
 namespace e65 {
 
 	class runtime :
-			public e65::interface::singleton<e65::runtime>,
+			public e65::type::singleton<e65::runtime>,
 			public e65::interface::runtime,
 			protected e65::type::thread {
 
@@ -77,7 +77,7 @@ namespace e65 {
 
 		protected:
 
-			friend class e65::interface::singleton<e65::runtime>;
+			friend class e65::type::singleton<e65::runtime>;
 
 			runtime(void);
 
