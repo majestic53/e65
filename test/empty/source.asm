@@ -1,0 +1,7 @@
+; Empty Example
+
+	.org 0xfffa
+
+	.dw 0x0000
+	.dw 0x0000
+	.dw 0x0000

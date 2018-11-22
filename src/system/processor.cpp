@@ -89,6 +89,95 @@ namespace e65 {
 			return m_cycle_last;
 		}
 
+		uint8_t
+		processor::cycles(
+			__in int command,
+			__in int mode,
+			__in_opt bool secondary
+			) const
+		{
+			uint8_t result;
+			std::map<int, std::pair<uint8_t, uint8_t>>::const_iterator entry_command;
+			std::map<int, std::map<int, std::pair<uint8_t, uint8_t>>>::const_iterator entry_mode;
+
+			E65_TRACE_ENTRY_FORMAT("Command=%i(%s), Mode=%i(%s), Mode=%x(%s)", command, E65_PCOMMAND_STRING(command),
+				mode, E65_PCOMMAND_MODE_STRING(mode), secondary, secondary ? "Secondary" : "Primary");
+
+			entry_mode = e65::type::E65_PCOMMAND_CYCLE_MAP.find(mode);
+			if(entry_mode == e65::type::E65_PCOMMAND_CYCLE_MAP.end()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_MODE,
+					"%i(%s) %i(%s)", command, E65_PCOMMAND_STRING(command), mode, E65_PCOMMAND_MODE_STRING(mode));
+			}
+
+			entry_command = entry_mode->second.find(command);
+			if(entry_command == entry_mode->second.end()) {
+				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_COMMAND,
+					"%i(%s) %i(%s)", command, E65_PCOMMAND_STRING(command), mode, E65_PCOMMAND_MODE_STRING(mode));
+			}
+
+			result = (secondary ? entry_command->second.second : entry_command->second.first);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%02x)", result, result);
+			return result;
+		}
+
+		bool
+		processor::decode(
+			__in uint8_t code,
+			__inout int &command,
+			__inout int &mode,
+			__inout int &length
+			)
+		{
+			bool result = false;
+			std::map<uint8_t, std::pair<int, int>>::const_iterator entry_command;
+
+			E65_TRACE_ENTRY_FORMAT("Code=%u(%02x), Command=%p, Mode=%p, Length=%p", code, code, &command, &mode, &length);
+
+			entry_command = e65::type::E65_PCOMMAND_ID_MAP.find(code);
+			if(entry_command != e65::type::E65_PCOMMAND_ID_MAP.end()) {
+				std::map<int, int>::const_iterator entry_length;
+
+				command = entry_command->second.first;
+				mode = entry_command->second.second;
+
+				entry_length = e65::type::E65_PCOMMAND_LENGTH_MAP.find(mode);
+				if(entry_length != e65::type::E65_PCOMMAND_LENGTH_MAP.end()) {
+					length = entry_length->second;
+					result = true;
+				}
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%x", result);
+			return result;
+		}
+
+		void
+		processor::execute_adc(
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Mode=%i(%s), Operand=%u(%04x)", mode, E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+
+			// TODO
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_and(
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Mode=%i(%s), Operand=%u(%04x)", mode, E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+
+			// TODO
+
+			E65_TRACE_EXIT();
+		}
+
 		void
 		processor::execute_brk(
 			__in e65::interface::system::memory &memory
@@ -100,7 +189,7 @@ namespace e65 {
 			push_word(memory, m_program_counter);
 			push(memory, m_flags.raw);
 			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_MASKABLE_INTERRUPT);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_BRK);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -111,7 +200,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.carry = 0;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLC);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_CLC, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -122,7 +211,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.decimal_enable = 0;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLD);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_CLD, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -133,7 +222,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.irq_disable = 0;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLI);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_CLI, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -144,7 +233,20 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.overflow = 0;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_CLV);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_CLV, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_cmp(
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Mode=%i(%s), Operand=%u(%04x)", mode, E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+
+			// TODO
 
 			E65_TRACE_EXIT();
 		}
@@ -157,7 +259,7 @@ namespace e65 {
 			--m_index_x;
 			m_flags.sign = (m_index_x & E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_DEX);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_DEX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -170,7 +272,20 @@ namespace e65 {
 			--m_index_y;
 			m_flags.sign = (m_index_y & E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_DEY);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_DEY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_eor(
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Mode=%i(%s), Operand=%u(%04x)", mode, E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+
+			// TODO
 
 			E65_TRACE_EXIT();
 		}
@@ -183,7 +298,7 @@ namespace e65 {
 			++m_index_x;
 			m_flags.sign = (m_index_x & E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_INX);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_INX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -196,7 +311,22 @@ namespace e65 {
 			++m_index_y;
 			m_flags.sign = (m_index_y & E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_INY);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_INY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_lda(
+			__in e65::interface::system::memory &memory,
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Mode=%i(%s), Operand=%u(%04x)", &memory, mode, E65_PCOMMAND_MODE_STRING(mode),
+				operand, operand);
+
+			// TODO
 
 			E65_TRACE_EXIT();
 		}
@@ -206,7 +336,20 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_NOP);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_NOP, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_ora(
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Mode=%i(%s), Operand=%u(%04x)", mode, E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+
+			// TODO
 
 			E65_TRACE_EXIT();
 		}
@@ -219,7 +362,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			push(memory, m_accumulator);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHA);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PHA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -232,7 +375,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			push(memory, m_flags.raw);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHP);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PHP, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -245,7 +388,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			push(memory, m_index_x);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHX);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PHX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -258,7 +401,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			push(memory, m_index_y);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PHY);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PHY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -273,7 +416,7 @@ namespace e65 {
 			m_accumulator = pop(memory);
 			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLA);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PLA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -286,7 +429,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			m_flags.raw = pop(memory);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLP);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PLP, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -301,7 +444,7 @@ namespace e65 {
 			m_index_x = pop(memory);
 			m_flags.sign = (m_index_x & E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLX);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PLX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -316,7 +459,7 @@ namespace e65 {
 			m_index_y = pop(memory);
 			m_flags.sign = (m_index_y & E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_PLY);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_PLY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -330,7 +473,7 @@ namespace e65 {
 
 			m_flags.raw = pop(memory);
 			m_program_counter = pop_word(memory);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_RTI);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_RTI, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -343,7 +486,20 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			m_program_counter = (pop_word(memory) - 1);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_RTS);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_RTS, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_sbc(
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Mode=%i(%s), Operand=%u(%04x)", mode, E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+
+			// TODO
 
 			E65_TRACE_EXIT();
 		}
@@ -354,7 +510,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.carry = 1;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_SEC);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_SEC, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -365,7 +521,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.decimal_enable = 1;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_SED);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_SED, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -376,7 +532,22 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_flags.irq_disable = 1;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_SEI);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_SEI, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		processor::execute_sta(
+			__in e65::interface::system::memory &memory,
+			__in int mode,
+			__in uint16_t operand
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Mode=%i(%s), Operand=%u(%04x)", &memory, mode, E65_PCOMMAND_MODE_STRING(mode),
+				operand, operand);
+
+			// TODO
 
 			E65_TRACE_EXIT();
 		}
@@ -387,7 +558,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_stop = true;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_STP);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_STP, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -400,7 +571,7 @@ namespace e65 {
 			m_index_x = m_accumulator;
 			m_flags.sign = (m_index_x & E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TAX);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_TAX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -413,7 +584,7 @@ namespace e65 {
 			m_index_y = m_accumulator;
 			m_flags.sign = (m_index_y & E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TAY);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_TAY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -426,7 +597,7 @@ namespace e65 {
 			m_index_x = m_stack_pointer;
 			m_flags.sign = (m_index_x & E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TSX);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_TSX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -439,7 +610,7 @@ namespace e65 {
 			m_accumulator = m_index_x;
 			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TXA);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_TXA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -450,7 +621,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_stack_pointer = m_index_x;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TXS);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_TXS, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -463,7 +634,7 @@ namespace e65 {
 			m_accumulator = m_index_y;
 			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_TYA);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_TYA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -474,7 +645,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_wait = true;
-			m_cycle_last += E65_PCOMMAND_CYCLE_TAKEN(e65::type::E65_PCOMMAND_WAI);
+			m_cycle_last += cycles(e65::type::E65_PCOMMAND_WAI, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
 		}
@@ -636,37 +807,42 @@ namespace e65 {
 
 			if(!m_stop && !m_wait) {
 				uint8_t code;
-				int command, length, mode;
 				uint16_t address = m_program_counter, operand = 0;
+				int command, length = 0, mode = e65::type::E65_PCOMMAND_MODE_IMPLIED;
 
 				code = read(memory, m_program_counter++);
-				if(!E65_PCOMMAND_VALID(code)) {
+				if(decode(code, command, mode, length)) {
+
+					switch(length) {
+						case e65::type::E65_PCOMMAND_LENGTH_NONE:
+							break;
+						case e65::type::E65_PCOMMAND_LENGTH_BYTE:
+							operand = read(memory, m_program_counter++);
+							break;
+						case e65::type::E65_PCOMMAND_LENGTH_WORD:
+							operand = read_word(memory, m_program_counter);
+							m_program_counter += sizeof(uint16_t);
+							break;
+						default:
+							THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_LENGTH,
+								"[%04x] %u(%02x)=%i", address, code, code, command);
+					}
+
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Command", "[%04x] %s %s {%u(%04x)}", address,
+						E65_PCOMMAND_STRING(command), E65_PCOMMAND_MODE_STRING(mode), operand, operand);
+				} else {
 					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Illegal command", "[%04x] %u(%02x)", address,
 						code, code);
 					command = e65::type::E65_PCOMMAND_NOP;
-				} else {
-					command = E65_PCOMMAND_ID(code);
 				}
-
-				length = E65_PCOMMAND_LENGTH(command);
-				switch(length) {
-					case e65::type::E65_PCOMMAND_LENGTH_NONE:
-						break;
-					case e65::type::E65_PCOMMAND_LENGTH_BYTE:
-						operand = read(memory, m_program_counter++);
-						break;
-					case e65::type::E65_PCOMMAND_LENGTH_WORD:
-						operand = read_word(memory, m_program_counter);
-						m_program_counter += sizeof(uint16_t);
-						break;
-					default:
-						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_LENGTH,
-							"[%04x] %u(%02x)=%i", address, code, code, command);
-				}
-
-				mode = E65_PCOMMAND_MODE(command);
 
 				switch(command) {
+					case e65::type::E65_PCOMMAND_ADC:
+						execute_adc(mode, operand);
+						break;
+					case e65::type::E65_PCOMMAND_AND:
+						execute_and(mode, operand);
+						break;
 					case e65::type::E65_PCOMMAND_BRK:
 						execute_brk(memory);
 						break;
@@ -682,11 +858,17 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_CLV:
 						execute_clv();
 						break;
+					case e65::type::E65_PCOMMAND_CMP:
+						execute_cmp(mode, operand);
+						break;
 					case e65::type::E65_PCOMMAND_DEX:
 						execute_dex();
 						break;
 					case e65::type::E65_PCOMMAND_DEY:
 						execute_dey();
+						break;
+					case e65::type::E65_PCOMMAND_EOR:
+						execute_eor(mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_INX:
 						execute_inx();
@@ -694,8 +876,14 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_INY:
 						execute_iny();
 						break;
+					case e65::type::E65_PCOMMAND_LDA:
+						execute_lda(memory, mode, operand);
+						break;
 					case e65::type::E65_PCOMMAND_NOP:
 						execute_nop();
+						break;
+					case e65::type::E65_PCOMMAND_ORA:
+						execute_ora(mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_PHA:
 						execute_pha(memory);
@@ -727,6 +915,9 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_RTS:
 						execute_rts(memory);
 						break;
+					case e65::type::E65_PCOMMAND_SBC:
+						execute_sbc(mode, operand);
+						break;
 					case e65::type::E65_PCOMMAND_SEC:
 						execute_sec();
 						break;
@@ -735,6 +926,9 @@ namespace e65 {
 						break;
 					case e65::type::E65_PCOMMAND_SEI:
 						execute_sei();
+						break;
+					case e65::type::E65_PCOMMAND_STA:
+						execute_sta(memory, mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_STP:
 						execute_stp();
@@ -856,18 +1050,20 @@ namespace e65 {
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor resetting");
 
-			m_accumulator = E65_PROCESSOR_REGISTER_ACCUMULATOR;
+			m_accumulator = E65_PROCESSOR_REGISTER_ACCUMULATOR_RESET;
 			m_cycle = E65_PROCESSOR_INTERRUPT_CYCLES;
 			m_cycle_last = E65_PROCESSOR_INTERRUPT_CYCLES;
-			m_flags.raw = E65_PROCESSOR_REGISTER_FLAGS;
-			m_index_x = E65_PROCESSOR_REGISTER_INDEX_X;
-			m_index_y = E65_PROCESSOR_REGISTER_INDEX_Y;
+			m_flags.raw = E65_PROCESSOR_REGISTER_FLAGS_RESET;
+			m_index_x = E65_PROCESSOR_REGISTER_INDEX_X_RESET;
+			m_index_y = E65_PROCESSOR_REGISTER_INDEX_Y_RESET;
 			m_interrupt_irq = false;
 			m_interrupt_nmi = false;
 			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_RESET_INTERRUPT);
-			m_stack_pointer = E65_PROCESSOR_REGISTER_STACK_POINTER;
+			m_stack_pointer = E65_PROCESSOR_REGISTER_STACK_POINTER_RESET;
 			m_stop = false;
 			m_wait = false;
+
+			push_word(memory, m_program_counter);
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor reset");
 
