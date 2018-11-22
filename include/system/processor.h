@@ -118,6 +118,19 @@ namespace e65 {
 					__in const processor &other
 					) = delete;
 
+				uint16_t address_in(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand,
+					__inout bool &boundary
+					);
+
+				uint16_t address_out(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
 				uint8_t cycles(
 					__in int command,
 					__in int mode,
@@ -136,11 +149,13 @@ namespace e65 {
 					);
 
 				void execute_adc(
+					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
 					);
 
 				void execute_and(
+					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
 					);
@@ -154,6 +169,7 @@ namespace e65 {
 				void execute_clv(void);
 
 				void execute_cmp(
+					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
 					);
@@ -163,6 +179,7 @@ namespace e65 {
 				void execute_dey(void);
 
 				void execute_eor(
+					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
 					);
@@ -180,6 +197,7 @@ namespace e65 {
 				void execute_nop(void);
 
 				void execute_ora(
+					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
 					);
@@ -225,6 +243,7 @@ namespace e65 {
 					);
 
 				void execute_sbc(
+					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
 					);

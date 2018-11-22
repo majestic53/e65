@@ -173,7 +173,7 @@ e65_dump(
 		value = e65::runtime::acquire().bus().memory().read(iter);
 
 		stream << " " << E65_STRING_HEX(uint8_t, value);
-		buffer += (std::isprint(value) ? value : E65_DUMP_CHARACTER_FILL);
+		buffer += ((std::isprint(value) && !std::isspace(value)) ? value : E65_DUMP_CHARACTER_FILL);
 	}
 
 	if(!buffer.empty()) {

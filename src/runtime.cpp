@@ -339,6 +339,9 @@ namespace e65 {
 							case E65_RUNTIME_SDL_FULLSCREEN_KEY:
 								m_bus.video().display().set_fullscreen(!m_bus.video().display().fullscreen());
 								break;
+							case E65_RUNTIME_SDL_REFRESH_KEY:
+								m_bus.video().display().show();
+								break;
 							default:
 								m_bus.input().key(m_bus.memory(), value);
 								break;
