@@ -34,6 +34,8 @@ e65_breakpoint_list(
 	std::string buffer;
 	int result = EXIT_SUCCESS;
 
+	E65_TRACE_ENTRY_FORMAT("Output=%p", output);
+
 	if(!output) {
 		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", output);
 	}
@@ -47,6 +49,7 @@ e65_breakpoint_list(
 
 	std::memcpy(*output, &buffer[0], buffer.size());
 
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
 	return result;
 }
 
@@ -59,6 +62,8 @@ e65_core(
 	std::string buffer;
 	std::stringstream stream;
 	int flag, result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("Output=%p", output);
 
 	if(!output) {
 		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", output);
@@ -99,6 +104,7 @@ e65_core(
 
 	std::memcpy(*output, &buffer[0], buffer.size());
 
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
 	return result;
 }
 
@@ -114,11 +120,13 @@ e65_disassemble(
 	std::stringstream stream;
 	int result = EXIT_SUCCESS;
 
+	E65_TRACE_ENTRY_FORMAT("Output=%p, Address=%u(%04x), Offset=%u(%04x)", output, address, address, offset, offset);
+
 	if(!output || !offset) {
 		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p, %u(%04x), %u(%04x)", output, address, address, offset, offset);
 	}
 
-	stream << "[" << E65_STRING_HEX(uint16_t, address) << ", " << offset << "]" << std::endl;
+	stream << "[" << E65_STRING_HEX(uint16_t, address) << ", " << offset << " instructions]" << std::endl;
 
 	for(; entry < offset; ++entry) {
 		std::vector<uint8_t> data;
@@ -185,6 +193,7 @@ e65_disassemble(
 
 	std::memcpy(*output, &buffer[0], buffer.size());
 
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
 	return result;
 }
 
@@ -199,6 +208,8 @@ e65_dump(
 	std::string buffer;
 	std::stringstream stream;
 	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("Output=%p, Address=%u(%04x), Offset=%u(%04x)", output, address, address, offset, offset);
 
 	if(!output || !offset) {
 		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p, %u(%04x), %u(%04x)", output, address, address, offset, offset);
@@ -280,6 +291,7 @@ e65_dump(
 
 	std::memcpy(*output, &buffer[0], buffer.size());
 
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
 	return result;
 }
 
@@ -291,6 +303,8 @@ e65_command(
 	)
 {
 	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("Command=%i(%s), Request=%p, Response=%p", command, E65_COMMAND_STRING(command), &request, &response);
 
 	try {
 		uint16_t address;
@@ -347,6 +361,9 @@ e65_command(
 			case E65_PROCESSOR_ACCUMULATOR_SET:
 				e65::runtime::acquire().bus().processor().set_accumulator(request->payload.byte);
 				break;
+			case E65_PROCESSOR_BREAK:
+				result = e65::runtime::acquire().debug_break();
+				break;
 			case E65_PROCESSOR_CORE:
 				response->result = e65_core(&response->payload.literal);
 				break;
@@ -379,6 +396,9 @@ e65_command(
 				break;
 			case E65_PROCESSOR_PROGRAM_COUNTER_SET:
 				e65::runtime::acquire().bus().processor().set_program_counter(request->payload.word);
+				break;
+			case E65_PROCESSOR_RUN:
+				result= e65::runtime::acquire().debug_run();
 				break;
 			case E65_PROCESSOR_STACK_POINTER:
 				response->payload.byte = e65::runtime::acquire().bus().processor().stack_pointer();
@@ -443,6 +463,8 @@ e65_initialize(void)
 {
 	int result = EXIT_SUCCESS;
 
+	E65_TRACE_ENTRY();
+
 	try {
 		e65::runtime::acquire().initialize();
 	} catch(e65::type::exception &exc) {
@@ -479,6 +501,58 @@ e65_interrupt(
 }
 
 int
+e65_register_handler(
+	__in e65_cb breakpoint,
+	__in e65_cb irq,
+	__in e65_cb nmi,
+	__in e65_cb stop,
+	__in e65_cb wait
+	)
+{
+	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("Breakpoint=%p, Irq=%p, Nmi=%p, Stop=%p, Wait=%p", breakpoint, irq, nmi, stop, wait);
+
+	try {
+
+		result = (e65::runtime::acquire().breakpoint_handler(breakpoint) ? EXIT_SUCCESS : EXIT_FAILURE);
+		if(result != EXIT_SUCCESS) {
+			goto exit;
+		}
+
+		result = (e65::runtime::acquire().irq_handler(irq) ? EXIT_SUCCESS : EXIT_FAILURE);
+		if(result != EXIT_SUCCESS) {
+			goto exit;
+		}
+
+		result = (e65::runtime::acquire().nmi_handler(nmi) ? EXIT_SUCCESS : EXIT_FAILURE);
+		if(result != EXIT_SUCCESS) {
+			goto exit;
+		}
+
+		result = (e65::runtime::acquire().stop_handler(stop) ? EXIT_SUCCESS : EXIT_FAILURE);
+		if(result != EXIT_SUCCESS) {
+			goto exit;
+		}
+
+		result = (e65::runtime::acquire().wait_handler(wait) ? EXIT_SUCCESS : EXIT_FAILURE);
+		if(result != EXIT_SUCCESS) {
+			goto exit;
+		}
+	} catch(e65::type::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+exit:
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
 e65_reset(void)
 {
 	int result = EXIT_SUCCESS;
@@ -506,6 +580,8 @@ e65_run(
 {
 	int result = EXIT_SUCCESS;
 
+	E65_TRACE_ENTRY_FORMAT("Path=%p, Hex=%x, Debug=%x", path, hex, debug);
+
 	try {
 
 		if(!path) {
@@ -532,6 +608,8 @@ e65_step(
 {
 	int result = EXIT_SUCCESS;
 
+	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
+
 	try {
 		result = (e65::runtime::acquire().step(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
@@ -553,6 +631,8 @@ e65_step_frame(
 {
 	int result = EXIT_SUCCESS;
 
+	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
+
 	try {
 		result = (e65::runtime::acquire().step_frame(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
@@ -570,6 +650,7 @@ e65_step_frame(
 void
 e65_uninitialize(void)
 {
+	E65_TRACE_ENTRY();
 
 	try {
 		e65::runtime::acquire().uninitialize();
@@ -618,6 +699,8 @@ int
 e65_wait(void)
 {
 	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY();
 
 	try {
 		result = (e65::runtime::acquire().wait() ? EXIT_SUCCESS : EXIT_FAILURE);

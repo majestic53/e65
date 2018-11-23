@@ -53,48 +53,50 @@ e65 [-d|-h|-i|-v] input
 ### Debug Interface
 
 ```
-bc|breakpoint-clear                   <address|*>             Clear breakpoint at a given address
-bl|breakpoint-list                                            List all breakpoints
-bs|breakpoint-set                     <address>               Set breakpoint at a given address
+bc|clear                              <address|*>             Clear breakpoint at a given address
+bl|list                                                       List all breakpoints
+bp|set                                <address>               Set breakpoint at a given address
 ---                                   ---                     ---
-md|memory-dump                        <address> <offset>      Dump memory at an address for a given offset
-mr|memory-read                        <address>               Read byte from a given memory address
-mrw|memory-read-word                  <address>               Read word from a given memory address
-mw|memory-write                       <address> <value>       Write byte to a given memory address
-mww|memory-write-word                 <address> <value>       Write word to a given memory address
+d|dump                                <address> <offset>      Dump memory at an address for a given offset
+r|read                                <address>               Read byte from a given memory address
+rw|read-word                          <address>               Read word from a given memory address
+w|write                               <address> <value>       Write byte to a given memory address
+ww|write-word                         <address> <value>       Write word to a given memory address
 ---                                   ---                     ---
-pa|processor-accumulator                                      Display processor accumulator
-pas|processor-accumulator-set         <value>                 Set processor accumulator to given value
-pc|processor-core                                             Display processor core
-pcy|processor-cycle                                           Display current processor cycle
-pdsm|processor-disassemble            <address> <offset>      Disassemble instructions at an address for a given offset
-pf|processor-flags                                            Display processor flags
-pfs|processor-flags-set               <value>                 Set processor flags to given value
-px|processor-index-x                                          Display processor index-x
-pxs|processor-index-x-set             <value>                 Set processor index-x to given value
-py|processor-index-y                                          Display processor index-y
-pys|processor-index-y-set             <value>                 Set processor index-y to given value
-pi|processor-irq                                              Signal processor with a maskable interrupt
-pn|processor-nmi                                              Signal processor with a non-maskable interrupt
-ppc|processor-program-counter                                 Display processor program counter
-ppcs|processor-program-counter-set    <value>                 Set processor program counter to given value
-pr|processor-reset                                            Reset processor
-psp|processor-stack-pointer                                   Display processor stack pointer
-psps|processor-stack-pointer-set      <value>                 Set processor stack pointer to given value
-ps|processor-step                     <offset>                Step processor through a given number of steps
-psf|processor-step-frame              <offset>                Step processor through a given number of frames
-pss|processor-stop                                            Set processor stop flag
-psc|processor-stop-clear                                      Clear processor stop flag
-pws|processor-wait                                            Set processor wait flag
-pwc|processor-wait-clear                                      Clear processor wait flag
+a|accumulator                                                 Display processor accumulator
+as|accumulator-set                    <value>                 Set processor accumulator to given value
+b|break                                                       Break processor
+c|core                                                        Display processor core
+cy|cycle                                                      Display current processor cycle
+dasm|disassemble                      <address> <offset>      Disassemble instructions at an address for a given offset
+flg|flags                                                     Display processor flags
+flgs|flags-set                        <value>                 Set processor flags to given value
+x|index-x                                                     Display processor index-x
+xs|index-x-set                        <value>                 Set processor index-x to given value
+y|index-y                                                     Display processor index-y
+ys|index-y-set                        <value>                 Set processor index-y to given value
+i|irq                                                         Signal processor with a maskable interrupt
+n|nmi                                                         Signal processor with a non-maskable interrupt
+pc|program-counter                                            Display processor program counter
+pcs|program-counter-set               <value>                 Set processor program counter to given value
+rst|reset                                                     Reset processor
+g|run                                                         Run processor
+sp|stack-pointer                                              Display processor stack pointer
+sps|stack-pointer-set                 <value>                 Set processor stack pointer to given value
+s|step                                <offset>                Step processor through a given number of steps
+sf|step-frame                         <offset>                Step processor through a given number of frames
+ss|stop                                                       Set processor stop flag
+sc|stop-clear                                                 Clear processor stop flag
+ws|wait                                                       Set processor wait flag
+wc|wait-clear                                                 Clear processor wait flag
 ---                                   ---                     ---
-vf|video-frame                                                Display current video frame
-vfs|video-fullscreen                  <value>                 Fullscreen display window
-vh|video-hide                         <value>                 Hide display window
+f|frame                                                       Display current video frame
+fs|fullscreen                         <value>                 Fullscreen display window
+h|hide                                <value>                 Hide display window
 ---                                   ---                     ---
-q|exit                                                        Exit debug mode
-h|help                                                        Display help information
+?|help                                                        Display help information
 v|version                                                     Display version information
+q|exit                                                        Exit debug mode
 ```
 
 Changelog
@@ -102,6 +104,12 @@ Changelog
 
 Version 0.1.1847
 ----------------
+*Updated: 11/23/2108*
+
+* Added run/break debug commands
+* Added async event handlers
+* Cleaned up debug interface
+
 *Updated: 11/22/2018*
 
 * Added additional debug commands

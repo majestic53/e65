@@ -1375,17 +1375,20 @@ namespace e65 {
 
 		void
 		processor::service(
+			__in e65::interface::runtime &runtime,
 			__in e65::interface::system::memory &memory
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Memory=%p", &runtime, &memory);
 
 			if(m_interrupt_irq || m_interrupt_nmi) {
 
 				if(m_interrupt_nmi) {
 					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
+					runtime.nmi_signal(m_program_counter);
 				} else if(m_interrupt_irq) {
 					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
+					runtime.irq_signal(m_program_counter);
 				}
 
 				push_word(memory, m_program_counter);
@@ -1549,10 +1552,11 @@ namespace e65 {
 
 		uint8_t
 		processor::step(
+			__in e65::interface::runtime &runtime,
 			__in e65::interface::system::memory &memory
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Memory=%p", &runtime, &memory);
 
 			if(!e65::type::singleton<e65::system::processor>::initialized()) {
 				THROW_E65_SYSTEM_PROCESSOR_EXCEPTION(E65_SYSTEM_PROCESSOR_EXCEPTION_UNINITIALIZED);
@@ -1560,7 +1564,7 @@ namespace e65 {
 
 			m_cycle_last = 0;
 
-			service(memory);
+			service(runtime, memory);
 			process(memory);
 
 			m_cycle += m_cycle_last;

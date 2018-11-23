@@ -43,6 +43,7 @@ enum {
 	/* Processor commands */
 	E65_PROCESSOR_ACCUMULATOR,		/* Retrieve the processors accumulator register */
 	E65_PROCESSOR_ACCUMULATOR_SET,		/* Set the processors accumulator register */
+	E65_PROCESSOR_BREAK,			/* Stop an actively running processor */
 	E65_PROCESSOR_CORE,			/* Retrieve the processors core information (caller must free response) */
 	E65_PROCESSOR_CYCLE,			/* Retrieve the processors cycle count */
 	E65_PROCESSOR_DISASSEMBLE,		/* Disassemble processor instructions (caller must free response) */
@@ -54,6 +55,7 @@ enum {
 	E65_PROCESSOR_INDEX_Y_SET,		/* Set the processors index-y register */
 	E65_PROCESSOR_PROGRAM_COUNTER,		/* Retrieve the processors program counter register */
 	E65_PROCESSOR_PROGRAM_COUNTER_SET,	/* Set the processors program counter register */
+	E65_PROCESSOR_RUN,			/* Run the processor until a breakpoint is hit */
 	E65_PROCESSOR_STACK_POINTER,		/* Retrieve the processors stack pointer register */
 	E65_PROCESSOR_STACK_POINTER_SET,	/* Set the processors stack pointer register */
 	E65_PROCESSOR_STOP,			/* Set the processors stop flag */
@@ -85,6 +87,9 @@ typedef struct {
 		char *literal;
 	} payload;
 } e65_t;
+
+/* Callback handler */
+typedef void (*e65_cb)(unsigned short address);
 
 #ifdef __cplusplus
 extern "C" {
@@ -135,6 +140,18 @@ extern int e65_command(int command, const e65_t *request, e65_t *response);
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
 extern int e65_interrupt(int maskable);
+
+/**
+ * Library runtime register handler routine
+ * @brief This routine allows the caller to register event handlers for an active library session
+ * @param breakpoint A caller defined breakpoint handler routine
+ * @param irq A caller defined irq handler routine
+ * @param nmi A caller defined nmi handler routine
+ * @param stop A caller defined stop handler routine
+ * @param wait A caller defined wait handler routine
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
+ */
+extern int e65_register_handler(e65_cb breakpoint, e65_cb irq, e65_cb nmi, e65_cb stop, e65_cb wait);
 
 /**
  * Library runtime reset routine

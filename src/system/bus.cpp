@@ -330,9 +330,25 @@ namespace e65 {
 			address = m_processor.program_counter();
 			if(runtime.debug() && runtime.breakpoint(address)) {
 				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Processor breakpoint", "%u(%04x)", address, address);
+				runtime.breakpoint_signal(address);
+				result = EXIT_FAILURE;
 			} else {
 				m_input.step(m_memory);
-				result = m_processor.step(m_memory);
+				result = m_processor.step(runtime, m_memory);
+
+				if(runtime.debug()) {
+
+					if(m_processor.stopped()) {
+						runtime.stop_signal(address);
+						result = EXIT_FAILURE;
+					}
+
+					if(m_processor.waiting()) {
+						runtime.wait_signal(address);
+						result = EXIT_FAILURE;
+					}
+				}
+
 				m_video.step(m_memory);
 			}
 
@@ -359,25 +375,36 @@ namespace e65 {
 			if(runtime.debug()) {
 				result = EXIT_SUCCESS;
 
-				while(remaining > 0) {
+				while((result == EXIT_SUCCESS) && (remaining > 0)) {
 					uint16_t address = m_processor.program_counter();
 
 					if(runtime.breakpoint(address)) {
 						E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Processor breakpoint", "%u(%04x)",
 							address, address);
+						runtime.breakpoint_signal(address);
 						result = EXIT_FAILURE;
 						break;
 					}
 
 					m_input.step(m_memory);
-					remaining -= m_processor.step(m_memory);
+					remaining -= m_processor.step(runtime, m_memory);
+
+					if(m_processor.stopped()) {
+						runtime.stop_signal(address);
+						result = EXIT_FAILURE;
+					}
+
+					if(m_processor.waiting()) {
+						runtime.wait_signal(address);
+						result = EXIT_FAILURE;
+					}
 				}
 			} else {
 				result = 0;
 
 				while(remaining > 0) {
 					m_input.step(m_memory);
-					remaining -= m_processor.step(m_memory);
+					remaining -= m_processor.step(runtime, m_memory);
 				}
 
 				m_video.step(m_memory);

@@ -19,7 +19,7 @@
 #ifndef E65_SYSTEM_PROCESSOR_H_
 #define E65_SYSTEM_PROCESSOR_H_
 
-#include "../interface/system/processor.h"
+#include "../interface/runtime.h"
 #include "./memory.h"
 
 namespace e65 {
@@ -95,6 +95,7 @@ namespace e65 {
 				uint8_t stack_pointer(void) const override;
 
 				uint8_t step(
+					__in e65::interface::runtime &runtime,
 					__in e65::interface::system::memory &memory
 					);
 
@@ -316,6 +317,7 @@ namespace e65 {
 					) const;
 
 				void service(
+					__in e65::interface::runtime &runtime,
 					__in e65::interface::system::memory &memory
 					);
 

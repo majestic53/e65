@@ -71,8 +71,10 @@ static const std::string E65_COMMAND_STR[] = {
 	// processor
 	"Processor-Accumulator",
 	"Processor-Accumulator-Set",
+	"Processor-Break",
 	"Processor-Core",
 	"Processor-Cycle",
+	"processor-Disassemble",
 	"Processor-Flags",
 	"Processor-Flags-Set",
 	"Processor-Index-X",
@@ -81,12 +83,15 @@ static const std::string E65_COMMAND_STR[] = {
 	"Processor-Index-Y-Set",
 	"Processor-Program-Counter",
 	"Processor-Program-Counter-Set",
+	"Processor-Run",
 	"Processor-Stack-Pointer",
 	"Processor-Stack-Pointer-Set",
 	"Processor-Stop",
 	"Processor-Stop-Clear",
+	"Processor-Stopped",
 	"Processor-Wait",
 	"Processor-Wait-Clear",
+	"Processor-Waiting",
 
 	// video
 	"Video-Frame",
