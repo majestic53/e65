@@ -88,8 +88,17 @@ typedef struct {
 	} payload;
 } e65_t;
 
+enum {
+	E65_EVENT_BREAK = 0,			/* Encountered processor break command (BRK) */
+	E65_EVENT_BREAKPOINT,			/* Encountered breakpoint */
+	E65_EVENT_MASKABLE_INTERRUPT,		/* Encountered maskable interrupt (IRQ) */
+	E65_EVENT_NON_MASKABLE_INTERRUPT,	/* Encountered non-maskable interrupt (NMI) */
+	E65_EVENT_STOP,				/* Encountered processor stop command (STP) */
+	E65_EVENT_WAIT,				/* Encountered processor wait command (WAI) */
+};
+
 /* Callback handler */
-typedef void (*e65_cb)(unsigned short address);
+typedef void (*e65_cb)(int type, unsigned short address);
 
 #ifdef __cplusplus
 extern "C" {
@@ -143,15 +152,11 @@ extern int e65_interrupt(int maskable);
 
 /**
  * Library runtime register handler routine
- * @brief This routine allows the caller to register event handlers for an active library session
- * @param breakpoint A caller defined breakpoint handler routine
- * @param irq A caller defined irq handler routine
- * @param nmi A caller defined nmi handler routine
- * @param stop A caller defined stop handler routine
- * @param wait A caller defined wait handler routine
+ * @brief This routine allows the caller to register an event handler for an active library session
+ * @param handler A caller defined event handler routine
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_register_handler(e65_cb breakpoint, e65_cb irq, e65_cb nmi, e65_cb stop, e65_cb wait);
+extern int e65_register_handler(e65_cb handler);
 
 /**
  * Library runtime reset routine

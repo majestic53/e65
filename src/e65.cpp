@@ -502,43 +502,15 @@ e65_interrupt(
 
 int
 e65_register_handler(
-	__in e65_cb breakpoint,
-	__in e65_cb irq,
-	__in e65_cb nmi,
-	__in e65_cb stop,
-	__in e65_cb wait
+	__in e65_cb handler
 	)
 {
 	int result = EXIT_SUCCESS;
 
-	E65_TRACE_ENTRY_FORMAT("Breakpoint=%p, Irq=%p, Nmi=%p, Stop=%p, Wait=%p", breakpoint, irq, nmi, stop, wait);
+	E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
 
 	try {
-
-		result = (e65::runtime::acquire().breakpoint_handler(breakpoint) ? EXIT_SUCCESS : EXIT_FAILURE);
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
-
-		result = (e65::runtime::acquire().irq_handler(irq) ? EXIT_SUCCESS : EXIT_FAILURE);
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
-
-		result = (e65::runtime::acquire().nmi_handler(nmi) ? EXIT_SUCCESS : EXIT_FAILURE);
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
-
-		result = (e65::runtime::acquire().stop_handler(stop) ? EXIT_SUCCESS : EXIT_FAILURE);
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
-
-		result = (e65::runtime::acquire().wait_handler(wait) ? EXIT_SUCCESS : EXIT_FAILURE);
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
+		result = (e65::runtime::acquire().register_handler(handler) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
@@ -547,7 +519,6 @@ e65_register_handler(
 		result = EXIT_FAILURE;
 	}
 
-exit:
 	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
 	return result;
 }

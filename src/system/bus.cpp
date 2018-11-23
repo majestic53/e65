@@ -18,6 +18,7 @@
 
 #include <climits>
 #include "../../include/system/bus.h"
+#include "../../include/e65.h"
 #include "../../include/trace.h"
 #include "./bus_type.h"
 
@@ -330,23 +331,13 @@ namespace e65 {
 			address = m_processor.program_counter();
 			if(runtime.debug() && runtime.breakpoint(address)) {
 				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Processor breakpoint", "%u(%04x)", address, address);
-				runtime.breakpoint_signal(address);
-				result = EXIT_FAILURE;
+				runtime.signal_event(E65_EVENT_BREAKPOINT, address);
 			} else {
 				m_input.step(m_memory);
 				result = m_processor.step(runtime, m_memory);
 
-				if(runtime.debug()) {
-
-					if(m_processor.stopped()) {
-						runtime.stop_signal(address);
-						result = EXIT_FAILURE;
-					}
-
-					if(m_processor.waiting()) {
-						runtime.wait_signal(address);
-						result = EXIT_FAILURE;
-					}
+				if(runtime.debug() && (m_processor.stopped() || m_processor.waiting())) {
+					result = 0;
 				}
 
 				m_video.step(m_memory);
@@ -381,7 +372,7 @@ namespace e65 {
 					if(runtime.breakpoint(address)) {
 						E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Processor breakpoint", "%u(%04x)",
 							address, address);
-						runtime.breakpoint_signal(address);
+						runtime.signal_event(E65_EVENT_BREAKPOINT, address);
 						result = EXIT_FAILURE;
 						break;
 					}
@@ -389,13 +380,7 @@ namespace e65 {
 					m_input.step(m_memory);
 					remaining -= m_processor.step(runtime, m_memory);
 
-					if(m_processor.stopped()) {
-						runtime.stop_signal(address);
-						result = EXIT_FAILURE;
-					}
-
-					if(m_processor.waiting()) {
-						runtime.wait_signal(address);
+					if(m_processor.stopped() || m_processor.waiting()) {
 						result = EXIT_FAILURE;
 					}
 				}

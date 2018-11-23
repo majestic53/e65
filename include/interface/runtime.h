@@ -33,27 +33,12 @@ namespace e65 {
 					__in uint16_t address
 					) = 0;
 
-				virtual void breakpoint_signal(
-					__in uint16_t address
-					) = 0;
-
 				virtual e65::interface::system::bus &bus(void) = 0;
 
 				virtual bool debug(void) const = 0;
 
-				virtual void irq_signal(
-					__in uint16_t address
-					) = 0;
-
-				virtual void nmi_signal(
-					__in uint16_t address
-					) = 0;
-
-				virtual void stop_signal(
-					__in uint16_t address
-					) = 0;
-
-				virtual void wait_signal(
+				virtual void signal_event(
+					__in int type,
 					__in uint16_t address
 					) = 0;
 		};

@@ -62,6 +62,21 @@ namespace e65 {
 
 	#define E65_RUNTIME_SDL_FULLSCREEN_KEY (SDL_SCANCODE_F11)
 	#define E65_RUNTIME_SDL_REFRESH_KEY (SDL_SCANCODE_F5)
+
+	static const std::string E65_RUNTIME_EVENT_STR[] = {
+		"Break",
+		"Breakpoint",
+		"Maskable-Interrupt",
+		"Non-maskable-Interrupt",
+		"Stop",
+		"Wait",
+		};
+
+	#define E65_RUNTIME_EVENT_MAX E65_EVENT_WAIT
+
+	#define E65_RUNTIME_EVENT_STRING(_TYPE_) \
+		(((_TYPE_) > E65_RUNTIME_EVENT_MAX) ? E65_STRING_UNKNOWN : \
+			E65_STRING_CHECK(E65_RUNTIME_EVENT_STR[_TYPE_]))
 }
 
 #endif // E65_RUNTIME_TYPE_H_

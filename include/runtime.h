@@ -44,19 +44,11 @@ namespace e65 {
 				__in uint16_t address
 				);
 
-			bool breakpoint_handler(
-				__in e65_cb handler
-				);
-
 			std::string breakpoint_list(void) const;
 
 			bool breakpoint_set(
 				__in uint16_t address
 				);
-
-			void breakpoint_signal(
-				__in uint16_t address
-				) override;
 
 			std::set<uint16_t> breakpoints(void) const;
 
@@ -70,21 +62,9 @@ namespace e65 {
 
 			bool debug_run(void);
 
-			bool irq_handler(
+			bool register_handler(
 				__in e65_cb handler
 				);
-
-			void irq_signal(
-				__in uint16_t address
-				) override;
-
-			bool nmi_handler(
-				__in e65_cb handler
-				);
-
-			void nmi_signal(
-				__in uint16_t address
-				) override;
 
 			bool reset(void);
 
@@ -96,6 +76,11 @@ namespace e65 {
 
 			bool running(void) const;
 
+			void signal_event(
+				__in int type,
+				__in uint16_t address
+				) override;
+
 			bool step(
 				__in_opt uint32_t offset = 1
 				);
@@ -104,14 +89,6 @@ namespace e65 {
 				__in_opt uint32_t offset = 1
 				);
 
-			bool stop_handler(
-				__in e65_cb handler
-				);
-
-			void stop_signal(
-				__in uint16_t address
-				) override;
-
 			std::string to_string(void) const override;
 
 			static std::string version(void);
@@ -119,14 +96,6 @@ namespace e65 {
 			bool wait(
 				__in_opt uint32_t timeout = 0
 				);
-
-			bool wait_handler(
-				__in e65_cb handler
-				);
-
-			void wait_signal(
-				__in uint16_t address
-				) override;
 
 		protected:
 
@@ -171,15 +140,7 @@ namespace e65 {
 
 			bool m_debug_running;
 
-			e65_cb m_handler_breakpoint;
-
-			e65_cb m_handler_irq;
-
-			e65_cb m_handler_nmi;
-
-			e65_cb m_handler_stop;
-
-			e65_cb m_handler_wait;
+			e65_cb m_handler;
 
 			e65::trace &m_trace;
 	};

@@ -27,11 +27,7 @@ namespace e65 {
 		m_bus(e65::system::bus::acquire()),
 		m_debug(false),
 		m_debug_running(false),
-		m_handler_breakpoint(nullptr),
-		m_handler_irq(nullptr),
-		m_handler_nmi(nullptr),
-		m_handler_stop(nullptr),
-		m_handler_wait(nullptr),
+		m_handler(nullptr),
 		m_trace(e65::trace::acquire())
 	{
 		m_trace.initialize();
@@ -97,23 +93,6 @@ namespace e65 {
 		return result;
 	}
 
-	bool
-	runtime::breakpoint_handler(
-		__in e65_cb handler
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpointer handler set", "%p", handler);
-
-		m_handler_breakpoint = handler;
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
 	std::string
 	runtime::breakpoint_list(void) const
 	{
@@ -161,22 +140,6 @@ namespace e65 {
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
-	}
-
-	void
-	runtime::breakpoint_signal(
-		__in uint16_t address
-		)
-	{
-		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
-
-		if(m_handler_breakpoint) {
-			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpoint handler signalled", "%p, %u(%04x)",
-				m_handler_breakpoint, address, address);
-			m_handler_breakpoint(address);
-		}
-
-		E65_TRACE_EXIT();
 	}
 
 	std::set<uint16_t>
@@ -270,72 +233,6 @@ namespace e65 {
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
-	}
-
-	bool
-	runtime::irq_handler(
-		__in e65_cb handler
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime irq handler set", "%p", handler);
-
-		m_handler_irq = handler;
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	void
-	runtime::irq_signal(
-		__in uint16_t address
-		)
-	{
-		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
-
-		if(m_handler_irq) {
-			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime irq handler signalled", "%p, %u(%04x)",
-				m_handler_irq, address, address);
-			m_handler_irq(address);
-		}
-
-		E65_TRACE_EXIT();
-	}
-
-	bool
-	runtime::nmi_handler(
-		__in e65_cb handler
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime nmi handler set", "%p", handler);
-
-		m_handler_nmi = handler;
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	void
-	runtime::nmi_signal(
-		__in uint16_t address
-		)
-	{
-		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
-
-		if(m_handler_nmi) {
-			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime nmi handler signalled", "%p, %u(%04x)",
-				m_handler_nmi, address, address);
-			m_handler_nmi(address);
-		}
-
-		E65_TRACE_EXIT();
 	}
 
 	bool
@@ -524,6 +421,23 @@ namespace e65 {
 	}
 
 	bool
+	runtime::register_handler(
+		__in e65_cb handler
+		)
+	{
+		bool result = true;
+
+		E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
+
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime handler set", "%p", handler);
+
+		m_handler = handler;
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
 	runtime::reset(void)
 	{
 		bool result = true;
@@ -613,6 +527,23 @@ namespace e65 {
 		return result;
 	}
 
+	void
+	runtime::signal_event(
+		__in int type,
+		__in uint16_t address
+		)
+	{
+		E65_TRACE_ENTRY_FORMAT("Type=%i(%s), Address=%u(%04x)", type, E65_RUNTIME_EVENT_STRING(type), address, address);
+
+		if(m_handler) {
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime handler signalled", "%p, %i(%s), %u(%04x)",
+				m_handler, type, E65_RUNTIME_EVENT_STRING(type), address, address);
+			m_handler(type, address);
+		}
+
+		E65_TRACE_EXIT();
+	}
+
 	bool
 	runtime::step(
 		__in uint32_t offset
@@ -681,39 +612,6 @@ namespace e65 {
 		return result;
 	}
 
-	bool
-	runtime::stop_handler(
-		__in e65_cb handler
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime stop handler set", "%p", handler);
-
-		m_handler_stop = handler;
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	void
-	runtime::stop_signal(
-		__in uint16_t address
-		)
-	{
-		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
-
-		if(m_handler_stop) {
-			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime stop handler signalled", "%p, %u(%04x)",
-				m_handler_stop, address, address);
-			m_handler_stop(address);
-		}
-
-		E65_TRACE_EXIT();
-	}
-
 	std::string
 	runtime::to_string(void) const
 	{
@@ -726,11 +624,7 @@ namespace e65 {
 
 		if(e65::type::singleton<e65::runtime>::initialized()) {
 			result << ", Thread=" << e65::type::thread::to_string()
-				<< ", Breakpoint-Handler=" << E65_STRING_HEX(uintptr_t, m_handler_breakpoint)
-				<< ", Irq-Handler=" << E65_STRING_HEX(uintptr_t, m_handler_irq)
-				<< ", Nmi-Handler=" << E65_STRING_HEX(uintptr_t, m_handler_nmi)
-				<< ", Stop-Handler=" << E65_STRING_HEX(uintptr_t, m_handler_stop)
-				<< ", Wait-Handler=" << E65_STRING_HEX(uintptr_t, m_handler_wait)
+				<< ", Handler=" << E65_STRING_HEX(uintptr_t, m_handler)
 				<< ", Bus=" << m_bus.to_string()
 				<< ", Trace=" << m_trace.to_string()
 				<< ", Mode=" << m_debug << "(" << (m_debug ? "Debug" : "Normal") << ")";
@@ -771,38 +665,5 @@ namespace e65 {
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
-	}
-
-	bool
-	runtime::wait_handler(
-		__in e65_cb handler
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Handler=%p", handler);
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime wait handler set", "%p", handler);
-
-		m_handler_wait = handler;
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	void
-	runtime::wait_signal(
-		__in uint16_t address
-		)
-	{
-		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
-
-		if(m_handler_wait) {
-			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime wait handler signalled", "%p, %u(%04x)",
-				m_handler_wait, address, address);
-			m_handler_wait(address);
-		}
-
-		E65_TRACE_EXIT();
 	}
 }

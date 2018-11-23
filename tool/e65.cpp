@@ -119,74 +119,58 @@ display_version(
 }
 
 void
-handle_breakpoint(
+event_handler(
+	__in int type,
 	__in uint16_t address
 	)
 {
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
-#endif // TRACE_COLOR
-	std::cout << "<Hit breakpoint @" << E65_STRING_HEX(uint16_t, address) << ">";
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR_RESET;
-#endif // TRACE_COLOR
-	std::cout << std::endl;
-}
 
-void
-handle_irq(
-	__in uint16_t address
-	)
-{
+	switch(type) {
+		case E65_EVENT_BREAK:
 #ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
 #endif // TRACE_COLOR
-	std::cout << "<Maskable interrupt serviced @" << E65_STRING_HEX(uint16_t, address) << ">";
+			std::cout << "<Processor break @ " << E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+		case E65_EVENT_BREAKPOINT:
 #ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR_RESET;
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
 #endif // TRACE_COLOR
-	std::cout << std::endl;
-}
+			std::cout << "<Hit breakpoint @ " << E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+		case E65_EVENT_MASKABLE_INTERRUPT:
+#ifdef TRACE_COLOR
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+			std::cout << "<Maskable interrupt serviced @ " << E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+		case E65_EVENT_NON_MASKABLE_INTERRUPT:
+#ifdef TRACE_COLOR
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+			std::cout << "<Non-maskable interrupt serviced @ " << E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+		case E65_EVENT_STOP:
+#ifdef TRACE_COLOR
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+			std::cout << "<Processor stopped @ " << E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+		case E65_EVENT_WAIT:
+#ifdef TRACE_COLOR
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+			std::cout << "<Processor waiting for interrupt @ " << E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+		default:
+#ifdef TRACE_COLOR
+			std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_ERROR);
+#endif // TRACE_COLOR
+			std::cout << "<Unhandled event " << type << "(" << E65_STRING_HEX(int, type) << ") @ "
+				<< E65_STRING_HEX(uint16_t, address) << ">";
+			break;
+	}
 
-void
-handle_nmi(
-	__in uint16_t address
-	)
-{
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
-#endif // TRACE_COLOR
-	std::cout << "<Non-maskable interrupt serviced @" << E65_STRING_HEX(uint16_t, address) << ">";
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR_RESET;
-#endif // TRACE_COLOR
-	std::cout << std::endl;
-}
-
-void
-handle_stop(
-	__in uint16_t address
-	)
-{
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
-#endif // TRACE_COLOR
-	std::cout << "<Processor stopped @" << E65_STRING_HEX(uint16_t, address) << ">";
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR_RESET;
-#endif // TRACE_COLOR
-	std::cout << std::endl;
-}
-
-void
-handle_wait(
-	__in uint16_t address
-	)
-{
-#ifdef TRACE_COLOR
-	std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
-#endif // TRACE_COLOR
-	std::cout << "<Processor waiting for interrupt @" << E65_STRING_HEX(uint16_t, address) << ">";
 #ifdef TRACE_COLOR
 	std::cout << E65_LEVEL_COLOR_RESET;
 #endif // TRACE_COLOR
@@ -751,7 +735,7 @@ run(
 		}
 	} else {
 
-		result = e65_register_handler(handle_breakpoint, handle_irq, handle_nmi, handle_stop, handle_wait);
+		result = e65_register_handler(event_handler);
 		if(result != EXIT_SUCCESS) {
 			goto exit;
 		}

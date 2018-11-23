@@ -18,6 +18,7 @@
 
 #include <climits>
 #include "../../include/system/processor.h"
+#include "../../include/e65.h"
 #include "../../include/trace.h"
 #include "./processor_type.h"
 
@@ -331,16 +332,18 @@ namespace e65 {
 
 		void
 		processor::execute_brk(
+			__in e65::interface::runtime &runtime,
 			__in e65::interface::system::memory &memory
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Memory=%p", &runtime, &memory);
 
 			m_flags.breakpoint = 1;
 			push_word(memory, m_program_counter);
 			push(memory, m_flags.raw);
 			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_MASKABLE_INTERRUPT);
 			m_cycle_last += cycles(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+			runtime.signal_event(E65_EVENT_BREAK, m_program_counter);
 
 			E65_TRACE_EXIT();
 		}
@@ -1103,10 +1106,11 @@ namespace e65 {
 
 		void
 		processor::process(
+			__in e65::interface::runtime &runtime,
 			__in e65::interface::system::memory &memory
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Memory=%p", &runtime, &memory);
 
 			if(!m_stop && !m_wait) {
 				uint8_t code;
@@ -1147,7 +1151,7 @@ namespace e65 {
 						execute_and(memory, mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BRK:
-						execute_brk(memory);
+						execute_brk(runtime, memory);
 						break;
 					case e65::type::E65_PCOMMAND_CLC:
 						execute_clc();
@@ -1262,6 +1266,15 @@ namespace e65 {
 							"[%04x] %u(%02x)=%i", address, code, code, command);
 				}
 			} else {
+
+				if(m_stop) {
+					runtime.signal_event(E65_EVENT_STOP, m_program_counter);
+				}
+
+				if(m_wait) {
+					runtime.signal_event(E65_EVENT_WAIT, m_program_counter);
+				}
+
 				execute_nop();
 			}
 
@@ -1385,10 +1398,10 @@ namespace e65 {
 
 				if(m_interrupt_nmi) {
 					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");
-					runtime.nmi_signal(m_program_counter);
+					runtime.signal_event(E65_EVENT_NON_MASKABLE_INTERRUPT, m_program_counter);
 				} else if(m_interrupt_irq) {
 					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing IRQ interrupt");
-					runtime.irq_signal(m_program_counter);
+					runtime.signal_event(E65_EVENT_MASKABLE_INTERRUPT, m_program_counter);
 				}
 
 				push_word(memory, m_program_counter);
@@ -1565,7 +1578,7 @@ namespace e65 {
 			m_cycle_last = 0;
 
 			service(runtime, memory);
-			process(memory);
+			process(runtime, memory);
 
 			m_cycle += m_cycle_last;
 

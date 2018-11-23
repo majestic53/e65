@@ -146,6 +146,7 @@ namespace e65 {
 					);
 
 				void execute_brk(
+					__in e65::interface::runtime &runtime,
 					__in e65::interface::system::memory &memory
 					);
 
@@ -293,6 +294,7 @@ namespace e65 {
 					);
 
 				void process(
+					__in e65::interface::runtime &runtime,
 					__in e65::interface::system::memory &memory
 					);
 
