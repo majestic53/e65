@@ -204,8 +204,8 @@ prompt_command(
 	)
 {
 	std::stringstream stream;
-	int id, result = EXIT_SUCCESS;
 	e65_t request = {}, response = {};
+	int count, id, result = EXIT_SUCCESS;
 
 	terminate = false;
 
@@ -347,6 +347,30 @@ prompt_command(
 				std::cout << response.payload.dword << std::endl;
 			}
 			break;
+		case E65_COMMAND_PROCESSOR_DISASSEMBLE:
+			stream << std::hex << arguments.front();
+			stream >> request.address;
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::hex << arguments.back();
+			stream >> request.payload.word;
+
+			result = e65_command(E65_PROCESSOR_DISASSEMBLE, &request, &response);
+			if(result == EXIT_SUCCESS) {
+
+				char *literal = response.payload.literal;
+				if(literal) {
+					std::cout << literal << std::endl;
+					std::free(response.payload.literal);
+					response.payload.literal = nullptr;
+					literal = nullptr;
+				} else {
+					std::cerr << E65_EXCEPTION_STRING(E65_EXCEPTION_COMMAND_RESPONSE) << std::endl;
+					result = EXIT_FAILURE;
+				}
+			}
+			break;
 		case E65_COMMAND_PROCESSOR_FLAGS:
 
 			result = e65_command(E65_PROCESSOR_FLAGS, &request, &response);
@@ -428,14 +452,91 @@ prompt_command(
 			result = e65_command(E65_PROCESSOR_STACK_POINTER_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_STEP:
+			stream << std::hex << arguments.front();
+			stream >> count;
 
-			result = e65_step();
+			result = e65_step(count);
 			if(result != EXIT_SUCCESS) {
 
 				result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
 				if(result == EXIT_SUCCESS) {
-					std::cout << "Breakpoint " << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
+#ifdef TRACE_COLOR
+					std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+					std::cout << "<Hit breakpoint @" << E65_STRING_HEX(uint16_t, response.payload.word) << ">";
+#ifdef TRACE_COLOR
+					std::cout << E65_LEVEL_COLOR_RESET;
+#endif // TRACE_COLOR
+					std::cout << std::endl;
 				}
+			}
+
+			result = e65_command(E65_PROCESSOR_STOPPED, &request, &response);
+			if((result == EXIT_SUCCESS) && response.payload.dword) {
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+				std::cout << "<Processor stopped>";
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR_RESET;
+#endif // TRACE_COLOR
+				std::cout << std::endl;
+			}
+
+			result = e65_command(E65_PROCESSOR_WAITING, &request, &response);
+			if((result == EXIT_SUCCESS) && response.payload.dword) {
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+				std::cout << "<Processor waiting for interrupt>";
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR_RESET;
+#endif // TRACE_COLOR
+				std::cout << std::endl;
+			}
+			break;
+		case E65_COMMAND_PROCESSOR_STEP_FRAME:
+			stream << std::hex << arguments.front();
+			stream >> count;
+
+			result = e65_step_frame(count);
+			if(result != EXIT_SUCCESS) {
+
+				result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
+				if(result == EXIT_SUCCESS) {
+#ifdef TRACE_COLOR
+					std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+					std::cout << "<Hit breakpoint @" << E65_STRING_HEX(uint16_t, response.payload.word) << ">";
+#ifdef TRACE_COLOR
+					std::cout << E65_LEVEL_COLOR_RESET;
+#endif // TRACE_COLOR
+					std::cout << std::endl;
+				}
+			}
+
+			result = e65_command(E65_PROCESSOR_STOPPED, &request, &response);
+			if((result == EXIT_SUCCESS) && response.payload.dword) {
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+				std::cout << "<Processor stopped>";
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR_RESET;
+#endif // TRACE_COLOR
+				std::cout << std::endl;
+			}
+
+			result = e65_command(E65_PROCESSOR_WAITING, &request, &response);
+			if((result == EXIT_SUCCESS) && response.payload.dword) {
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR(e65::type::E65_LEVEL_WARNING);
+#endif // TRACE_COLOR
+				std::cout << "<Processor waiting for interrupt>";
+#ifdef TRACE_COLOR
+				std::cout << E65_LEVEL_COLOR_RESET;
+#endif // TRACE_COLOR
+				std::cout << std::endl;
 			}
 			break;
 		case E65_COMMAND_PROCESSOR_STOP:

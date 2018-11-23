@@ -45,6 +45,7 @@ enum {
 	E65_PROCESSOR_ACCUMULATOR_SET,		/* Set the processors accumulator register */
 	E65_PROCESSOR_CORE,			/* Retrieve the processors core information (caller must free response) */
 	E65_PROCESSOR_CYCLE,			/* Retrieve the processors cycle count */
+	E65_PROCESSOR_DISASSEMBLE,		/* Disassemble processor instructions (caller must free response) */
 	E65_PROCESSOR_FLAGS,			/* Retrieve the processors flags */
 	E65_PROCESSOR_FLAGS_SET,		/* Set the processors flags */
 	E65_PROCESSOR_INDEX_X,			/* Retrieve the processors index-x register */
@@ -57,8 +58,10 @@ enum {
 	E65_PROCESSOR_STACK_POINTER_SET,	/* Set the processors stack pointer register */
 	E65_PROCESSOR_STOP,			/* Set the processors stop flag */
 	E65_PROCESSOR_STOP_CLEAR,		/* Clear the processors stop flag */
+	E65_PROCESSOR_STOPPED,			/* Retrieve the processor stop flag */
 	E65_PROCESSOR_WAIT,			/* Set the processors wait flag */
 	E65_PROCESSOR_WAIT_CLEAR,		/* Clear the processors wait flag */
+	E65_PROCESSOR_WAITING,			/* Retrieve the processor wait flag */
 
 	/* Video commands */
 	E65_VIDEO_FRAME,			/* Retrieve the video frame count */
@@ -154,10 +157,18 @@ extern int e65_run(const char *path, int hex, int debug);
 /**
  * Library runtime step routine
  * @brief This routine allows the caller to step an active library session
- * @param None
+ * @param count Number of steps
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_step(void);
+extern int e65_step(int count);
+
+/**
+ * Library runtime step frame routine
+ * @brief This routine allows the caller to step an active library session through a frame
+ * @param count Number of frames
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
+ */
+extern int e65_step_frame(int count);
 
 /**
  * Library runtime wait routine

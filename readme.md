@@ -60,35 +60,37 @@ bs|breakpoint-set                     <address>               Set breakpoint at 
 md|memory-dump                        <address> <offset>      Dump memory at an address for a given offset
 mr|memory-read                        <address>               Read byte from a given memory address
 mrw|memory-read-word                  <address>               Read word from a given memory address
-mw|memory-write                       <address> <byte>        Write byte to a given memory address
-mww|memory-write-word                 <address> <word>        Write word to a given memory address
+mw|memory-write                       <address> <value>       Write byte to a given memory address
+mww|memory-write-word                 <address> <value>       Write word to a given memory address
 ---                                   ---                     ---
 pa|processor-accumulator                                      Display processor accumulator
-pas|processor-accumulator-set         <byte>                  Set processor accumulator to given value
+pas|processor-accumulator-set         <value>                 Set processor accumulator to given value
 pc|processor-core                                             Display processor core
 pcy|processor-cycle                                           Display current processor cycle
+pdsm|processor-disassemble            <address> <offset>      Disassemble instructions at an address for a given offset
 pf|processor-flags                                            Display processor flags
-pfs|processor-flags-set               <byte>                  Set processor flags to given value
+pfs|processor-flags-set               <value>                 Set processor flags to given value
 px|processor-index-x                                          Display processor index-x
-pxs|processor-index-x-set             <byte>                  Set processor index-x to given value
+pxs|processor-index-x-set             <value>                 Set processor index-x to given value
 py|processor-index-y                                          Display processor index-y
-pys|processor-index-y-set             <byte>                  Set processor index-y to given value
+pys|processor-index-y-set             <value>                 Set processor index-y to given value
 pi|processor-irq                                              Signal processor with a maskable interrupt
 pn|processor-nmi                                              Signal processor with a non-maskable interrupt
 ppc|processor-program-counter                                 Display processor program counter
-ppcs|processor-program-counter-set    <word>                  Set processor program counter to given value
+ppcs|processor-program-counter-set    <value>                 Set processor program counter to given value
 pr|processor-reset                                            Reset processor
 psp|processor-stack-pointer                                   Display processor stack pointer
-psps|processor-stack-pointer-set      <byte>                  Set processor stack pointer to given value
-ps|processor-step                                             Step processor through a single cycle
+psps|processor-stack-pointer-set      <value>                 Set processor stack pointer to given value
+ps|processor-step                     <offset>                Step processor through a given number of steps
+psf|processor-step-frame              <offset>                Step processor through a given number of frames
 pss|processor-stop                                            Set processor stop flag
 psc|processor-stop-clear                                      Clear processor stop flag
 pws|processor-wait                                            Set processor wait flag
 pwc|processor-wait-clear                                      Clear processor wait flag
 ---                                   ---                     ---
 vf|video-frame                                                Display current video frame
-vfs|video-fullscreen                  <bool>                  Fullscreen display window
-vh|video-hide                         <bool>                  Hide display window
+vfs|video-fullscreen                  <value>                 Fullscreen display window
+vh|video-hide                         <value>                 Hide display window
 ---                                   ---                     ---
 q|exit                                                        Exit debug mode
 h|help                                                        Display help information
@@ -100,6 +102,10 @@ Changelog
 
 Version 0.1.1847
 ----------------
+*Updated: 11/22/2018*
+
+* Added additional debug commands
+
 *Updated: 11/21/2018*
 
 * Added arithmetic commands

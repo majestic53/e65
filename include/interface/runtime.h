@@ -29,6 +29,12 @@ namespace e65 {
 
 			public:
 
+				virtual bool breakpoint(
+					__in uint16_t address
+					) = 0;
+
+				virtual bool debug(void) const = 0;
+
 				virtual e65::interface::system::bus &bus(void) = 0;
 		};
 	}

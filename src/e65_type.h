@@ -100,6 +100,8 @@ static const std::string E65_COMMAND_STR[] = {
 
 #define E65_CORE_COLUMN_WIDTH 6
 
+#define E65_DISASSEMBLE_COLUMN_WIDTH 14
+
 #define E65_DUMP_BLOCK_SIZE 0x10
 
 #define E65_DUMP_CHARACTER_FILL '.'

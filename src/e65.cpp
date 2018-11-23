@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <climits>
 #include <cstring>
 #include "../include/e65.h"
 #include "../include/runtime.h"
@@ -102,6 +103,92 @@ e65_core(
 }
 
 int
+e65_disassemble(
+	__inout char **output,
+	__in uint16_t address,
+	__in uint16_t offset
+	)
+{
+	uint16_t entry = 0;
+	std::string buffer;
+	std::stringstream stream;
+	int result = EXIT_SUCCESS;
+
+	if(!output || !offset) {
+		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p, %u(%04x), %u(%04x)", output, address, address, offset, offset);
+	}
+
+	stream << "[" << E65_STRING_HEX(uint16_t, address) << ", " << offset << "]" << std::endl;
+
+	for(; entry < offset; ++entry) {
+		std::vector<uint8_t> data;
+		std::vector<uint8_t>::iterator byte;
+		std::map<uint8_t, std::pair<int, int>>::const_iterator command;
+
+		stream << std::endl << "[" << E65_STRING_HEX(uint16_t, address) << "] ";
+
+		data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+
+		command = e65::type::E65_PCOMMAND_ID_MAP.find(data.back());
+		if(command != e65::type::E65_PCOMMAND_ID_MAP.end()) {
+			int mode = command->second.second;
+			std::map<int, int>::const_iterator length;
+
+			length = e65::type::E65_PCOMMAND_LENGTH_MAP.find(mode);
+			if(length != e65::type::E65_PCOMMAND_LENGTH_MAP.end()) {
+				stream << E65_PCOMMAND_STRING(command->second.first) << " " << E65_COLUMN_WIDTH(E65_DISASSEMBLE_COLUMN_WIDTH)
+					<< E65_PCOMMAND_MODE_STRING(mode);
+
+				switch(length->second) {
+					case e65::type::E65_PCOMMAND_LENGTH_NONE:
+						break;
+					case e65::type::E65_PCOMMAND_LENGTH_BYTE:
+						data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+						break;
+					case e65::type::E65_PCOMMAND_LENGTH_WORD:
+						data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+						data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+						break;
+					default:
+						break;
+				}
+			} else {
+				stream << E65_COLUMN_WIDTH(E65_DISASSEMBLE_COLUMN_WIDTH) << "<Illegal Mode>";
+			}
+		} else {
+			stream << E65_COLUMN_WIDTH(E65_DISASSEMBLE_COLUMN_WIDTH) << "<Illegal Command>";
+		}
+
+		stream << "[" << data.size() << "] {";
+
+		for(byte = data.begin(); byte != data.end(); ++byte) {
+
+			if(byte != data.begin()) {
+				stream << " ";
+			}
+
+			stream << E65_STRING_HEX(uint8_t, *byte);
+		}
+
+		stream << "}";
+	}
+
+	buffer = stream.str();
+	if(buffer.empty()) {
+		buffer = E65_STRING_EMPTY;
+	}
+
+	*output = (char *) std::calloc(buffer.size() + 1, sizeof(char));
+	if(!*output) {
+		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ALLOCATION, "%p, %p", *output, *output);
+	}
+
+	std::memcpy(*output, &buffer[0], buffer.size());
+
+	return result;
+}
+
+int
 e65_dump(
 	__inout char **output,
 	__in uint16_t address,
@@ -141,18 +228,18 @@ e65_dump(
 		THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p, %u(%04x), %u(%04x)", output, address, address, offset, offset);
 	}
 
-	std::cout << "[" << E65_STRING_HEX(uint16_t, address) << "-" << E65_STRING_HEX(uint16_t, address + offset - 1) << "] "
+	stream << "[" << E65_STRING_HEX(uint16_t, address) << "-" << E65_STRING_HEX(uint16_t, address + offset - 1) << "] "
 		<< E65_FLOAT_PRECISION(1, offset / E65_BYTES_PER_KBYTE) << " KB (" << offset << " bytes)"
 		<< std::endl << std::endl << "      ";
 
 	for(iter = 0; iter < E65_DUMP_BLOCK_SIZE; ++iter) {
-		std::cout << " " << E65_STRING_HEX(uint8_t, iter);
+		stream << " " << E65_STRING_HEX(uint8_t, iter);
 	}
 
-	std::cout << std::endl << "---- |";
+	stream << std::endl << "---- |";
 
 	for(iter = 0; iter < E65_DUMP_BLOCK_SIZE; ++iter) {
-		std::cout << " --";
+		stream << " --";
 	}
 
 	end = (address + offset);
@@ -266,6 +353,9 @@ e65_command(
 			case E65_PROCESSOR_CYCLE:
 				response->payload.dword = e65::runtime::acquire().bus().processor().cycle();
 				break;
+			case E65_PROCESSOR_DISASSEMBLE:
+				response->result = e65_disassemble(&response->payload.literal, request->address, request->payload.word);
+				break;
 			case E65_PROCESSOR_FLAGS:
 				response->payload.byte = e65::runtime::acquire().bus().processor().flags();
 				break;
@@ -302,11 +392,17 @@ e65_command(
 			case E65_PROCESSOR_STOP_CLEAR:
 				e65::runtime::acquire().bus().processor().set_stop(false);
 				break;
+			case E65_PROCESSOR_STOPPED:
+				response->payload.dword = e65::runtime::acquire().bus().processor().stopped();
+				break;
 			case E65_PROCESSOR_WAIT:
 				e65::runtime::acquire().bus().processor().set_wait(true);
 				break;
 			case E65_PROCESSOR_WAIT_CLEAR:
 				e65::runtime::acquire().bus().processor().set_wait(false);
+				break;
+			case E65_PROCESSOR_WAITING:
+				response->payload.dword = e65::runtime::acquire().bus().processor().waiting();
 				break;
 			case E65_VIDEO_FRAME:
 				response->payload.dword = e65::runtime::acquire().bus().video().frame();
@@ -430,12 +526,35 @@ e65_run(
 }
 
 int
-e65_step(void)
+e65_step(
+	__in int count
+	)
 {
 	int result = EXIT_SUCCESS;
 
 	try {
-		result = (e65::runtime::acquire().step() ? EXIT_SUCCESS : EXIT_FAILURE);
+		result = (e65::runtime::acquire().step(count) ? EXIT_SUCCESS : EXIT_FAILURE);
+	} catch(e65::type::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
+e65_step_frame(
+	__in int count
+	)
+{
+	int result = EXIT_SUCCESS;
+
+	try {
+		result = (e65::runtime::acquire().step_frame(count) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;

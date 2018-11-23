@@ -856,6 +856,8 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY();
 
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_WARNING, "Processor stopped");
+
 			m_stop = true;
 			m_cycle_last += cycles(e65::type::E65_PCOMMAND_STP, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -942,6 +944,8 @@ namespace e65 {
 		processor::execute_wai(void)
 		{
 			E65_TRACE_ENTRY();
+
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_WARNING, "Processor waiting for interrupt");
 
 			m_wait = true;
 			m_cycle_last += cycles(e65::type::E65_PCOMMAND_WAI, e65::type::E65_PCOMMAND_MODE_IMPLIED);

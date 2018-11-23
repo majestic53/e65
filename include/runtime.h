@@ -35,11 +35,11 @@ namespace e65 {
 
 			~runtime(void);
 
-			bool breakpoint_clear(
+			bool breakpoint(
 				__in uint16_t address
-				);
+				) override;
 
-			bool breakpoint_contains(
+			bool breakpoint_clear(
 				__in uint16_t address
 				);
 
@@ -55,6 +55,8 @@ namespace e65 {
 
 			e65::interface::system::bus &bus(void) override;
 
+			bool debug(void) const override;
+
 			bool reset(void);
 
 			void run(
@@ -65,7 +67,13 @@ namespace e65 {
 
 			bool running(void) const;
 
-			bool step(void);
+			bool step(
+				__in_opt uint32_t count = 1
+				);
+
+			bool step_frame(
+				__in_opt uint32_t count = 1
+				);
 
 			std::string to_string(void) const override;
 

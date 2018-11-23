@@ -49,6 +49,25 @@ namespace e65 {
 	}
 
 	bool
+	runtime::breakpoint(
+		__in uint16_t address
+		)
+	{
+		bool result;
+
+		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		result = (m_breakpoint.find(address) != m_breakpoint.end());
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
 	runtime::breakpoint_clear(
 		__in uint16_t address
 		)
@@ -67,25 +86,6 @@ namespace e65 {
 			m_breakpoint.erase(entry);
 			result = true;
 		}
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	bool
-	runtime::breakpoint_contains(
-		__in uint16_t address
-		)
-	{
-		bool result;
-
-		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		result = (m_breakpoint.find(address) != m_breakpoint.end());
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
@@ -131,7 +131,7 @@ namespace e65 {
 
 		E65_TRACE_ENTRY_FORMAT("Address=%u(%04x)", address, address);
 
-		result = !breakpoint_contains(address);
+		result = !breakpoint(address);
 		if(result) {
 			m_breakpoint.insert(address);
 		}
@@ -178,6 +178,19 @@ namespace e65 {
 
 		E65_TRACE_EXIT();
 		return m_bus;
+	}
+
+	bool
+	runtime::debug(void) const
+	{
+		E65_TRACE_ENTRY();
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", m_debug);
+		return m_debug;
 	}
 
 	bool
@@ -452,11 +465,13 @@ namespace e65 {
 	}
 
 	bool
-	runtime::step(void)
+	runtime::step(
+		__in uint32_t count
+		)
 	{
 		bool result;
 
-		E65_TRACE_ENTRY();
+		E65_TRACE_ENTRY_FORMAT("Count=%u", count);
 
 		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
@@ -464,14 +479,52 @@ namespace e65 {
 
 		result = m_debug;
 		if(result) {
-			uint16_t address = m_bus.processor().program_counter();
+			uint32_t iter = 0;
 
-			if(breakpoint_contains(address)) {
-				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpoint", "%u(%04x)", address, address);
-				result = false;
-			} else {
-				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime stepping", "%u(%04x)", address, address);
-				m_bus.step(*this);
+			if(!count) {
+				count = 1;
+			}
+
+			for(; iter < count; ++iter) {
+
+				result = (m_bus.step(*this) > 0);
+				if(!result) {
+					break;
+				}
+			}
+		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
+	runtime::step_frame(
+		__in uint32_t count
+		)
+	{
+		bool result;
+
+		E65_TRACE_ENTRY_FORMAT("Count=%u", count);
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		result = m_debug;
+		if(result) {
+			uint32_t iter = 0;
+
+			if(!count) {
+				count = 1;
+			}
+
+			for(; iter < count; ++iter) {
+
+				result = (m_bus.step_frame(*this) != EXIT_FAILURE);
+				if(!result) {
+					break;
+				}
 			}
 		}
 

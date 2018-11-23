@@ -322,13 +322,19 @@ namespace e65 {
 			__in e65::interface::runtime &runtime
 			)
 		{
-			uint8_t result;
+			uint16_t address;
+			uint8_t result = 0;
 
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
-			m_input.step(m_memory);
-			result = m_processor.step(m_memory);
-			m_video.step(m_memory);
+			address = m_processor.program_counter();
+			if(runtime.debug() && runtime.breakpoint(address)) {
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Processor breakpoint", "%u(%04x)", address, address);
+			} else {
+				m_input.step(m_memory);
+				result = m_processor.step(m_memory);
+				m_video.step(m_memory);
+			}
 
 			E65_TRACE_EXIT_FORMAT("Result=%u", result);
 			return result;
@@ -340,8 +346,8 @@ namespace e65 {
 			__in_opt uint32_t previous
 			)
 		{
+			uint32_t result;
 			int64_t remaining;
-			uint32_t result = 0;
 
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Previous=%u", &runtime, previous);
 
@@ -350,15 +356,35 @@ namespace e65 {
 			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Frame", "[%u] Cycles=%u (Previous=%u)", m_video.frame(), remaining,
 				previous);
 
-			while(remaining > 0) {
-				m_input.step(m_memory);
-				remaining -= m_processor.step(m_memory);
-			}
+			if(runtime.debug()) {
+				result = EXIT_SUCCESS;
 
-			m_video.step(m_memory);
+				while(remaining > 0) {
+					uint16_t address = m_processor.program_counter();
 
-			if(remaining < 0) {
-				result = -remaining;
+					if(runtime.breakpoint(address)) {
+						E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Processor breakpoint", "%u(%04x)",
+							address, address);
+						result = EXIT_FAILURE;
+						break;
+					}
+
+					m_input.step(m_memory);
+					remaining -= m_processor.step(m_memory);
+				}
+			} else {
+				result = 0;
+
+				while(remaining > 0) {
+					m_input.step(m_memory);
+					remaining -= m_processor.step(m_memory);
+				}
+
+				m_video.step(m_memory);
+
+				if(remaining < 0) {
+					result = -remaining;
+				}
 			}
 
 			E65_TRACE_EXIT_FORMAT("Result=%u", result);
