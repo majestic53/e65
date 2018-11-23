@@ -205,7 +205,7 @@ prompt_command(
 {
 	std::stringstream stream;
 	e65_t request = {}, response = {};
-	int count, id, result = EXIT_SUCCESS;
+	int id, offset, result = EXIT_SUCCESS;
 
 	terminate = false;
 
@@ -453,9 +453,9 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_STEP:
 			stream << std::hex << arguments.front();
-			stream >> count;
+			stream >> offset;
 
-			result = e65_step(count);
+			result = e65_step(offset);
 			if(result != EXIT_SUCCESS) {
 
 				result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
@@ -497,9 +497,9 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_STEP_FRAME:
 			stream << std::hex << arguments.front();
-			stream >> count;
+			stream >> offset;
 
-			result = e65_step_frame(count);
+			result = e65_step_frame(offset);
 			if(result != EXIT_SUCCESS) {
 
 				result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);

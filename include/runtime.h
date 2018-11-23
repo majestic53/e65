@@ -68,11 +68,11 @@ namespace e65 {
 			bool running(void) const;
 
 			bool step(
-				__in_opt uint32_t count = 1
+				__in_opt uint32_t offset = 1
 				);
 
 			bool step_frame(
-				__in_opt uint32_t count = 1
+				__in_opt uint32_t offset = 1
 				);
 
 			std::string to_string(void) const override;

@@ -104,15 +104,15 @@ namespace e65 {
 		}
 
 		if(!m_breakpoint.empty()) {
-			size_t count = 1;
+			size_t offset = 1;
 
-			for(entry = m_breakpoint.begin(); entry != m_breakpoint.end(); ++count, ++entry) {
+			for(entry = m_breakpoint.begin(); entry != m_breakpoint.end(); ++entry, ++offset) {
 
 				if(entry != m_breakpoint.begin()) {
 					result << std::endl;
 				}
 
-				result << "[" << count << "] " << E65_STRING_HEX(uint16_t, *entry);
+				result << "[" << offset << "] " << E65_STRING_HEX(uint16_t, *entry);
 			}
 		} else {
 			result << E65_STRING_EMPTY;
@@ -466,12 +466,12 @@ namespace e65 {
 
 	bool
 	runtime::step(
-		__in uint32_t count
+		__in uint32_t offset
 		)
 	{
 		bool result;
 
-		E65_TRACE_ENTRY_FORMAT("Count=%u", count);
+		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
 
 		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
@@ -481,11 +481,11 @@ namespace e65 {
 		if(result) {
 			uint32_t iter = 0;
 
-			if(!count) {
-				count = 1;
+			if(!offset) {
+				offset = 1;
 			}
 
-			for(; iter < count; ++iter) {
+			for(; iter < offset; ++iter) {
 
 				result = (m_bus.step(*this) > 0);
 				if(!result) {
@@ -500,12 +500,12 @@ namespace e65 {
 
 	bool
 	runtime::step_frame(
-		__in uint32_t count
+		__in uint32_t offset
 		)
 	{
 		bool result;
 
-		E65_TRACE_ENTRY_FORMAT("Count=%u", count);
+		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
 
 		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
@@ -515,11 +515,11 @@ namespace e65 {
 		if(result) {
 			uint32_t iter = 0;
 
-			if(!count) {
-				count = 1;
+			if(!offset) {
+				offset = 1;
 			}
 
-			for(; iter < count; ++iter) {
+			for(; iter < offset; ++iter) {
 
 				result = (m_bus.step_frame(*this) != EXIT_FAILURE);
 				if(!result) {

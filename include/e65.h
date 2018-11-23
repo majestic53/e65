@@ -157,18 +157,18 @@ extern int e65_run(const char *path, int hex, int debug);
 /**
  * Library runtime step routine
  * @brief This routine allows the caller to step an active library session
- * @param count Number of steps
+ * @param offset Number of steps
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_step(int count);
+extern int e65_step(int offset);
 
 /**
  * Library runtime step frame routine
  * @brief This routine allows the caller to step an active library session through a frame
- * @param count Number of frames
+ * @param offset Number of frames
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_step_frame(int count);
+extern int e65_step_frame(int offset);
 
 /**
  * Library runtime wait routine

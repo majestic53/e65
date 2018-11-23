@@ -527,13 +527,13 @@ e65_run(
 
 int
 e65_step(
-	__in int count
+	__in int offset
 	)
 {
 	int result = EXIT_SUCCESS;
 
 	try {
-		result = (e65::runtime::acquire().step(count) ? EXIT_SUCCESS : EXIT_FAILURE);
+		result = (e65::runtime::acquire().step(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
@@ -548,13 +548,13 @@ e65_step(
 
 int
 e65_step_frame(
-	__in int count
+	__in int offset
 	)
 {
 	int result = EXIT_SUCCESS;
 
 	try {
-		result = (e65::runtime::acquire().step_frame(count) ? EXIT_SUCCESS : EXIT_FAILURE);
+		result = (e65::runtime::acquire().step_frame(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
