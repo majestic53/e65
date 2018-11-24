@@ -97,6 +97,9 @@ namespace e65 {
 				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDIRECT:
 					result = read_word(memory, operand);
 					break;
+				case e65::type::E65_PCOMMAND_MODE_RELATIVE:
+					// TODO
+					break;
 				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE:
 					result = (operand & UINT8_MAX);
 					break;
@@ -133,6 +136,9 @@ namespace e65 {
 					indirect = read_word(memory, operand & UINT8_MAX);
 					result = (indirect + m_index_y);
 					boundary = (((indirect & UINT8_MAX) + m_index_y) > UINT8_MAX);
+					break;
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE:
+					// TODO
 					break;
 				default:
 					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_MODE,
@@ -1150,8 +1156,61 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_AND:
 						execute_and(memory, mode, operand);
 						break;
+					case e65::type::E65_PCOMMAND_ASL:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BBR0:
+					case e65::type::E65_PCOMMAND_BBR1:
+					case e65::type::E65_PCOMMAND_BBR2:
+					case e65::type::E65_PCOMMAND_BBR3:
+					case e65::type::E65_PCOMMAND_BBR4:
+					case e65::type::E65_PCOMMAND_BBR5:
+					case e65::type::E65_PCOMMAND_BBR6:
+					case e65::type::E65_PCOMMAND_BBR7:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BBS0:
+					case e65::type::E65_PCOMMAND_BBS1:
+					case e65::type::E65_PCOMMAND_BBS2:
+					case e65::type::E65_PCOMMAND_BBS3:
+					case e65::type::E65_PCOMMAND_BBS4:
+					case e65::type::E65_PCOMMAND_BBS5:
+					case e65::type::E65_PCOMMAND_BBS6:
+					case e65::type::E65_PCOMMAND_BBS7:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BCC:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BCS:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BEQ:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BIT:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BMI:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BNE:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BPL:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BRA:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_BRK:
 						execute_brk(runtime, memory);
+						break;
+					case e65::type::E65_PCOMMAND_BVC:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_BVS:
+						// TODO
 						break;
 					case e65::type::E65_PCOMMAND_CLC:
 						execute_clc();
@@ -1168,6 +1227,15 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_CMP:
 						execute_cmp(memory, mode, operand);
 						break;
+					case e65::type::E65_PCOMMAND_CPX:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_CPY:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_DEC:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_DEX:
 						execute_dex();
 						break;
@@ -1177,14 +1245,32 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_EOR:
 						execute_eor(memory, mode, operand);
 						break;
+					case e65::type::E65_PCOMMAND_INC:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_INX:
 						execute_inx();
 						break;
 					case e65::type::E65_PCOMMAND_INY:
 						execute_iny();
 						break;
+					case e65::type::E65_PCOMMAND_JMP:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_JSR:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_LDA:
 						execute_lda(memory, mode, operand);
+						break;
+					case e65::type::E65_PCOMMAND_LDX:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_LDY:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_LSR:
+						// TODO
 						break;
 					case e65::type::E65_PCOMMAND_NOP:
 						execute_nop();
@@ -1216,6 +1302,22 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_PLY:
 						execute_ply(memory);
 						break;
+					case e65::type::E65_PCOMMAND_RMB0:
+					case e65::type::E65_PCOMMAND_RMB1:
+					case e65::type::E65_PCOMMAND_RMB2:
+					case e65::type::E65_PCOMMAND_RMB3:
+					case e65::type::E65_PCOMMAND_RMB4:
+					case e65::type::E65_PCOMMAND_RMB5:
+					case e65::type::E65_PCOMMAND_RMB6:
+					case e65::type::E65_PCOMMAND_RMB7:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_ROL:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_ROR:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_RTI:
 						execute_rti(memory);
 						break;
@@ -1234,17 +1336,42 @@ namespace e65 {
 					case e65::type::E65_PCOMMAND_SEI:
 						execute_sei();
 						break;
+					case e65::type::E65_PCOMMAND_SMB0:
+					case e65::type::E65_PCOMMAND_SMB1:
+					case e65::type::E65_PCOMMAND_SMB2:
+					case e65::type::E65_PCOMMAND_SMB3:
+					case e65::type::E65_PCOMMAND_SMB4:
+					case e65::type::E65_PCOMMAND_SMB5:
+					case e65::type::E65_PCOMMAND_SMB6:
+					case e65::type::E65_PCOMMAND_SMB7:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_STA:
 						execute_sta(memory, mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_STP:
 						execute_stp();
 						break;
+					case e65::type::E65_PCOMMAND_STX:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_STY:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_STZ:
+						// TODO
+						break;
 					case e65::type::E65_PCOMMAND_TAX:
 						execute_tax();
 						break;
 					case e65::type::E65_PCOMMAND_TAY:
 						execute_tay();
+						break;
+					case e65::type::E65_PCOMMAND_TRB:
+						// TODO
+						break;
+					case e65::type::E65_PCOMMAND_TSB:
+						// TODO
 						break;
 					case e65::type::E65_PCOMMAND_TSX:
 						execute_tsx();

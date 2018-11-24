@@ -68,7 +68,8 @@ as|accumulator-set                    <value>                 Set processor accu
 b|break                                                       Break processor
 c|core                                                        Display processor core
 cy|cycle                                                      Display current processor cycle
-dasm|disassemble                      <address> <offset>      Disassemble instructions at an address for a given offset
+dasm|disassemble                      <address> <offset>      Disassemble instructions at an address for a
+								given offset
 flg|flags                                                     Display processor flags
 flgs|flags-set                        <value>                 Set processor flags to given value
 x|index-x                                                     Display processor index-x
