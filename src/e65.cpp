@@ -139,6 +139,8 @@ e65_disassemble(
 
 		command = e65::type::E65_PCOMMAND_ID_MAP.find(data.back());
 		if(command != e65::type::E65_PCOMMAND_ID_MAP.end()) {
+			uint16_t operand = 0;
+			std::stringstream substream;
 			int mode = command->second.second;
 			std::map<int, int>::const_iterator length;
 
@@ -152,10 +154,13 @@ e65_disassemble(
 						break;
 					case e65::type::E65_PCOMMAND_LENGTH_BYTE:
 						data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+						operand = data.back();
 						break;
 					case e65::type::E65_PCOMMAND_LENGTH_WORD:
 						data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+						operand = data.back();
 						data.push_back(e65::runtime::acquire().bus().memory().read(address++));
+						operand |= (data.back() << CHAR_BIT);
 						break;
 					default:
 						break;
@@ -163,6 +168,42 @@ e65_disassemble(
 			} else {
 				stream << E65_COLUMN_WIDTH(E65_DISASSEMBLE_COLUMN_WIDTH) << "<Illegal Mode>";
 			}
+
+			switch(mode) {
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE:
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDEX_INDIRECT:
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDEX_X:
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDEX_Y:
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDIRECT:
+					substream << "abs=" << E65_STRING_HEX(uint16_t, operand);
+					break;
+				case e65::type::E65_PCOMMAND_MODE_ACCUMULATOR:
+					substream << "a=" << E65_STRING_HEX(uint8_t, operand);
+					break;
+				case e65::type::E65_PCOMMAND_MODE_IMMEDIATE:
+					substream << "#=" << E65_STRING_HEX(uint8_t, operand);
+					break;
+				case e65::type::E65_PCOMMAND_MODE_RELATIVE:
+					substream << "r=" << E65_STRING_HEX(uint8_t, operand);
+					break;
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE:
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_INDEX_INDIRECT:
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_INDEX_X:
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_INDEX_Y:
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_INDIRECT:
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_INDIRECT_INDEX:
+					substream << "zp=" << E65_STRING_HEX(uint8_t, operand);
+					break;
+				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE:
+					substream << "zp=" << E65_STRING_HEX(uint8_t, operand >> CHAR_BIT)
+						<< ", r=" << E65_STRING_HEX(uint8_t, operand);
+					break;
+				default:
+					substream << " ";
+					break;
+			}
+
+			stream << E65_COLUMN_WIDTH(E65_DISASSEMBLE_COLUMN_WIDTH) << substream.str();
 		} else {
 			stream << E65_COLUMN_WIDTH(E65_DISASSEMBLE_COLUMN_WIDTH) << "<Illegal Command>";
 		}
