@@ -176,14 +176,17 @@ namespace e65 {
 					);
 
 				void execute_bcc(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
 				void execute_bcs(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
 				void execute_beq(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
@@ -194,18 +197,22 @@ namespace e65 {
 					);
 
 				void execute_bmi(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
 				void execute_bne(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
 				void execute_bpl(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
 				void execute_bra(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
@@ -215,10 +222,12 @@ namespace e65 {
 					);
 
 				void execute_bvc(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 
 				void execute_bvs(
+					__in e65::interface::system::memory &memory,
 					__in int8_t operand
 					);
 

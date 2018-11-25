@@ -105,10 +105,14 @@ Changelog
 
 Version 0.1.1847
 ----------------
+*Updated: 11/25/2018*
+
+* Implemented branch instructions
+
 *Updated: 11/24/2018*
 
 * Implemented additional processor instructions
-	* Todo: branch & jump instructions
+	* Todo: <s>branch &</s> jump instructions
 
 *Updated: 11/23/2108*
 

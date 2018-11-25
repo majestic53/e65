@@ -91,6 +91,7 @@ namespace e65 {
 			__inout bool &boundary
 			)
 		{
+			int8_t relative;
 			uint16_t indirect, result = 0;
 
 			E65_TRACE_ENTRY_FORMAT("Memory=%p, Mode=%i(%s), Operand=%u(%04x), Boundary=%p", &memory, mode, E65_PCOMMAND_MODE_STRING(mode),
@@ -117,7 +118,14 @@ namespace e65 {
 					result = read_word(memory, operand);
 					break;
 				case e65::type::E65_PCOMMAND_MODE_RELATIVE:
-					// TODO
+					relative = (operand & UINT8_MAX);
+					result = (m_program_counter + relative);
+
+					if(relative >= 0) {
+						boundary = ((((m_program_counter % UINT8_MAX) + relative)) > UINT8_MAX);
+					} else {
+						boundary = ((m_program_counter % UINT8_MAX) < -relative);
+					}
 					break;
 				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE:
 					result = (operand & UINT8_MAX);
@@ -157,7 +165,7 @@ namespace e65 {
 					boundary = (((indirect & UINT8_MAX) + m_index_y) > UINT8_MAX);
 					break;
 				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE:
-					// TODO
+					result = (m_program_counter + (int8_t) ((operand >> CHAR_BIT) & UINT8_MAX));
 					break;
 				default:
 					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_MODE,
@@ -400,7 +408,26 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p, Command=%i(%s), Operand=%u(%04x)", &memory, command, E65_PCOMMAND_STRING(command),
 				operand, operand);
 
-			// TODO
+			switch(command) {
+				case e65::type::E65_PCOMMAND_BBR0:
+				case e65::type::E65_PCOMMAND_BBR1:
+				case e65::type::E65_PCOMMAND_BBR2:
+				case e65::type::E65_PCOMMAND_BBR3:
+				case e65::type::E65_PCOMMAND_BBR4:
+				case e65::type::E65_PCOMMAND_BBR5:
+				case e65::type::E65_PCOMMAND_BBR6:
+				case e65::type::E65_PCOMMAND_BBR7:
+
+					if(!(read(memory, operand & UINT8_MAX) & E65_BIT(command - e65::type::E65_PCOMMAND_BBR0))) {
+						m_program_counter = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE, operand);
+					}
+					break;
+				default:
+					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_COMMAND,
+						"%s %s", E65_PCOMMAND_STRING(command), e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE);
+			}
+
+			m_cycle_last += calculate_cycles(command, e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE);
 
 			E65_TRACE_EXIT();
 		}
@@ -415,43 +442,95 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p, Command=%i(%s), Operand=%u(%04x)", &memory, command, E65_PCOMMAND_STRING(command),
 				operand, operand);
 
-			// TODO
+			switch(command) {
+				case e65::type::E65_PCOMMAND_BBS0:
+				case e65::type::E65_PCOMMAND_BBS1:
+				case e65::type::E65_PCOMMAND_BBS2:
+				case e65::type::E65_PCOMMAND_BBS3:
+				case e65::type::E65_PCOMMAND_BBS4:
+				case e65::type::E65_PCOMMAND_BBS5:
+				case e65::type::E65_PCOMMAND_BBS6:
+				case e65::type::E65_PCOMMAND_BBS7:
+
+					if(read(memory, operand & UINT8_MAX) & E65_BIT(command - e65::type::E65_PCOMMAND_BBS0)) {
+						m_program_counter = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE, operand);
+					}
+					break;
+				default:
+					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_COMMAND,
+						"%s %s", E65_PCOMMAND_STRING(command), e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE);
+			}
+
+			m_cycle_last += calculate_cycles(command, e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_bcc(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(!m_flags.carry) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BCC, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_bcs(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(m_flags.carry) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BCS, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_beq(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(m_flags.zero) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BEQ, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
@@ -494,48 +573,86 @@ namespace e65 {
 
 		void
 		processor::execute_bmi(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(m_flags.sign) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BMI, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_bne(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(!m_flags.zero) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BNE, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_bpl(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(!m_flags.sign) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BPL, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_bra(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			m_program_counter = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BRA, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
@@ -560,24 +677,46 @@ namespace e65 {
 
 		void
 		processor::execute_bvc(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(!m_flags.overflow) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BVC, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
 
 		void
 		processor::execute_bvs(
+			__in e65::interface::system::memory &memory,
 			__in int8_t operand
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Operand=%i(%02x)", operand, operand);
+			uint16_t address;
+			bool boundary = false;
 
-			// TODO
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Operand=%i(%02x)", &memory, operand, operand);
+
+			address = calculate_address(memory, e65::type::E65_PCOMMAND_MODE_RELATIVE, operand, boundary);
+
+			if(m_flags.overflow) {
+				m_program_counter = address;
+				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+			}
+
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BVS, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
 
 			E65_TRACE_EXIT();
 		}
@@ -2093,37 +2232,37 @@ namespace e65 {
 						execute_bbs(memory, command, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BCC:
-						execute_bcc(operand);
+						execute_bcc(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BCS:
-						execute_bcs(operand);
+						execute_bcs(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BEQ:
-						execute_beq(operand);
+						execute_beq(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BIT:
 						execute_bit(memory, mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BMI:
-						execute_bmi(operand);
+						execute_bmi(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BNE:
-						execute_bne(operand);
+						execute_bne(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BPL:
-						execute_bpl(operand);
+						execute_bpl(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BRA:
-						execute_bra(operand);
+						execute_bra(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BRK:
 						execute_brk(runtime, memory);
 						break;
 					case e65::type::E65_PCOMMAND_BVC:
-						execute_bvc(operand);
+						execute_bvc(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_BVS:
-						execute_bvs(operand);
+						execute_bvs(memory, operand);
 						break;
 					case e65::type::E65_PCOMMAND_CLC:
 						execute_clc();

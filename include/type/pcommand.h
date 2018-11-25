@@ -551,7 +551,7 @@ namespace e65 {
 			std::make_pair(e65::type::E65_PCOMMAND_BMI, std::make_pair(2, 4)),
 			std::make_pair(e65::type::E65_PCOMMAND_BNE, std::make_pair(2, 4)),
 			std::make_pair(e65::type::E65_PCOMMAND_BPL, std::make_pair(2, 4)),
-			std::make_pair(e65::type::E65_PCOMMAND_BRA, std::make_pair(2, 4)),
+			std::make_pair(e65::type::E65_PCOMMAND_BRA, std::make_pair(3, 4)),
 			std::make_pair(e65::type::E65_PCOMMAND_BVC, std::make_pair(2, 4)),
 			std::make_pair(e65::type::E65_PCOMMAND_BVS, std::make_pair(2, 4)),
 			};
@@ -661,22 +661,22 @@ namespace e65 {
 			};
 
 		static const std::map<int, std::pair<uint8_t, uint8_t>> E65_PCOMMAND_ZEROPAGE_RELATIVE_CYCLE_MAP = {
-			std::make_pair(e65::type::E65_PCOMMAND_BBR0, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR1, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR2, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR3, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR4, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR5, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR6, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBR7, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS0, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS1, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS2, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS3, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS4, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS5, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS6, std::make_pair(2, 3)),
-			std::make_pair(e65::type::E65_PCOMMAND_BBS7, std::make_pair(2, 3)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR0, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR1, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR2, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR3, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR4, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR5, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR6, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBR7, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS0, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS1, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS2, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS3, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS4, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS5, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS6, std::make_pair(5, 5)),
+			std::make_pair(e65::type::E65_PCOMMAND_BBS7, std::make_pair(5, 5)),
 			};
 
 		static const std::map<int, std::map<int, std::pair<uint8_t, uint8_t>>> E65_PCOMMAND_CYCLE_MAP = {
