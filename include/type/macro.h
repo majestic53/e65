@@ -23,6 +23,9 @@ namespace e65 {
 
 	namespace type {
 
+		#define E65_BIT(_BIT_) \
+			(1 << (_BIT_))
+
 		#define E65_COLUMN_WIDTH(_WIDTH_) \
 			std::left << std::setw(_WIDTH_)
 

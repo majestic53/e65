@@ -119,20 +119,20 @@ namespace e65 {
 					__in const processor &other
 					) = delete;
 
-				uint16_t address_in(
+				uint16_t calculate_address(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				uint16_t calculate_address(
 					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand,
 					__inout bool &boundary
 					);
 
-				uint16_t address_out(
-					__in e65::interface::system::memory &memory,
-					__in int mode,
-					__in uint16_t operand
-					);
-
-				uint8_t cycles(
+				uint8_t calculate_cycles(
 					__in int command,
 					__in int mode,
 					__in_opt bool secondary = false
@@ -145,11 +145,6 @@ namespace e65 {
 					__inout int &length
 					);
 
-				void execute_brk(
-					__in e65::interface::runtime &runtime,
-					__in e65::interface::system::memory &memory
-					);
-
 				void execute_adc(
 					__in e65::interface::system::memory &memory,
 					__in int mode,
@@ -160,6 +155,71 @@ namespace e65 {
 					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
+					);
+
+				void execute_asl(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_bbr(
+					__in e65::interface::system::memory &memory,
+					__in int command,
+					__in uint16_t operand
+					);
+
+				void execute_bbs(
+					__in e65::interface::system::memory &memory,
+					__in int command,
+					__in uint16_t operand
+					);
+
+				void execute_bcc(
+					__in int8_t operand
+					);
+
+				void execute_bcs(
+					__in int8_t operand
+					);
+
+				void execute_beq(
+					__in int8_t operand
+					);
+
+				void execute_bit(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_bmi(
+					__in int8_t operand
+					);
+
+				void execute_bne(
+					__in int8_t operand
+					);
+
+				void execute_bpl(
+					__in int8_t operand
+					);
+
+				void execute_bra(
+					__in int8_t operand
+					);
+
+				void execute_brk(
+					__in e65::interface::runtime &runtime,
+					__in e65::interface::system::memory &memory
+					);
+
+				void execute_bvc(
+					__in int8_t operand
+					);
+
+				void execute_bvs(
+					__in int8_t operand
 					);
 
 				void execute_clc(void);
@@ -176,6 +236,24 @@ namespace e65 {
 					__in uint16_t operand
 					);
 
+				void execute_cpx(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_cpy(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_dec(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
 				void execute_dex(void);
 
 				void execute_dey(void);
@@ -186,11 +264,47 @@ namespace e65 {
 					__in uint16_t operand
 					);
 
+				void execute_inc(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
 				void execute_inx(void);
 
 				void execute_iny(void);
 
+				void execute_jmp(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_jsr(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
 				void execute_lda(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_ldx(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_ldy(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_lsr(
 					__in e65::interface::system::memory &memory,
 					__in int mode,
 					__in uint16_t operand
@@ -236,6 +350,24 @@ namespace e65 {
 					__in e65::interface::system::memory &memory
 					);
 
+				void execute_rmb(
+					__in e65::interface::system::memory &memory,
+					__in int command,
+					__in uint16_t operand
+					);
+
+				void execute_rol(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_ror(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
 				void execute_rti(
 					__in e65::interface::system::memory &memory
 					);
@@ -256,6 +388,12 @@ namespace e65 {
 
 				void execute_sei(void);
 
+				void execute_smb(
+					__in e65::interface::system::memory &memory,
+					__in int command,
+					__in uint16_t operand
+					);
+
 				void execute_sta(
 					__in e65::interface::system::memory &memory,
 					__in int mode,
@@ -264,9 +402,39 @@ namespace e65 {
 
 				void execute_stp(void);
 
+				void execute_stx(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_sty(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_stz(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
 				void execute_tax(void);
 
 				void execute_tay(void);
+
+				void execute_trb(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
+
+				void execute_tsb(
+					__in e65::interface::system::memory &memory,
+					__in int mode,
+					__in uint16_t operand
+					);
 
 				void execute_tsx(void);
 
