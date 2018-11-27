@@ -577,36 +577,24 @@ prompt_command(
 }
 
 int
-prompt_done(void)
-{
-	bool result;
-
-	e65::runtime &instance = e65::runtime::acquire();
-
-	result = instance.initialized();
-	if(result) {
-		result = instance.running();
-	}
-
-	return result;
-}
-
-int
 prompt(void)
 {
 	int result = EXIT_SUCCESS;
 
-	rl_event_hook = prompt_done;
-
-	while(e65::runtime::acquire().running()) {
-		int id;
+	for(;;) {
 		char *input;
 		size_t length;
+		int id, state;
 		bool terminate = false;
 		std::string command, input_str;
 		std::stringstream prompt, stream;
 		std::vector<std::string> arguments;
 		std::vector<std::string>::iterator argument;
+
+		result = e65_state(&state);
+		if((result != EXIT_SUCCESS) || (state != E65_STATE_ACTIVE)) {
+			break;
+		}
 
 #ifdef TRACE_COLOR
 		prompt << E65_LEVEL_COLOR(e65::type::E65_LEVEL_INFORMATION);

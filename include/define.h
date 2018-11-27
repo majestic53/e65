@@ -49,8 +49,8 @@ namespace e65 {
 	#define E65_VERSION_MAJOR 0
 	#define E65_VERSION_MINOR 1
 	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 10
-	#define E65_VERSION_WEEK 1847
+	#define E65_VERSION_REVISION 1
+	#define E65_VERSION_WEEK 1848
 }
 
 #endif // E65_DEFINE_H_

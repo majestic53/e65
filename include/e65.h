@@ -97,6 +97,11 @@ enum {
 	E65_EVENT_WAIT,				/* Encountered processor wait command (WAI) */
 };
 
+enum {
+	E65_STATE_INACTIVE = 0,			/* Library is inactive */
+	E65_STATE_ACTIVE,			/* Library is active */
+};
+
 /* Callback handler */
 typedef void (*e65_cb)(int type, unsigned short address);
 
@@ -175,6 +180,14 @@ extern int e65_reset(void);
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
 extern int e65_run(const char *path, int hex, int debug);
+
+/**
+ * Library runtime state routine
+ * @brief This routine allows the caller to retrieve a library session state
+ * @param state A pointer to a valid integer, which will hold the library state
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
+ */
+extern int e65_state(int *state);
 
 /**
  * Library runtime step routine

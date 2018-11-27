@@ -120,11 +120,12 @@ namespace e65 {
 				case e65::type::E65_PCOMMAND_MODE_RELATIVE:
 					relative = (operand & UINT8_MAX);
 					result = (m_program_counter + relative);
+					indirect = ((m_program_counter - e65::type::E65_PCOMMAND_LENGTH_BYTE) & UINT8_MAX);
 
 					if(relative >= 0) {
-						boundary = ((((m_program_counter % UINT8_MAX) + relative)) > UINT8_MAX);
+						boundary = ((indirect + relative) > UINT8_MAX);
 					} else {
-						boundary = ((m_program_counter % UINT8_MAX) < -relative);
+						boundary = (indirect < -(relative + e65::type::E65_PCOMMAND_LENGTH_BYTE));
 					}
 					break;
 				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE:
@@ -165,7 +166,8 @@ namespace e65 {
 					boundary = (((indirect & UINT8_MAX) + m_index_y) > UINT8_MAX);
 					break;
 				case e65::type::E65_PCOMMAND_MODE_ZEROPAGE_RELATIVE:
-					result = (m_program_counter + (int8_t) ((operand >> CHAR_BIT) & UINT8_MAX));
+					result = ((m_program_counter - e65::type::E65_PCOMMAND_LENGTH_WORD)
+							+ (int8_t) ((operand >> CHAR_BIT) & UINT8_MAX));
 					break;
 				default:
 					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_MODE,
@@ -1076,10 +1078,24 @@ namespace e65 {
 			__in uint16_t operand
 			)
 		{
+			uint16_t address = 0;
+
 			E65_TRACE_ENTRY_FORMAT("Memory=%p, Mode=%i(%s), Operand=%u(%04x)", &memory, mode, E65_PCOMMAND_MODE_STRING(mode),
 				operand, operand);
 
-			// TODO
+			switch(mode) {
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE:
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDEX_INDIRECT:
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE_INDIRECT:
+					address = calculate_address(memory, mode, operand);
+					break;
+				default:
+					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_MODE,
+						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_JMP), E65_PCOMMAND_MODE_STRING(mode));
+			}
+
+			m_program_counter = address;
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_JMP, mode);
 
 			E65_TRACE_EXIT();
 		}
@@ -1091,10 +1107,23 @@ namespace e65 {
 			__in uint16_t operand
 			)
 		{
+			uint16_t address = 0;
+
 			E65_TRACE_ENTRY_FORMAT("Memory=%p, Mode=%i(%s), Operand=%u(%04x)", &memory, mode, E65_PCOMMAND_MODE_STRING(mode),
 				operand, operand);
 
-			// TODO
+			switch(mode) {
+				case e65::type::E65_PCOMMAND_MODE_ABSOLUTE:
+					address = calculate_address(memory, mode, operand);
+					break;
+				default:
+					THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_MODE,
+						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_JSR), E65_PCOMMAND_MODE_STRING(mode));
+			}
+
+			push_word(memory, m_program_counter - 1);
+			m_program_counter = address;
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_JSR, mode);
 
 			E65_TRACE_EXIT();
 		}
@@ -1603,7 +1632,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			m_program_counter = (pop_word(memory) - 1);
+			m_program_counter = (pop_word(memory) + 1);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_RTS, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();

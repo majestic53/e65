@@ -103,6 +103,12 @@ q|exit                                                        Exit debug mode
 Changelog
 =========
 
+Version 0.1.1848
+----------------
+*Updated: 11/26/2018*
+
+* Implemented jump instructions
+
 Version 0.1.1847
 ----------------
 *Updated: 11/25/2018*
@@ -112,7 +118,6 @@ Version 0.1.1847
 *Updated: 11/24/2018*
 
 * Implemented additional processor instructions
-	* Todo: <s>branch &</s> jump instructions
 
 *Updated: 11/23/2108*
 
@@ -136,23 +141,6 @@ Version 0.1.1847
 *Updated: 11/19/2018*
 
 * Added processor commands
-
-Version 0.1.1846
-----------------
-*Updated: 11/17/2018*
-
-* Added processor core command
-* Implemented processor interrupt handler
-* Documented e65 public header file
-
-*Updated: 11/13/2018*
-
-* Added processor interrupt handler
-* Added processor reset debug command
-
-*Updated: 11/12/2018*
-
-* Added additional debug commands
 
 *Changelog truncated (see file history for full log)*
 

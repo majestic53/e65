@@ -614,6 +614,34 @@ e65_run(
 }
 
 int
+e65_state(
+	__in int *state
+	)
+{
+	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("State=%p", state);
+
+	try {
+
+		if(!state) {
+			THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p", state);
+		}
+
+		*state = (e65::runtime::acquire().running() ? E65_STATE_ACTIVE : E65_STATE_INACTIVE);
+	} catch(e65::type::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
 e65_step(
 	__in int offset
 	)
