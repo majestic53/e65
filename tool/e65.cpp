@@ -20,6 +20,7 @@
 #include <fstream>
 #include <readline/readline.h>
 #include <readline/history.h>
+#include <thread>
 #include "./e65_type.h"
 
 std::string
@@ -561,6 +562,8 @@ prompt_command(
 			break;
 		case E65_COMMAND_EXIT:
 			terminate = true;
+
+			result = e65_terminate();
 			break;
 		case E65_COMMAND_HELP:
 			std::cout << display_command_usage() << std::endl;
@@ -576,25 +579,19 @@ prompt_command(
 	return result;
 }
 
-int
+void
 prompt(void)
 {
-	int result = EXIT_SUCCESS;
 
 	for(;;) {
+		int id;
 		char *input;
 		size_t length;
-		int id, state;
 		bool terminate = false;
 		std::string command, input_str;
 		std::stringstream prompt, stream;
 		std::vector<std::string> arguments;
 		std::vector<std::string>::iterator argument;
-
-		result = e65_state(&state);
-		if((result != EXIT_SUCCESS) || (state != E65_STATE_ACTIVE)) {
-			break;
-		}
 
 #ifdef TRACE_COLOR
 		prompt << E65_LEVEL_COLOR(e65::type::E65_LEVEL_INFORMATION);
@@ -664,8 +661,7 @@ prompt(void)
 			continue;
 		}
 
-		result = prompt_command(id, arguments, terminate);
-		if(result != EXIT_SUCCESS) {
+		if((prompt_command(id, arguments, terminate) != EXIT_SUCCESS) && !terminate) {
 			std::string error_str;
 
 #ifdef TRACE_COLOR
@@ -692,8 +688,6 @@ prompt(void)
 			break;
 		}
 	}
-
-	return result;
 }
 
 int
@@ -704,10 +698,20 @@ run(
 	)
 {
 	int result = EXIT_SUCCESS;
+	std::thread prompt_thread;
 
 	result = e65_initialize();
 	if(result != EXIT_SUCCESS) {
 		goto exit;
+	}
+
+	if(debug) {
+
+		if(e65_register_handler(event_handler) != EXIT_SUCCESS) {
+			goto exit;
+		}
+
+		prompt_thread = std::thread(prompt);
 	}
 
 	result = e65_run(path.c_str(), ihex, debug);
@@ -715,23 +719,12 @@ run(
 		goto exit;
 	}
 
-	if(!debug) {
+exit:
 
-		result = e65_wait();
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
-	} else {
-
-		result = e65_register_handler(event_handler);
-		if(result != EXIT_SUCCESS) {
-			goto exit;
-		}
-
-		result = prompt();
+	if(prompt_thread.joinable()) {
+		prompt_thread.join();
 	}
 
-exit:
 	e65_uninitialize();
 
 	return result;

@@ -138,16 +138,6 @@ extern void e65_uninitialize(void);
  */
 
 /**
- * Library runtime command routine
- * @brief This routine allows the caller to issue commands to an active library session
- * @param command Caller requested command
- * @param request A pointer to a valid, caller allocated request structure
- * @param response A pointer to a valid, caller allocated response structure
- * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
- */
-extern int e65_command(int command, const e65_t *request, e65_t *response);
-
-/**
  * Library runtime interrupt routine
  * @brief This routine allows the caller to interrupt an active library session
  * @param maskable A flag that defines the interrupt as either maskable=true or non-maskable=false (ie. IRQ=true, NMI=false)
@@ -190,6 +180,30 @@ extern int e65_run(const char *path, int hex, int debug);
 extern int e65_state(int *state);
 
 /**
+ * Library runtime terminate routine
+ * @brief This routine allows the caller to terminate an active library session
+ * @param None
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
+ */
+extern int e65_terminate(void);
+
+/**
+ * ========================================================
+ * DEBUG ROUTINES
+ * ========================================================
+ */
+
+/**
+ * Library runtime command routine
+ * @brief This routine allows the caller to issue commands to an active library session
+ * @param command Caller requested command
+ * @param request A pointer to a valid, caller allocated request structure
+ * @param response A pointer to a valid, caller allocated response structure
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
+ */
+extern int e65_command(int command, const e65_t *request, e65_t *response);
+
+/**
  * Library runtime step routine
  * @brief This routine allows the caller to step an active library session
  * @param offset Number of steps
@@ -204,14 +218,6 @@ extern int e65_step(int offset);
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
 extern int e65_step_frame(int offset);
-
-/**
- * Library runtime wait routine
- * @brief This routine allows the caller to wait for an active library session to finish (This call is blocking)
- * @param None
- * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
- */
-extern int e65_wait(void);
 
 /**
  * ========================================================

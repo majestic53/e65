@@ -28,6 +28,7 @@ namespace e65 {
 		m_debug(false),
 		m_debug_running(false),
 		m_handler(nullptr),
+		m_running(false),
 		m_trace(e65::trace::acquire())
 	{
 		m_trace.initialize();
@@ -83,6 +84,8 @@ namespace e65 {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpoint cleared", "%u(%04x)", address ,address);
+
 		entry = m_breakpoint.find(address);
 		if(entry != m_breakpoint.end()) {
 			m_breakpoint.erase(entry);
@@ -91,6 +94,22 @@ namespace e65 {
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
+	}
+
+	void
+	runtime::breakpoint_clear_all(void)
+	{
+		E65_TRACE_ENTRY();
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpoints cleared");
+
+		m_breakpoint.clear();
+
+		E65_TRACE_EXIT();
 	}
 
 	std::string
@@ -135,38 +154,13 @@ namespace e65 {
 
 		result = !breakpoint(address);
 		if(result) {
+			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime breakpoint set", "%u(%04x)", address ,address);
+
 			m_breakpoint.insert(address);
 		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
-	}
-
-	std::set<uint16_t>
-	runtime::breakpoints(void) const
-	{
-		E65_TRACE_ENTRY();
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		E65_TRACE_EXIT();
-		return m_breakpoint;
-	}
-
-	void
-	runtime::breakpoints_clear(void)
-	{
-		E65_TRACE_ENTRY();
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		m_breakpoint.clear();
-
-		E65_TRACE_EXIT();
 	}
 
 	e65::interface::system::bus &
@@ -208,6 +202,8 @@ namespace e65 {
 
 		result = (m_debug && m_debug_running);
 		if(result) {
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime debug break");
+
 			m_debug_running = false;
 		}
 
@@ -228,6 +224,8 @@ namespace e65 {
 
 		result = (m_debug && !m_debug_running);
 		if(result) {
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime debug run");
+
 			m_debug_running = true;
 		}
 
@@ -259,103 +257,11 @@ namespace e65 {
 		}
 
 		m_bus.initialize(context, length);
-		e65::type::thread::start(true, context, length);
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime initialized");
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
-	}
-
-	bool
-	runtime::on_run(
-		__in const void *context,
-		__in size_t length
-		)
-	{
-		bool result = true;
-		uint32_t begin = 0, current = 0, previous = 0;
-
-		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
-
-		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop entry");
-
-		while(e65::type::thread::active()) {
-			float delta, rate;
-			uint32_t end = SDL_GetTicks();
-
-			rate = (end - begin);
-			if(rate >= E65_MILLISECONDS_PER_SECOND) {
-				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
-
-				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f",
-					(rate > 0.f) ? rate : 0.f);
-
-				m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
-				begin = end;
-				current = 0;
-			}
-
-			result = poll();
-			if(!result) {
-				break;
-			}
-
-			if(!m_debug) {
-				previous = m_bus.step_frame(*this, previous);
-			} else {
-
-				if(m_debug_running) {
-					m_debug_running = step_frame();
-				}
-
-				if(!m_bus.video().display().hidden()) {
-					m_bus.video().display().show();
-				}
-			}
-
-			delta = (SDL_GetTicks() - end);
-			if(delta < E65_RUNTIME_FRAME_DELTA) {
-				SDL_Delay(E65_RUNTIME_FRAME_DELTA - delta);
-			}
-
-			++current;
-		}
-
-		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop exit");
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	bool
-	runtime::on_start(
-		__in const void *context,
-		__in size_t length
-		)
-	{
-		bool result = true;
-
-		E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
-
-		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime starting");
-
-		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime started");
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	void
-	runtime::on_stop(void)
-	{
-		E65_TRACE_ENTRY();
-
-		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime stopping");
-
-		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime stopped");
-
-		E65_TRACE_EXIT();
 	}
 
 	void
@@ -365,8 +271,7 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime uninitializing");
 
-		e65::type::thread::stop();
-
+		terminate();
 		m_bus.uninitialize();
 		SDL_Quit();
 
@@ -448,6 +353,8 @@ namespace e65 {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime reset");
+
 		m_bus.reset(*this);
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
@@ -465,6 +372,7 @@ namespace e65 {
 		std::ifstream file;
 		std::stringstream title;
 		std::vector<uint8_t> data;
+		uint32_t begin = 0, current = 0, previous = 0;
 
 		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
 
@@ -505,7 +413,54 @@ namespace e65 {
 			m_bus.video().display().set_hidden(true);
 		}
 
-		e65::type::thread::notify();
+		set_running(true);
+
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop entry");
+
+		while(m_running) {
+			float delta, rate;
+			uint32_t end = SDL_GetTicks();
+
+			rate = (end - begin);
+			if(rate >= E65_MILLISECONDS_PER_SECOND) {
+				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
+
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f",
+					(rate > 0.f) ? rate : 0.f);
+
+				m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
+				begin = end;
+				current = 0;
+			}
+
+			if(!poll()) {
+				break;
+			}
+
+			if(!m_debug) {
+				previous = m_bus.step_frame(*this, previous);
+			} else {
+
+				if(m_debug_running) {
+					m_debug_running = step_frame();
+				}
+
+				if(!m_bus.video().display().hidden()) {
+					m_bus.video().display().show();
+				}
+			}
+
+			delta = (SDL_GetTicks() - end);
+			if(delta < E65_RUNTIME_FRAME_DELTA) {
+				SDL_Delay(E65_RUNTIME_FRAME_DELTA - delta);
+			}
+
+			++current;
+		}
+
+		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop exit");
+
+		set_running(false);
 
 		E65_TRACE_EXIT();
 	}
@@ -513,18 +468,31 @@ namespace e65 {
 	bool
 	runtime::running(void) const
 	{
-		bool result;
-
 		E65_TRACE_ENTRY();
 
 		if(!e65::type::singleton<e65::runtime>::initialized()) {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
-		result = e65::type::thread::active();
+		E65_TRACE_EXIT_FORMAT("Result=%x", m_running);
+		return m_running;
+	}
 
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
+	void
+	runtime::set_running(
+		__in bool running
+		)
+	{
+		E65_TRACE_ENTRY_FORMAT("Running=%x", running);
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		std::lock_guard<std::mutex> lock(m_running_mutex);
+		m_running = running;
+
+		E65_TRACE_EXIT();
 	}
 
 	void
@@ -569,6 +537,7 @@ namespace e65 {
 
 				result = (m_bus.step(*this) > 0);
 				if(!result) {
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping steps", "%u-%u", iter, offset);
 					break;
 				}
 			}
@@ -603,9 +572,32 @@ namespace e65 {
 
 				result = (m_bus.step_frame(*this) != EXIT_FAILURE);
 				if(!result) {
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping frames", "%u-%u", iter, offset);
 					break;
 				}
 			}
+		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
+	runtime::terminate(void)
+	{
+		bool result;
+
+		E65_TRACE_ENTRY();
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		result = m_running;
+		if(result) {
+			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime terminated");
+
+			set_running(false);
 		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
@@ -623,11 +615,11 @@ namespace e65 {
 			<< " Interface=" << e65::type::singleton<e65::runtime>::to_string();
 
 		if(e65::type::singleton<e65::runtime>::initialized()) {
-			result << ", Thread=" << e65::type::thread::to_string()
+			result << ", Bus=" << m_bus.to_string()
 				<< ", Handler=" << E65_STRING_HEX(uintptr_t, m_handler)
-				<< ", Bus=" << m_bus.to_string()
-				<< ", Trace=" << m_trace.to_string()
-				<< ", Mode=" << m_debug << "(" << (m_debug ? "Debug" : "Normal") << ")";
+				<< ", Mode=" << m_debug << "(" << (m_debug ? "Debug" : "Normal") << ")"
+				<< ", State=" << m_running << "(" << (m_running ? "Running" : "Stopped") << ")"
+				<< ", Trace=" << m_trace.to_string();
 		}
 
 		E65_TRACE_EXIT();
@@ -643,27 +635,5 @@ namespace e65 {
 			<< "-" << E65_VERSION_RELEASE;
 
 		return result.str();
-	}
-
-	bool
-	runtime::wait(
-		__in_opt uint32_t timeout
-		)
-	{
-		bool result;
-
-		E65_TRACE_ENTRY_FORMAT("Timeout=%u", timeout);
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		result = !m_debug;
-		if(result) {
-			result = e65::type::thread::wait(timeout);
-		}
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
 	}
 }

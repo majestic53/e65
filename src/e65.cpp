@@ -367,7 +367,7 @@ e65_command(
 				}
 				break;
 			case E65_BREAKPOINT_CLEAR_ALL:
-				e65::runtime::acquire().breakpoints_clear();
+				e65::runtime::acquire().breakpoint_clear_all();
 				break;
 			case E65_BREAKPOINT_LIST:
 				response->result = e65_breakpoint_list(&response->payload.literal);
@@ -687,6 +687,27 @@ e65_step_frame(
 	return result;
 }
 
+int
+e65_terminate(void)
+{
+	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY();
+
+	try {
+		result = (e65::runtime::acquire().terminate() ? EXIT_SUCCESS : EXIT_FAILURE);
+	} catch(e65::type::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
 void
 e65_uninitialize(void)
 {
@@ -733,25 +754,4 @@ e65_version_string(void)
 
 	E65_TRACE_EXIT();
 	return E65_STRING_CHECK(g_version);
-}
-
-int
-e65_wait(void)
-{
-	int result = EXIT_SUCCESS;
-
-	E65_TRACE_ENTRY();
-
-	try {
-		result = (e65::runtime::acquire().wait() ? EXIT_SUCCESS : EXIT_FAILURE);
-	} catch(e65::type::exception &exc) {
-		g_error = exc.to_string();
-		result = EXIT_FAILURE;
-	} catch(std::exception &exc) {
-		g_error = exc.what();
-		result = EXIT_FAILURE;
-	}
-
-	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
-	return result;
 }

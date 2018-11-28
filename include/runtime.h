@@ -29,8 +29,7 @@ namespace e65 {
 
 	class runtime :
 			public e65::type::singleton<e65::runtime>,
-			public e65::interface::runtime,
-			protected e65::type::thread {
+			public e65::interface::runtime {
 
 		public:
 
@@ -44,15 +43,13 @@ namespace e65 {
 				__in uint16_t address
 				);
 
+			void breakpoint_clear_all(void);
+
 			std::string breakpoint_list(void) const;
 
 			bool breakpoint_set(
 				__in uint16_t address
 				);
-
-			std::set<uint16_t> breakpoints(void) const;
-
-			void breakpoints_clear(void);
 
 			e65::interface::system::bus &bus(void) override;
 
@@ -89,13 +86,11 @@ namespace e65 {
 				__in_opt uint32_t offset = 1
 				);
 
+			bool terminate(void);
+
 			std::string to_string(void) const override;
 
 			static std::string version(void);
-
-			bool wait(
-				__in_opt uint32_t timeout = 0
-				);
 
 		protected:
 
@@ -116,21 +111,13 @@ namespace e65 {
 				__in size_t length
 				) override;
 
-			bool on_run(
-				__in const void *context,
-				__in size_t length
-				) override;
-
-			bool on_start(
-				__in const void *context,
-				__in size_t length
-				) override;
-
-			void on_stop(void) override;
-
 			void on_uninitialize(void) override;
 
 			bool poll(void);
+
+			void set_running(
+				__in bool running
+				);
 
 			std::set<uint16_t> m_breakpoint;
 
@@ -141,6 +128,10 @@ namespace e65 {
 			bool m_debug_running;
 
 			e65_cb m_handler;
+
+			bool m_running;
+
+			std::mutex m_running_mutex;
 
 			e65::trace &m_trace;
 	};

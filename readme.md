@@ -105,6 +105,11 @@ Changelog
 
 Version 0.1.1848
 ----------------
+*Updated: 11/27/2018*
+
+* Moved runtime into main thread to avoid renderer issues
+* Minor reorg of the interface
+
 *Updated: 11/26/2018*
 
 * Implemented jump instructions
