@@ -27,7 +27,8 @@ namespace e65 {
 		video::video(void) :
 			e65::type::singleton<e65::system::video>(e65::type::E65_SINGLETON_VIDEO),
 			m_display(e65::system::display::acquire()),
-			m_frame(0)
+			m_frame(0),
+			m_frame_cycles(0)
 		{
 			E65_TRACE_ENTRY();
 
@@ -94,6 +95,19 @@ namespace e65 {
 			return m_frame;
 		}
 
+		uint32_t
+		video::frame_cycles(void) const
+		{
+			E65_TRACE_ENTRY();
+
+			if(!e65::type::singleton<e65::system::video>::initialized()) {
+				THROW_E65_SYSTEM_VIDEO_EXCEPTION(E65_SYSTEM_VIDEO_EXCEPTION_UNINITIALIZED);
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%u", m_frame_cycles);
+			return m_frame_cycles;
+		}
+
 		bool
 		video::on_initialize(
 			__in const void *context,
@@ -107,6 +121,7 @@ namespace e65 {
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video initializing");
 
 			m_display.initialize(context, length);
+			m_frame_cycles = (E65_PROCESSOR_FREQUENCY / m_display.frequency());
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Video initialized");
 
@@ -161,7 +176,8 @@ namespace e65 {
 
 			if(e65::type::singleton<e65::system::video>::initialized()) {
 				result << ", Display=" << m_display.to_string()
-					<< ", Frame=" << m_frame;
+					<< ", Frame=" << m_frame
+					<< ", Frame-Cycles=" << m_frame_cycles;
 			}
 
 			return result.str();

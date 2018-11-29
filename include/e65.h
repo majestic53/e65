@@ -67,8 +67,12 @@ enum {
 
 	/* Video commands */
 	E65_VIDEO_FRAME,			/* Retrieve the video frame count */
-	E65_VIDEO_FULLSCREEN,			/* Fullscreen video display */
-	E65_VIDEO_HIDE,				/* Hide video display */
+	E65_VIDEO_FRAME_CYCLE,			/* Retrieve the video frame cycle count */
+	E65_VIDEO_FREQUENCY,			/* Retrieve the video frequency (Hz) */
+	E65_VIDEO_FULLSCREEN,			/* Fullscreen the video display */
+	E65_VIDEO_HIDE,				/* Hide the video display */
+	E65_VIDEO_PIXEL,			/* Retrieve a video display pixel color */
+	E65_VIDEO_PIXEL_SET,			/* Set a video display pixel color */
 };
 
 typedef struct {

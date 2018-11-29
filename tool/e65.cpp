@@ -17,6 +17,7 @@
  */
 
 #include <algorithm>
+#include <climits>
 #include <fstream>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -265,7 +266,7 @@ prompt_command(
 {
 	std::stringstream stream;
 	e65_t request = {}, response = {};
-	int id, offset, result = EXIT_SUCCESS;
+	int id, index = 0, result = EXIT_SUCCESS, value;
 
 	terminate = false;
 
@@ -519,15 +520,15 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_STEP:
 			stream << std::hex << arguments.front();
-			stream >> offset;
+			stream >> value;
 
-			result = e65_step(offset);
+			result = e65_step(value);
 			break;
 		case E65_COMMAND_PROCESSOR_STEP_FRAME:
 			stream << std::hex << arguments.front();
-			stream >> offset;
+			stream >> value;
 
-			result = e65_step_frame(offset);
+			result = e65_step_frame(value);
 			break;
 		case E65_COMMAND_PROCESSOR_STOP:
 			result = e65_command(E65_PROCESSOR_STOP, &request, &response);
@@ -548,6 +549,20 @@ prompt_command(
 				std::cout << response.payload.dword << std::endl;
 			}
 			break;
+		case E65_COMMAND_VIDEO_FRAME_CYCLE:
+
+			result = e65_command(E65_VIDEO_FRAME_CYCLE, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << response.payload.dword << std::endl;
+			}
+			break;
+		case E65_COMMAND_VIDEO_FREQUENCY:
+
+			result = e65_command(E65_VIDEO_FREQUENCY, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << response.payload.dword << std::endl;
+			}
+			break;
 		case E65_COMMAND_VIDEO_FULLSCREEN:
 			stream << std::hex << arguments.front();
 			stream >> request.payload.dword;
@@ -559,6 +574,41 @@ prompt_command(
 			stream >> request.payload.dword;
 
 			result = e65_command(E65_VIDEO_HIDE, &request, &response);
+			break;
+		case E65_COMMAND_VIDEO_PIXEL:
+			stream << std::dec << arguments.front();
+			stream >> value;
+			request.address = value;
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::dec << arguments.back();
+			stream >> value;
+			request.address |= (value << CHAR_BIT);
+
+			result = e65_command(E65_VIDEO_PIXEL, &request, &response);
+			if(result == EXIT_SUCCESS) {
+				std::cout << (int) response.payload.byte << " (" << E65_COLOR_STRING(response.payload.byte) << ")" << std::endl;
+			}
+			break;
+		case E65_COMMAND_VIDEO_PIXEL_SET:
+			stream << std::dec << arguments.at(index++);
+			stream >> value;
+			request.address = value;
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::dec << arguments.at(index++);
+			stream >> value;
+			request.address |= (value << CHAR_BIT);
+
+			stream.clear();
+			stream.str(std::string());
+			stream << std::dec << arguments.at(index++);
+			stream >> value;
+			request.payload.byte = value;
+
+			result = e65_command(E65_VIDEO_PIXEL_SET, &request, &response);
 			break;
 		case E65_COMMAND_EXIT:
 			terminate = true;

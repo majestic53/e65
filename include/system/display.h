@@ -38,11 +38,13 @@ namespace e65 {
 
 				void clear(void);
 
+				uint32_t frequency(void) const override;
+
 				bool fullscreen(void) const override;
 
 				bool hidden(void) const override;
 
-				uint32_t pixel(
+				int pixel(
 					__in uint32_t x,
 					__in uint32_t y
 					) const override;

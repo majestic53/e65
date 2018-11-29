@@ -59,6 +59,28 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
+		uint32_t
+		display::frequency(void) const
+		{
+			uint32_t result;
+			SDL_DisplayMode mode = {};
+
+			E65_TRACE_ENTRY();
+
+			if(!e65::type::singleton<e65::system::display>::initialized()) {
+				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
+			}
+
+			if(SDL_SetWindowDisplayMode(m_window, &mode)) {
+				result = (mode.refresh_rate ? mode.refresh_rate : E65_VIDEO_FRAME_RATE);
+			} else {
+				result = E65_VIDEO_FRAME_RATE;
+			}
+
+			E65_TRACE_EXIT_FORMAT("Result=%u", result);
+			return result;
+		}
+
 		bool
 		display::fullscreen(void) const
 		{
@@ -187,13 +209,15 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
-		uint32_t
+		int
 		display::pixel(
 			__in uint32_t x,
 			__in uint32_t y
 			) const
 		{
-			uint32_t index, result;
+			uint32_t index;
+			int result = e65::type::E65_COLOR_BLACK;
+			std::map<uint32_t, int>::const_iterator entry;
 
 			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}", x, y);
 
@@ -206,9 +230,12 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_POSITION, "{%u, %u}", x, y);
 			}
 
-			result = m_pixel.at(index).raw;
+			entry = e65::type::E65_COLOR_MAP.find(m_pixel.at(index).raw);
+			if(entry != e65::type::E65_COLOR_MAP.end()) {
+				result = entry->second;
+			}
 
-			E65_TRACE_EXIT_FORMAT("Result=%u(%08x)", result, result);
+			E65_TRACE_EXIT_FORMAT("Result=%i(%s)", result, E65_COLOR_STRING(result));
 			return result;
 		}
 
@@ -295,7 +322,7 @@ namespace e65 {
 			__in uint8_t color
 			)
 		{
-			E65_TRACE_ENTRY_FORMAT("Index=%u, Color=%u(%s)", index, color, E65_DISPLAY_COLOR_STRING(color));
+			E65_TRACE_ENTRY_FORMAT("Index=%u, Color=%u(%s)", index, color, E65_COLOR_STRING(color));
 
 			if(!e65::type::singleton<e65::system::display>::initialized()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
@@ -305,7 +332,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_INDEX, "%u", index);
 			}
 
-			m_pixel.at(index) = E65_DISPLAY_COLOR(color);
+			m_pixel.at(index) = E65_COLOR(color);
 
 			E65_TRACE_EXIT();
 		}
@@ -318,7 +345,7 @@ namespace e65 {
 			)
 
 		{
-			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%s)", x, y, color, E65_DISPLAY_COLOR_STRING(color));
+			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%s)", x, y, color, E65_COLOR_STRING(color));
 
 			set_pixel(E65_DISPLAY_PIXEL_INDEX(x, y), color);
 

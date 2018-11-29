@@ -31,11 +31,13 @@ namespace e65 {
 
 				public:
 
+					virtual uint32_t frequency(void) const = 0;
+
 					virtual bool fullscreen(void) const = 0;
 
 					virtual bool hidden(void) const = 0;
 
-					virtual uint32_t pixel(
+					virtual int pixel(
 						__in uint32_t x,
 						__in uint32_t y
 						) const = 0;

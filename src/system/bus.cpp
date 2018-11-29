@@ -358,7 +358,7 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Previous=%u", &runtime, previous);
 
-			remaining = (E65_PROCESSOR_CYCLES_PER_FRAME - previous);
+			remaining = (m_video.frame_cycles() - previous);
 
 			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Frame", "[%u] Cycles=%u (Previous=%u)", m_video.frame(), remaining,
 				previous);

@@ -35,6 +35,8 @@ namespace e65 {
 					virtual e65::interface::system::display &display(void) = 0;
 
 					virtual uint32_t frame(void) const = 0;
+
+					virtual uint32_t frame_cycles(void) const = 0;
 			};
 		}
 	}

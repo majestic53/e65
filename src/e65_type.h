@@ -51,7 +51,7 @@ static const std::string E65_EXCEPTION_STR[] = {
 #define THROW_E65_EXCEPTION_FORMAT(_EXCEPT_, _FORMAT_, ...) \
 	E65_EXCEPTION_THROW_FORMAT(E65_EXCEPTION_STRING(_EXCEPT_), _FORMAT_, __VA_ARGS__)
 
-#define E65_COMMAND_MAX E65_VIDEO_HIDE
+#define E65_COMMAND_MAX E65_VIDEO_PIXEL_SET
 
 static const std::string E65_COMMAND_STR[] = {
 
@@ -97,6 +97,8 @@ static const std::string E65_COMMAND_STR[] = {
 	"Video-Frame",
 	"Video-Fullscreen",
 	"Video-Hide",
+	"Video-Pixel",
+	"Video-Pixel-Set",
 	};
 
 #define E65_COMMAND_STRING(_TYPE_) \

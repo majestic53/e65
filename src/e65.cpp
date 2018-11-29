@@ -468,11 +468,25 @@ e65_command(
 			case E65_VIDEO_FRAME:
 				response->payload.dword = e65::runtime::acquire().bus().video().frame();
 				break;
+			case E65_VIDEO_FRAME_CYCLE:
+				response->payload.dword = e65::runtime::acquire().bus().video().frame_cycles();
+				break;
+			case E65_VIDEO_FREQUENCY:
+				response->payload.dword = e65::runtime::acquire().bus().video().display().frequency();
+				break;
 			case E65_VIDEO_FULLSCREEN:
 				e65::runtime::acquire().bus().video().display().set_fullscreen(request->payload.dword);
 				break;
 			case E65_VIDEO_HIDE:
 				e65::runtime::acquire().bus().video().display().set_hidden(request->payload.dword);
+				break;
+			case E65_VIDEO_PIXEL:
+				response->payload.byte = e65::runtime::acquire().bus().video().display().pixel(request->address & UINT8_MAX,
+					(request->address >> CHAR_BIT) & UINT8_MAX);
+				break;
+			case E65_VIDEO_PIXEL_SET:
+				e65::runtime::acquire().bus().video().display().set_pixel(request->address & UINT8_MAX,
+					(request->address >> CHAR_BIT) & UINT8_MAX, request->payload.byte);
 				break;
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", command, E65_COMMAND_STRING(command));
@@ -651,7 +665,7 @@ e65_step(
 	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
 
 	try {
-		result = (e65::runtime::acquire().step(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
+		result = (e65::runtime::acquire().debug_step(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;
@@ -674,7 +688,7 @@ e65_step_frame(
 	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
 
 	try {
-		result = (e65::runtime::acquire().step_frame(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
+		result = (e65::runtime::acquire().debug_step_frame(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;

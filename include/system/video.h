@@ -42,6 +42,8 @@ namespace e65 {
 
 				uint32_t frame(void) const override;
 
+				uint32_t frame_cycles(void) const override;
+
 				void step(
 					__in e65::interface::system::memory &memory
 					);
@@ -72,6 +74,8 @@ namespace e65 {
 				e65::system::display &m_display;
 
 				uint32_t m_frame;
+
+				uint32_t m_frame_cycles;
 		};
 	}
 }

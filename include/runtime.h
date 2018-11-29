@@ -59,6 +59,14 @@ namespace e65 {
 
 			bool debug_run(void);
 
+			bool debug_step(
+				__in_opt uint32_t offset = 1
+				);
+
+			bool debug_step_frame(
+				__in_opt uint32_t offset = 1
+				);
+
 			bool register_handler(
 				__in e65_cb handler
 				);
@@ -77,14 +85,6 @@ namespace e65 {
 				__in int type,
 				__in uint16_t address
 				) override;
-
-			bool step(
-				__in_opt uint32_t offset = 1
-				);
-
-			bool step_frame(
-				__in_opt uint32_t offset = 1
-				);
 
 			bool terminate(void);
 

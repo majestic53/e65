@@ -68,8 +68,7 @@ as|accumulator-set                    <value>                 Set processor accu
 b|break                                                       Break processor
 c|core                                                        Display processor core
 cy|cycle                                                      Display current processor cycle
-dasm|disassemble                      <address> <offset>      Disassemble instructions at an address for a
-								given offset
+dasm|disassemble                      <address> <offset>      Disassemble instructions at an address for a given offset
 flg|flags                                                     Display processor flags
 flgs|flags-set                        <value>                 Set processor flags to given value
 x|index-x                                                     Display processor index-x
@@ -92,8 +91,12 @@ ws|wait                                                       Set processor wait
 wc|wait-clear                                                 Clear processor wait flag
 ---                                   ---                     ---
 f|frame                                                       Display current video frame
+fc|frame-cycle                                                Display video frame cycle count
+frq|frequency                                                 Display video frequency (Hz)
 fs|fullscreen                         <value>                 Fullscreen display window
 h|hide                                <value>                 Hide display window
+p|pixel                               <x> <y>                 Retrieve display pixel at a given coordinate
+ps|pixel-set                          <x> <y> <color>         Set display pixel at a given coordinate
 ---                                   ---                     ---
 ?|help                                                        Display help information
 v|version                                                     Display version information
@@ -105,6 +108,12 @@ Changelog
 
 Version 0.1.1848
 ----------------
+*Updated: 11/28/2018*
+
+* Added additional video debug commands
+* Minor bug fixes
+	* Cycle count is now based on display mode
+
 *Updated: 11/27/2018*
 
 * Moved runtime into main thread to avoid renderer issues

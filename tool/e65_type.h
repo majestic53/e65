@@ -119,8 +119,12 @@ enum {
 
 	// video
 	E65_COMMAND_VIDEO_FRAME,
+	E65_COMMAND_VIDEO_FRAME_CYCLE,
+	E65_COMMAND_VIDEO_FREQUENCY,
 	E65_COMMAND_VIDEO_FULLSCREEN,
 	E65_COMMAND_VIDEO_HIDE,
+	E65_COMMAND_VIDEO_PIXEL,
+	E65_COMMAND_VIDEO_PIXEL_SET,
 
 	// built-in
 	E65_COMMAND_HELP,
@@ -180,8 +184,12 @@ static const std::string E65_COMMAND_ARG[] = {
 
 	// video
 	"",
+	"",
+	"",
 	"<value>",
 	"<value>",
+	"<x> <y>",
+	"<x> <y> <color>",
 
 	// built-in
 	"",
@@ -237,8 +245,12 @@ static const std::string E65_COMMAND_DESC[] = {
 
 	// video
 	"Display current video frame",
+	"Display video frame cycle count",
+	"Display video frequency (Hz)",
 	"Fullscreen display window",
 	"Hide display window",
+	"Retrieve display pixel at a given coordinate",
+	"Set display pixel at a given coordinate",
 
 	// built-in
 	"Display help information",
@@ -294,8 +306,12 @@ static const std::string E65_COMMAND_LONG_STR[] = {
 
 	// video
 	"frame",
+	"frame-cycle",
+	"frequency",
 	"fullscreen",
 	"hide",
+	"pixel",
+	"pixel-set",
 
 	// built-in
 	"help",
@@ -351,8 +367,12 @@ static const std::string E65_COMMAND_SHORT_STR[] = {
 
 	// video
 	"f",
+	"fc",
+	"frq",
 	"fs",
 	"h",
+	"p",
+	"ps",
 
 	// built-in
 	"?",
@@ -443,10 +463,18 @@ std::map<std::string, int> E65_COMMAND_MAP = {
 	// video
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FRAME), E65_COMMAND_VIDEO_FRAME),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FRAME_CYCLE), E65_COMMAND_VIDEO_FRAME_CYCLE),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FRAME_CYCLE), E65_COMMAND_VIDEO_FRAME_CYCLE),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FREQUENCY), E65_COMMAND_VIDEO_FREQUENCY),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FREQUENCY), E65_COMMAND_VIDEO_FREQUENCY),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_FULLSCREEN), E65_COMMAND_VIDEO_FULLSCREEN),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_FULLSCREEN), E65_COMMAND_VIDEO_FULLSCREEN),
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_HIDE), E65_COMMAND_VIDEO_HIDE),
 	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_HIDE), E65_COMMAND_VIDEO_HIDE),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_PIXEL), E65_COMMAND_VIDEO_PIXEL),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_PIXEL), E65_COMMAND_VIDEO_PIXEL),
+	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_VIDEO_PIXEL_SET), E65_COMMAND_VIDEO_PIXEL_SET),
+	std::make_pair(E65_COMMAND_SHORT_STRING(E65_COMMAND_VIDEO_PIXEL_SET), E65_COMMAND_VIDEO_PIXEL_SET),
 
 	// built-in
 	std::make_pair(E65_COMMAND_LONG_STRING(E65_COMMAND_HELP), E65_COMMAND_HELP),
@@ -507,8 +535,12 @@ std::map<int, size_t> E65_COMMAND_LENGTH_MAP = {
 
 	// video
 	std::make_pair(E65_COMMAND_VIDEO_FRAME, 0),
+	std::make_pair(E65_COMMAND_VIDEO_FRAME_CYCLE, 0),
+	std::make_pair(E65_COMMAND_VIDEO_FREQUENCY, 0),
 	std::make_pair(E65_COMMAND_VIDEO_FULLSCREEN, 1),
 	std::make_pair(E65_COMMAND_VIDEO_HIDE, 1),
+	std::make_pair(E65_COMMAND_VIDEO_PIXEL, 2),
+	std::make_pair(E65_COMMAND_VIDEO_PIXEL_SET, 3),
 
 	// built-in
 	std::make_pair(E65_COMMAND_HELP, 0),

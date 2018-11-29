@@ -234,6 +234,76 @@ namespace e65 {
 	}
 
 	bool
+	runtime::debug_step(
+		__in uint32_t offset
+		)
+	{
+		bool result;
+
+		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		result = m_debug;
+		if(result) {
+			uint32_t iter = 0;
+
+			if(!offset) {
+				offset = 1;
+			}
+
+			for(; iter < offset; ++iter) {
+
+				result = (m_bus.step(*this) > 0);
+				if(!result) {
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping steps", "%u-%u", iter, offset);
+					break;
+				}
+			}
+		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
+	runtime::debug_step_frame(
+		__in uint32_t offset
+		)
+	{
+		bool result;
+
+		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		result = m_debug;
+		if(result) {
+			uint32_t iter = 0;
+
+			if(!offset) {
+				offset = 1;
+			}
+
+			for(; iter < offset; ++iter) {
+
+				result = (m_bus.step_frame(*this) != EXIT_FAILURE);
+				if(!result) {
+					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping frames", "%u-%u", iter, offset);
+					break;
+				}
+			}
+		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
 	runtime::on_initialize(
 		__in const void *context,
 		__in size_t length
@@ -439,15 +509,8 @@ namespace e65 {
 
 			if(!m_debug) {
 				previous = m_bus.step_frame(*this, previous);
-			} else {
-
-				if(m_debug_running) {
-					m_debug_running = step_frame();
-				}
-
-				if(!m_bus.video().display().hidden()) {
-					m_bus.video().display().show();
-				}
+			} else if(m_debug_running) {
+				m_debug_running = debug_step_frame();
 			}
 
 			delta = (SDL_GetTicks() - end);
@@ -510,76 +573,6 @@ namespace e65 {
 		}
 
 		E65_TRACE_EXIT();
-	}
-
-	bool
-	runtime::step(
-		__in uint32_t offset
-		)
-	{
-		bool result;
-
-		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		result = m_debug;
-		if(result) {
-			uint32_t iter = 0;
-
-			if(!offset) {
-				offset = 1;
-			}
-
-			for(; iter < offset; ++iter) {
-
-				result = (m_bus.step(*this) > 0);
-				if(!result) {
-					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping steps", "%u-%u", iter, offset);
-					break;
-				}
-			}
-		}
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
-	}
-
-	bool
-	runtime::step_frame(
-		__in uint32_t offset
-		)
-	{
-		bool result;
-
-		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		result = m_debug;
-		if(result) {
-			uint32_t iter = 0;
-
-			if(!offset) {
-				offset = 1;
-			}
-
-			for(; iter < offset; ++iter) {
-
-				result = (m_bus.step_frame(*this) != EXIT_FAILURE);
-				if(!result) {
-					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping frames", "%u-%u", iter, offset);
-					break;
-				}
-			}
-		}
-
-		E65_TRACE_EXIT_FORMAT("Result=%x", result);
-		return result;
 	}
 
 	bool

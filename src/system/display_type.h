@@ -19,6 +19,7 @@
 #ifndef E65_SYSTEM_DISPLAY_TYPE_H_
 #define E65_SYSTEM_DISPLAY_TYPE_H_
 
+#include "../../include/type/color.h"
 #include "../../include/type/exception.h"
 
 namespace e65 {
@@ -69,41 +70,7 @@ namespace e65 {
 		#define E65_DISPLAY_PIXEL_INDEX(_X_, _Y_) \
 			((E65_DISPLAY_WIDTH * (_Y_)) + (_X_))
 
-		#define E65_COLOR_MAX e65::type::E65_COLOR_LIGHT_GREY
-
-		static const e65::type::color_t E65_DISPLAY_COL[] = {
-			{{ 0, 0, 0, 255, }},
-			{{ 255, 255, 255, 255, }},
-			{{ 0, 0, 204, 255, }},
-			{{ 207, 190, 114, 255, }},
-			{{ 123, 80, 117, 255, }},
-			{{ 22, 210, 115, 255, }},
-			{{ 164, 101, 52, 255, }},
-			{{ 0, 212, 237, 255, }},
-			{{ 0, 121, 245, 255, }},
-			{{ 2, 89, 143, 255, }},
-			{{ 41, 41, 239, 255, }},
-			{{ 83, 87, 85, 255, }},
-			{{ 133, 138, 136, 255, }},
-			{{ 52, 226, 138, 255, }},
-			{{ 207, 159, 114, 255, }},
-			{{ 182, 189, 186, 255, }},
-			};
-
-		#define E65_DISPLAY_COLOR(_TYPE_) \
-			(((_TYPE_) > E65_COLOR_MAX) ? E65_DISPLAY_COL[e65::type::E65_COLOR_BLACK] : \
-				E65_DISPLAY_COL[_TYPE_])
-
-		static const std::string E65_DISPLAY_COL_STR[] = {
-			"Black", "White", "Red", "Cyan", "Purple", "Green", "Blue", "Yellow", "Orange", "Brown",
-			"Light-red", "Dark-grey", "Grey", "Light-green", "Light-blue", "Light-grey",
-			};
-
-		#define E65_DISPLAY_COLOR_STRING(_TYPE_) \
-			(((_TYPE_) > E65_COLOR_MAX) ? E65_STRING_UNKNOWN : \
-				E65_STRING_CHECK(E65_DISPLAY_COL_STR[_TYPE_]))
-
-		#define E65_DISPLAY_COLOR_BACKGROUND E65_DISPLAY_COLOR(e65::type::E65_COLOR_BLACK)
+		#define E65_DISPLAY_COLOR_BACKGROUND E65_COLOR(e65::type::E65_COLOR_BLACK)
 	}
 }
 
