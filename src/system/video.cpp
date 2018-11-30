@@ -143,6 +143,59 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
+		int
+		video::pixel(
+			__in e65::interface::system::memory &memory,
+			__in uint32_t x,
+			__in uint32_t y
+			) const
+		{
+			uint16_t address;
+			int result = e65::type::E65_COLOR_BLACK;
+
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Position={%u, %u}", &memory, x, y);
+
+			if(!e65::type::singleton<e65::system::video>::initialized()) {
+				THROW_E65_SYSTEM_VIDEO_EXCEPTION(E65_SYSTEM_VIDEO_EXCEPTION_UNINITIALIZED);
+			}
+
+			address = (E65_PIXEL_INDEX(x, y) + E65_VIDEO_ADDRESS_MIN);
+			if(address > E65_VIDEO_ADDRESS_MAX) {
+				THROW_E65_SYSTEM_VIDEO_EXCEPTION_FORMAT(E65_SYSTEM_VIDEO_EXCEPTION_POSITION, "{%u, %u}", x, y);
+			}
+
+			result = memory.read(address);
+
+			E65_TRACE_EXIT_FORMAT("Result=%i(%s)", result, E65_COLOR_STRING(result));
+			return result;
+		}
+
+		void
+		video::set_pixel(
+			__in e65::interface::system::memory &memory,
+			__in uint32_t x,
+			__in uint32_t y,
+			__in int color
+			)
+		{
+			uint16_t address;
+
+			E65_TRACE_ENTRY_FORMAT("Memory=%p, Position={%u, %u}, Color=%u(%s)", &memory, x, y, color, E65_COLOR_STRING(color));
+
+			if(!e65::type::singleton<e65::system::video>::initialized()) {
+				THROW_E65_SYSTEM_VIDEO_EXCEPTION(E65_SYSTEM_VIDEO_EXCEPTION_UNINITIALIZED);
+			}
+
+			address = (E65_PIXEL_INDEX(x, y) + E65_VIDEO_ADDRESS_MIN);
+			if(address > E65_VIDEO_ADDRESS_MAX) {
+				THROW_E65_SYSTEM_VIDEO_EXCEPTION_FORMAT(E65_SYSTEM_VIDEO_EXCEPTION_POSITION, "{%u, %u}", x, y);
+			}
+
+			memory.write(address, color);
+
+			E65_TRACE_EXIT();
+		}
+
 		void
 		video::step(
 			__in e65::interface::system::memory &memory
@@ -160,7 +213,6 @@ namespace e65 {
 				m_display.set_pixel(offset - E65_VIDEO_ADDRESS_MIN, memory.read(offset));
 			}
 
-			m_display.show();
 			++m_frame;
 
 			E65_TRACE_EXIT();

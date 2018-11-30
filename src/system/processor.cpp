@@ -299,7 +299,13 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_ADC), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			// TODO: perform operation and set flags (also handle decimal mode)
+			if(m_flags.decimal_enable) {
+				// TODO: decimal mode
+
+				++m_cycle_last;
+			} else {
+				// TODO: binary mode
+			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_ADC, mode, boundary);
 
@@ -483,7 +489,7 @@ namespace e65 {
 
 			if(!m_flags.carry) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BCC, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -506,7 +512,7 @@ namespace e65 {
 
 			if(m_flags.carry) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BCS, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -529,7 +535,7 @@ namespace e65 {
 
 			if(m_flags.zero) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BEQ, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -588,7 +594,7 @@ namespace e65 {
 
 			if(m_flags.sign) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BMI, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -611,7 +617,7 @@ namespace e65 {
 
 			if(!m_flags.zero) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BNE, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -634,7 +640,7 @@ namespace e65 {
 
 			if(!m_flags.sign) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BPL, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -667,11 +673,12 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Memory=%p", &runtime, &memory);
 
-			m_flags.breakpoint = 1;
+			m_flags.decimal_enable = 0;
+			m_flags.irq_disable = 1;
 			push_word(memory, m_program_counter);
-			push(memory, m_flags.raw);
+			push(memory, (m_flags.raw | E65_PFLAG(e65::type::E65_PFLAG_BREAKPOINT)));
 			m_program_counter = read_word(memory, E65_PROCESSOR_ADDRESS_MASKABLE_INTERRUPT);
-			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMPLIED);
+			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMMEDIATE);
 			runtime.signal_event(E65_EVENT_BREAK, m_program_counter);
 
 			E65_TRACE_EXIT();
@@ -692,7 +699,7 @@ namespace e65 {
 
 			if(!m_flags.overflow) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BVC, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -715,7 +722,7 @@ namespace e65 {
 
 			if(m_flags.overflow) {
 				m_program_counter = address;
-				m_cycle_last += E65_PCOMMAND_RELATIVE_CYCLES_TAKEN;
+				++m_cycle_last;
 			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BVS, e65::type::E65_PCOMMAND_MODE_RELATIVE, boundary);
@@ -1121,7 +1128,7 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_JSR), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			push_word(memory, m_program_counter - 1);
+			push_word(memory, m_program_counter);
 			m_program_counter = address;
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_JSR, mode);
 
@@ -1632,7 +1639,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
-			m_program_counter = (pop_word(memory) + 1);
+			m_program_counter = pop_word(memory);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_RTS, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
 			E65_TRACE_EXIT();
@@ -1670,7 +1677,13 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_SBC), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			// TODO: perform operation and set flags (also handle decimal mode)
+			if(m_flags.decimal_enable) {
+				// TODO: decimal mode
+
+				++m_cycle_last;
+			} else {
+				// TODO: binary mode
+			}
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_SBC, mode, boundary);
 
@@ -2587,7 +2600,7 @@ namespace e65 {
 			m_stop = false;
 			m_wait = false;
 
-			push_word(memory, m_program_counter);
+			push_word(memory, 0);
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor reset");
 
@@ -2614,6 +2627,7 @@ namespace e65 {
 
 				push_word(memory, m_program_counter);
 				push(memory, m_flags.raw & ~E65_PFLAG(e65::type::E65_PFLAG_BREAKPOINT));
+				m_flags.decimal_enable = 0;
 
 				if(m_interrupt_nmi) {
 					m_interrupt_nmi = false;

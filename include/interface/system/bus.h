@@ -37,7 +37,18 @@ namespace e65 {
 
 					virtual e65::interface::system::memory &memory(void) = 0;
 
+					virtual int pixel(
+						__in uint32_t x,
+						__in uint32_t y
+						) const = 0;
+
 					virtual e65::interface::system::processor &processor(void) = 0;
+
+					virtual void set_pixel(
+						__in uint32_t x,
+						__in uint32_t y,
+						__in int color
+						) = 0;
 
 					virtual e65::interface::system::video &video(void) = 0;
 			};

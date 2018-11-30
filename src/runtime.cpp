@@ -246,7 +246,7 @@ namespace e65 {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
-		result = m_debug;
+		result = (m_debug && !m_debug_running);
 		if(result) {
 			uint32_t iter = 0;
 
@@ -281,22 +281,9 @@ namespace e65 {
 			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
 		}
 
-		result = m_debug;
+		result = (m_debug && !m_debug_running);
 		if(result) {
-			uint32_t iter = 0;
-
-			if(!offset) {
-				offset = 1;
-			}
-
-			for(; iter < offset; ++iter) {
-
-				result = (m_bus.step_frame(*this) != EXIT_FAILURE);
-				if(!result) {
-					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping frames", "%u-%u", iter, offset);
-					break;
-				}
-			}
+			result = step_frame(offset);
 		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
@@ -483,7 +470,7 @@ namespace e65 {
 			m_bus.video().display().set_hidden(true);
 		}
 
-		set_running(true);
+		m_running = true;
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop entry");
 
@@ -509,9 +496,11 @@ namespace e65 {
 
 			if(!m_debug) {
 				previous = m_bus.step_frame(*this, previous);
-			} else if(m_debug_running) {
-				m_debug_running = debug_step_frame();
+			} else if(m_debug_running && !step_frame()) {
+				m_debug_running = false;
 			}
+
+			m_bus.video().display().show();
 
 			delta = (SDL_GetTicks() - end);
 			if(delta < E65_RUNTIME_FRAME_DELTA) {
@@ -523,7 +512,7 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop exit");
 
-		set_running(false);
+		m_running = false;
 
 		E65_TRACE_EXIT();
 	}
@@ -539,23 +528,6 @@ namespace e65 {
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", m_running);
 		return m_running;
-	}
-
-	void
-	runtime::set_running(
-		__in bool running
-		)
-	{
-		E65_TRACE_ENTRY_FORMAT("Running=%x", running);
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		std::lock_guard<std::mutex> lock(m_running_mutex);
-		m_running = running;
-
-		E65_TRACE_EXIT();
 	}
 
 	void
@@ -576,6 +548,33 @@ namespace e65 {
 	}
 
 	bool
+	runtime::step_frame(
+		__in uint32_t offset
+		)
+	{
+		bool result;
+		uint32_t iter = 0;
+
+		E65_TRACE_ENTRY_FORMAT("Offset=%u", offset);
+
+		if(!offset) {
+			offset = 1;
+		}
+
+		for(; iter < offset; ++iter) {
+
+			result = (m_bus.step_frame(*this) != EXIT_FAILURE);
+			if(!result) {
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Runtime skipping frames", "%u-%u", iter, offset);
+				break;
+			}
+		}
+
+		E65_TRACE_EXIT_FORMAT("Result=%x", result);
+		return result;
+	}
+
+	bool
 	runtime::terminate(void)
 	{
 		bool result;
@@ -590,7 +589,7 @@ namespace e65 {
 		if(result) {
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime terminated");
 
-			set_running(false);
+			m_running = false;
 		}
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);

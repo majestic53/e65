@@ -41,6 +41,9 @@ namespace e65 {
 		#define E65_STRING_UNKNOWN "Unknown"
 
 		#define E65_VIDEO_FRAME_RATE 60
+
+		#define E65_VIDEO_HEIGHT 32
+		#define E65_VIDEO_WIDTH 32
 	}
 }
 

@@ -481,12 +481,12 @@ e65_command(
 				e65::runtime::acquire().bus().video().display().set_hidden(request->payload.dword);
 				break;
 			case E65_VIDEO_PIXEL:
-				response->payload.byte = e65::runtime::acquire().bus().video().display().pixel(request->address & UINT8_MAX,
+				response->payload.byte = e65::runtime::acquire().bus().pixel(request->address & UINT8_MAX,
 					(request->address >> CHAR_BIT) & UINT8_MAX);
 				break;
 			case E65_VIDEO_PIXEL_SET:
-				e65::runtime::acquire().bus().video().display().set_pixel(request->address & UINT8_MAX,
-					(request->address >> CHAR_BIT) & UINT8_MAX, request->payload.byte);
+				e65::runtime::acquire().bus().set_pixel(request->address & UINT8_MAX, (request->address >> CHAR_BIT) & UINT8_MAX,
+					request->payload.byte);
 				break;
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", command, E65_COMMAND_STRING(command));

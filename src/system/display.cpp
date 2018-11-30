@@ -51,7 +51,7 @@ namespace e65 {
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display clearing");
 
-			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
+			m_pixel.resize(E65_VIDEO_WIDTH * E65_VIDEO_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
 			show();
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Display cleared");
@@ -126,13 +126,13 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Context[%u]=%p", length, context);
 
 			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Display initializing", "{%u, %u} Scale=%.1f",
-				E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT, E65_DISPLAY_SCALE);
+				E65_VIDEO_WIDTH, E65_VIDEO_HEIGHT, E65_DISPLAY_SCALE);
 
 			m_title = E65;
-			m_pixel.resize(E65_DISPLAY_WIDTH * E65_DISPLAY_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
+			m_pixel.resize(E65_VIDEO_WIDTH * E65_VIDEO_HEIGHT, E65_DISPLAY_COLOR_BACKGROUND);
 
 			m_window = SDL_CreateWindow(E65_STRING_CHECK(m_title), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-					E65_DISPLAY_WIDTH * E65_DISPLAY_SCALE, E65_DISPLAY_HEIGHT * E65_DISPLAY_SCALE, E65_DISPLAY_FLAGS);
+					E65_VIDEO_WIDTH * E65_DISPLAY_SCALE, E65_VIDEO_HEIGHT * E65_DISPLAY_SCALE, E65_DISPLAY_FLAGS);
 
 			if(!m_window) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateWindow failed! %s",
@@ -145,7 +145,7 @@ namespace e65 {
 					SDL_GetError());
 			}
 
-			if(SDL_RenderSetLogicalSize(m_renderer, E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT)) {
+			if(SDL_RenderSetLogicalSize(m_renderer, E65_VIDEO_WIDTH, E65_VIDEO_HEIGHT)) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL,
 					"SDL_RenderSetLogicalSize failed! %s", SDL_GetError());
 			}
@@ -162,7 +162,7 @@ namespace e65 {
 			}
 
 			m_texture = SDL_CreateTexture(m_renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING,
-					E65_DISPLAY_WIDTH, E65_DISPLAY_HEIGHT);
+					E65_VIDEO_WIDTH, E65_VIDEO_HEIGHT);
 
 			if(!m_texture) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_CreateTexture failed! %s",
@@ -225,7 +225,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			index = E65_DISPLAY_PIXEL_INDEX(x, y);
+			index = E65_PIXEL_INDEX(x, y);
 			if(index >= m_pixel.size()) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_POSITION, "{%u, %u}", x, y);
 			}
@@ -347,7 +347,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%s)", x, y, color, E65_COLOR_STRING(color));
 
-			set_pixel(E65_DISPLAY_PIXEL_INDEX(x, y), color);
+			set_pixel(E65_PIXEL_INDEX(x, y), color);
 
 			E65_TRACE_EXIT();
 		}
@@ -378,7 +378,7 @@ namespace e65 {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION(E65_SYSTEM_DISPLAY_EXCEPTION_UNINITIALIZED);
 			}
 
-			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_DISPLAY_WIDTH * sizeof(e65::type::color_t))) {
+			if(SDL_UpdateTexture(m_texture, nullptr, &m_pixel[0], E65_VIDEO_WIDTH * sizeof(e65::type::color_t))) {
 				THROW_E65_SYSTEM_DISPLAY_EXCEPTION_FORMAT(E65_SYSTEM_DISPLAY_EXCEPTION_EXTERNAL, "SDL_UpdateTexture failed! %s",
 					SDL_GetError());
 			}

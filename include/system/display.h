@@ -47,7 +47,7 @@ namespace e65 {
 				int pixel(
 					__in uint32_t x,
 					__in uint32_t y
-					) const override;
+					) const;
 
 				void set_frame_rate(
 					__in float frame_rate
@@ -64,13 +64,13 @@ namespace e65 {
 				void set_pixel(
 					__in uint32_t index,
 					__in uint8_t color
-					) override;
+					);
 
 				void set_pixel(
 					__in uint32_t x,
 					__in uint32_t y,
 					__in int color
-					) override;
+					);
 
 				void set_title(
 					__in const std::string &title

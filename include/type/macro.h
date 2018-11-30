@@ -43,6 +43,9 @@ namespace e65 {
 		#define E65_FLOAT_PRECISION(_PRECISION_, _VALUE_) \
 			std::right << std::setprecision(_PRECISION_) << std::fixed << (_VALUE_) << std::defaultfloat
 
+		#define E65_PIXEL_INDEX(_X_, _Y_) \
+			((E65_VIDEO_WIDTH * (_Y_)) + (_X_))
+
 		#define E65_STRING_CHECK(_STRING_) \
 			((_STRING_).empty() ? E65_STRING_EMPTY : (_STRING_).c_str())
 

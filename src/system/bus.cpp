@@ -85,7 +85,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Hex=%x, Origin=%u(%04x)", data.size(), &data, hex, origin, origin);
 
-			clear();
+			m_memory.clear();
 
 			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
 				data.size() / E65_BYTES_PER_KBYTE, data.size());
@@ -95,6 +95,9 @@ namespace e65 {
 			} else {
 				load_binary(data, origin);
 			}
+
+			m_input.clear(m_memory);
+			m_video.clear(m_memory);
 
 			m_processor.reset(m_memory);
 
@@ -291,6 +294,26 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
+		int
+		bus::pixel(
+			__in uint32_t x,
+			__in uint32_t y
+			) const
+		{
+			int result;
+
+			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}", x, y);
+
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
+			}
+
+			result = m_video.pixel(m_memory, x, y);
+
+			E65_TRACE_EXIT_FORMAT("Result=%i(%s)", result, E65_COLOR_STRING(result));
+			return result;
+		}
+
 		e65::interface::system::processor &
 		bus::processor(void)
 		{
@@ -311,9 +334,31 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
+			}
+
 			m_input.step(m_memory);
 			m_processor.reset(m_memory);
 			m_video.step(m_memory);
+
+			E65_TRACE_EXIT();
+		}
+
+		void
+		bus::set_pixel(
+			__in uint32_t x,
+			__in uint32_t y,
+			__in int color
+			)
+		{
+			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%s)", x, y, color, E65_COLOR_STRING(color));
+
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_video.set_pixel(m_memory, x, y, color);
 
 			E65_TRACE_EXIT();
 		}
@@ -327,6 +372,10 @@ namespace e65 {
 			uint8_t result = 0;
 
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
+
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
+			}
 
 			address = m_processor.program_counter();
 			if(runtime.debug() && runtime.breakpoint(address)) {
@@ -358,6 +407,10 @@ namespace e65 {
 
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Previous=%u", &runtime, previous);
 
+			if(!e65::type::singleton<e65::system::bus>::initialized()) {
+				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
+			}
+
 			remaining = (m_video.frame_cycles() - previous);
 
 			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Frame", "[%u] Cycles=%u (Previous=%u)", m_video.frame(), remaining,
@@ -384,6 +437,8 @@ namespace e65 {
 						result = EXIT_FAILURE;
 					}
 				}
+
+				m_video.step(m_memory);
 			} else {
 				result = 0;
 

@@ -108,6 +108,10 @@ Changelog
 
 Version 0.1.1848
 ----------------
+*Updated: 11/29/2018*
+
+* Additional bug fixes
+
 *Updated: 11/28/2018*
 
 * Added additional video debug commands

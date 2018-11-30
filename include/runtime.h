@@ -115,8 +115,8 @@ namespace e65 {
 
 			bool poll(void);
 
-			void set_running(
-				__in bool running
+			bool step_frame(
+				__in_opt uint32_t offset = 1
 				);
 
 			std::set<uint16_t> m_breakpoint;
@@ -130,8 +130,6 @@ namespace e65 {
 			e65_cb m_handler;
 
 			bool m_running;
-
-			std::mutex m_running_mutex;
 
 			e65::trace &m_trace;
 	};

@@ -48,11 +48,22 @@ namespace e65 {
 
 				e65::interface::system::memory &memory(void) override;
 
+				int pixel(
+					__in uint32_t x,
+					__in uint32_t y
+					) const override;
+
 				e65::interface::system::processor &processor(void) override;
 
 				void reset(
 					__in e65::interface::runtime &runtime
 					);
+
+				void set_pixel(
+					__in uint32_t x,
+					__in uint32_t y,
+					__in int color
+					) override;
 
 				uint8_t step(
 					__in e65::interface::runtime &runtime

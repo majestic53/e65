@@ -254,7 +254,7 @@ namespace e65 {
 			std::make_pair(0xd0, std::make_pair(e65::type::E65_PCOMMAND_BNE, e65::type::E65_PCOMMAND_MODE_RELATIVE)),
 			std::make_pair(0x10, std::make_pair(e65::type::E65_PCOMMAND_BPL, e65::type::E65_PCOMMAND_MODE_RELATIVE)),
 			std::make_pair(0x80, std::make_pair(e65::type::E65_PCOMMAND_BRA, e65::type::E65_PCOMMAND_MODE_RELATIVE)),
-			std::make_pair(0x00, std::make_pair(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
+			std::make_pair(0x00, std::make_pair(e65::type::E65_PCOMMAND_BRK, e65::type::E65_PCOMMAND_MODE_IMMEDIATE)),
 			std::make_pair(0x50, std::make_pair(e65::type::E65_PCOMMAND_BVC, e65::type::E65_PCOMMAND_MODE_RELATIVE)),
 			std::make_pair(0x70, std::make_pair(e65::type::E65_PCOMMAND_BVS, e65::type::E65_PCOMMAND_MODE_RELATIVE)),
 			std::make_pair(0x18, std::make_pair(e65::type::E65_PCOMMAND_CLC, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
@@ -499,6 +499,7 @@ namespace e65 {
 			std::make_pair(e65::type::E65_PCOMMAND_ADC, std::make_pair(2, 2)),
 			std::make_pair(e65::type::E65_PCOMMAND_AND, std::make_pair(2, 2)),
 			std::make_pair(e65::type::E65_PCOMMAND_BIT, std::make_pair(3, 3)),
+			std::make_pair(e65::type::E65_PCOMMAND_BRK, std::make_pair(7, 7)),
 			std::make_pair(e65::type::E65_PCOMMAND_CMP, std::make_pair(2, 2)),
 			std::make_pair(e65::type::E65_PCOMMAND_CPX, std::make_pair(2, 2)),
 			std::make_pair(e65::type::E65_PCOMMAND_CPY, std::make_pair(2, 2)),
@@ -511,7 +512,6 @@ namespace e65 {
 			};
 
 		static const std::map<int, std::pair<uint8_t, uint8_t>> E65_PCOMMAND_IMPLIED_CYCLE_MAP = {
-			std::make_pair(e65::type::E65_PCOMMAND_BRK, std::make_pair(7, 7)),
 			std::make_pair(e65::type::E65_PCOMMAND_CLC, std::make_pair(2, 2)),
 			std::make_pair(e65::type::E65_PCOMMAND_CLD, std::make_pair(2, 2)),
 			std::make_pair(e65::type::E65_PCOMMAND_CLI, std::make_pair(2, 2)),
@@ -555,8 +555,6 @@ namespace e65 {
 			std::make_pair(e65::type::E65_PCOMMAND_BVC, std::make_pair(2, 4)),
 			std::make_pair(e65::type::E65_PCOMMAND_BVS, std::make_pair(2, 4)),
 			};
-
-		#define E65_PCOMMAND_RELATIVE_CYCLES_TAKEN 1
 
 		static const std::map<int, std::pair<uint8_t, uint8_t>> E65_PCOMMAND_ZEROPAGE_CYCLE_MAP = {
 			std::make_pair(e65::type::E65_PCOMMAND_ADC, std::make_pair(3, 3)),

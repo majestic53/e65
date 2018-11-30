@@ -21,6 +21,7 @@
 
 #include "../interface/system/video.h"
 #include "./display.h"
+#include "./memory.h"
 
 namespace e65 {
 
@@ -43,6 +44,19 @@ namespace e65 {
 				uint32_t frame(void) const override;
 
 				uint32_t frame_cycles(void) const override;
+
+				int pixel(
+					__in e65::interface::system::memory &memory,
+					__in uint32_t x,
+					__in uint32_t y
+					) const override;
+
+				void set_pixel(
+					__in e65::interface::system::memory &memory,
+					__in uint32_t x,
+					__in uint32_t y,
+					__in int color
+					) override;
 
 				void step(
 					__in e65::interface::system::memory &memory

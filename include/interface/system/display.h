@@ -37,11 +37,6 @@ namespace e65 {
 
 					virtual bool hidden(void) const = 0;
 
-					virtual int pixel(
-						__in uint32_t x,
-						__in uint32_t y
-						) const = 0;
-
 					virtual void set_frame_rate(
 						__in float frame_rate
 						) = 0;
@@ -52,17 +47,6 @@ namespace e65 {
 
 					virtual void set_hidden(
 						__in bool hidden
-						) = 0;
-
-					virtual void set_pixel(
-						__in uint32_t index,
-						__in uint8_t color
-						) = 0;
-
-					virtual void set_pixel(
-						__in uint32_t x,
-						__in uint32_t y,
-						__in int color
 						) = 0;
 
 					virtual void set_title(

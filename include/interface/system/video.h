@@ -37,6 +37,19 @@ namespace e65 {
 					virtual uint32_t frame(void) const = 0;
 
 					virtual uint32_t frame_cycles(void) const = 0;
+
+					virtual int pixel(
+						__in e65::interface::system::memory &memory,
+						__in uint32_t x,
+						__in uint32_t y
+						) const = 0;
+
+					virtual void set_pixel(
+						__in e65::interface::system::memory &memory,
+						__in uint32_t x,
+						__in uint32_t y,
+						__in int color
+						) = 0;
 			};
 		}
 	}
