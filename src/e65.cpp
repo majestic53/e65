@@ -349,6 +349,7 @@ e65_command(
 
 	try {
 		uint16_t address;
+		e65::runtime &instance = e65::runtime::acquire();
 
 		if(!request || !response) {
 			THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_ARGUMENT, "%p, %p", request, response);
@@ -360,14 +361,14 @@ e65_command(
 			case E65_BREAKPOINT_CLEAR:
 				address = request->address;
 
-				response->result = (e65::runtime::acquire().breakpoint_clear(address) ? EXIT_SUCCESS : EXIT_FAILURE);
+				response->result = (instance.breakpoint_clear(address) ? EXIT_SUCCESS : EXIT_FAILURE);
 				if(response->result != EXIT_SUCCESS) {
 					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Failed to clear breakpoint", "%u(%04x)",
 						address, address);
 				}
 				break;
 			case E65_BREAKPOINT_CLEAR_ALL:
-				e65::runtime::acquire().breakpoint_clear_all();
+				instance.breakpoint_clear_all();
 				break;
 			case E65_BREAKPOINT_LIST:
 				response->result = e65_breakpoint_list(&response->payload.literal);
@@ -375,7 +376,7 @@ e65_command(
 			case E65_BREAKPOINT_SET:
 				address = request->address;
 
-				response->result = (e65::runtime::acquire().breakpoint_set(address) ? EXIT_SUCCESS : EXIT_FAILURE);
+				response->result = (instance.breakpoint_set(address) ? EXIT_SUCCESS : EXIT_FAILURE);
 				if(response->result != EXIT_SUCCESS) {
 					E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_WARNING, "Failed to set breakpoint", "%u(%04x)",
 						address, address);
@@ -385,108 +386,108 @@ e65_command(
 				response->result = e65_dump(&response->payload.literal, request->address, request->payload.word);
 				break;
 			case E65_MEMORY_READ:
-				response->payload.byte = e65::runtime::acquire().bus().memory().read(request->address);
+				response->payload.byte = instance.bus().memory().read(request->address);
 				break;
 			case E65_MEMORY_READ_WORD:
-				response->payload.word = e65::runtime::acquire().bus().memory().read_word(request->address);
+				response->payload.word = instance.bus().memory().read_word(request->address);
 				break;
 			case E65_MEMORY_WRITE:
-				e65::runtime::acquire().bus().memory().write(request->address, request->payload.byte);
+				instance.bus().memory().write(request->address, request->payload.byte);
 				break;
 			case E65_MEMORY_WRITE_WORD:
-				e65::runtime::acquire().bus().memory().write_word(request->address, request->payload.word);
+				instance.bus().memory().write_word(request->address, request->payload.word);
 				break;
 			case E65_PROCESSOR_ACCUMULATOR:
-				response->payload.byte = e65::runtime::acquire().bus().processor().accumulator();
+				response->payload.byte = instance.bus().processor().accumulator();
 				break;
 			case E65_PROCESSOR_ACCUMULATOR_SET:
-				e65::runtime::acquire().bus().processor().set_accumulator(request->payload.byte);
+				instance.bus().processor().set_accumulator(request->payload.byte);
 				break;
 			case E65_PROCESSOR_BREAK:
-				result = e65::runtime::acquire().debug_break();
+				result = instance.debug_break();
 				break;
 			case E65_PROCESSOR_CORE:
 				response->result = e65_core(&response->payload.literal);
 				break;
 			case E65_PROCESSOR_CYCLE:
-				response->payload.dword = e65::runtime::acquire().bus().processor().cycle();
+				response->payload.dword = instance.bus().processor().cycle();
 				break;
 			case E65_PROCESSOR_DISASSEMBLE:
 				response->result = e65_disassemble(&response->payload.literal, request->address, request->payload.word);
 				break;
 			case E65_PROCESSOR_FLAGS:
-				response->payload.byte = e65::runtime::acquire().bus().processor().flags();
+				response->payload.byte = instance.bus().processor().flags();
 				break;
 			case E65_PROCESSOR_FLAGS_SET:
-				e65::runtime::acquire().bus().processor().set_flags(request->payload.byte);
+				instance.bus().processor().set_flags(request->payload.byte);
 				break;
 			case E65_PROCESSOR_INDEX_X:
-				response->payload.byte = e65::runtime::acquire().bus().processor().index_x();
+				response->payload.byte = instance.bus().processor().index_x();
 				break;
 			case E65_PROCESSOR_INDEX_X_SET:
-				e65::runtime::acquire().bus().processor().set_index_x(request->payload.byte);
+				instance.bus().processor().set_index_x(request->payload.byte);
 				break;
 			case E65_PROCESSOR_INDEX_Y:
-				response->payload.byte = e65::runtime::acquire().bus().processor().index_y();
+				response->payload.byte = instance.bus().processor().index_y();
 				break;
 			case E65_PROCESSOR_INDEX_Y_SET:
-				e65::runtime::acquire().bus().processor().set_index_y(request->payload.byte);
+				instance.bus().processor().set_index_y(request->payload.byte);
 				break;
 			case E65_PROCESSOR_PROGRAM_COUNTER:
-				response->payload.word = e65::runtime::acquire().bus().processor().program_counter();
+				response->payload.word = instance.bus().processor().program_counter();
 				break;
 			case E65_PROCESSOR_PROGRAM_COUNTER_SET:
-				e65::runtime::acquire().bus().processor().set_program_counter(request->payload.word);
+				instance.bus().processor().set_program_counter(request->payload.word);
 				break;
 			case E65_PROCESSOR_RUN:
-				result= e65::runtime::acquire().debug_run();
+				result= instance.debug_run();
 				break;
 			case E65_PROCESSOR_STACK_POINTER:
-				response->payload.byte = e65::runtime::acquire().bus().processor().stack_pointer();
+				response->payload.byte = instance.bus().processor().stack_pointer();
 				break;
 			case E65_PROCESSOR_STACK_POINTER_SET:
-				e65::runtime::acquire().bus().processor().set_stack_pointer(request->payload.byte);
+				instance.bus().processor().set_stack_pointer(request->payload.byte);
 				break;
 			case E65_PROCESSOR_STOP:
-				e65::runtime::acquire().bus().processor().set_stop(true);
+				instance.bus().processor().set_stop(true);
 				break;
 			case E65_PROCESSOR_STOP_CLEAR:
-				e65::runtime::acquire().bus().processor().set_stop(false);
+				instance.bus().processor().set_stop(false);
 				break;
 			case E65_PROCESSOR_STOPPED:
-				response->payload.dword = e65::runtime::acquire().bus().processor().stopped();
+				response->payload.dword = instance.bus().processor().stopped();
 				break;
 			case E65_PROCESSOR_WAIT:
-				e65::runtime::acquire().bus().processor().set_wait(true);
+				instance.bus().processor().set_wait(true);
 				break;
 			case E65_PROCESSOR_WAIT_CLEAR:
-				e65::runtime::acquire().bus().processor().set_wait(false);
+				instance.bus().processor().set_wait(false);
 				break;
 			case E65_PROCESSOR_WAITING:
-				response->payload.dword = e65::runtime::acquire().bus().processor().waiting();
+				response->payload.dword = instance.bus().processor().waiting();
 				break;
 			case E65_VIDEO_FRAME:
-				response->payload.dword = e65::runtime::acquire().bus().video().frame();
+				response->payload.dword = instance.bus().video().frame();
 				break;
 			case E65_VIDEO_FRAME_CYCLE:
-				response->payload.dword = e65::runtime::acquire().bus().video().frame_cycles();
+				response->payload.dword = instance.bus().video().frame_cycles();
 				break;
 			case E65_VIDEO_FREQUENCY:
-				response->payload.dword = e65::runtime::acquire().bus().video().display().frequency();
+				response->payload.dword = instance.bus().video().display().frequency();
 				break;
 			case E65_VIDEO_FULLSCREEN:
-				e65::runtime::acquire().bus().video().display().set_fullscreen(request->payload.dword);
+				instance.bus().video().display().set_fullscreen(request->payload.dword);
 				break;
 			case E65_VIDEO_HIDE:
-				e65::runtime::acquire().bus().video().display().set_hidden(request->payload.dword);
+				instance.bus().video().display().set_hidden(request->payload.dword);
 				break;
 			case E65_VIDEO_PIXEL:
-				response->payload.byte = e65::runtime::acquire().bus().pixel(request->address & UINT8_MAX,
+				response->payload.byte = instance.bus().video().pixel(instance.bus().memory(), request->address & UINT8_MAX,
 					(request->address >> CHAR_BIT) & UINT8_MAX);
 				break;
 			case E65_VIDEO_PIXEL_SET:
-				e65::runtime::acquire().bus().set_pixel(request->address & UINT8_MAX, (request->address >> CHAR_BIT) & UINT8_MAX,
-					request->payload.byte);
+				instance.bus().video().set_pixel(instance.bus().memory(), request->address & UINT8_MAX,
+					(request->address >> CHAR_BIT) & UINT8_MAX, request->payload.byte);
 				break;
 			default:
 				THROW_E65_EXCEPTION_FORMAT(E65_EXCEPTION_COMMAND, "%u(%s)", command, E65_COMMAND_STRING(command));

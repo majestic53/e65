@@ -294,26 +294,6 @@ namespace e65 {
 			E65_TRACE_EXIT();
 		}
 
-		int
-		bus::pixel(
-			__in uint32_t x,
-			__in uint32_t y
-			) const
-		{
-			int result;
-
-			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}", x, y);
-
-			if(!e65::type::singleton<e65::system::bus>::initialized()) {
-				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
-			}
-
-			result = m_video.pixel(m_memory, x, y);
-
-			E65_TRACE_EXIT_FORMAT("Result=%i(%s)", result, E65_COLOR_STRING(result));
-			return result;
-		}
-
 		e65::interface::system::processor &
 		bus::processor(void)
 		{
@@ -341,24 +321,6 @@ namespace e65 {
 			m_input.step(m_memory);
 			m_processor.reset(m_memory);
 			m_video.step(m_memory);
-
-			E65_TRACE_EXIT();
-		}
-
-		void
-		bus::set_pixel(
-			__in uint32_t x,
-			__in uint32_t y,
-			__in int color
-			)
-		{
-			E65_TRACE_ENTRY_FORMAT("Position={%u, %u}, Color=%u(%s)", x, y, color, E65_COLOR_STRING(color));
-
-			if(!e65::type::singleton<e65::system::bus>::initialized()) {
-				THROW_E65_SYSTEM_BUS_EXCEPTION(E65_SYSTEM_BUS_EXCEPTION_UNINITIALIZED);
-			}
-
-			m_video.set_pixel(m_memory, x, y, color);
 
 			E65_TRACE_EXIT();
 		}
