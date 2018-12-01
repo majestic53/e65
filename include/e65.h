@@ -25,22 +25,17 @@
  * ========================================================
  */
 
+/* Command enumeration */
 enum {
-
-	/* Breakpoint commands */
 	E65_BREAKPOINT_CLEAR = 0,		/* Remove a breakpoint from the current sesion */
 	E65_BREAKPOINT_CLEAR_ALL,		/* Remove all breakpoints from the current session */
 	E65_BREAKPOINT_LIST,			/* List all breakpoints in the current session (caller must free response) */
 	E65_BREAKPOINT_SET,			/* Add a breakpoint to the current session */
-
-	/* Memory commands */
 	E65_MEMORY_DUMP,			/* Dump memory at a specified address to offset (caller must free response) */
 	E65_MEMORY_READ,			/* Read a byte from a specified memory address */
 	E65_MEMORY_READ_WORD,			/* Read a word from a specified memory address */
 	E65_MEMORY_WRITE,			/* Write a byte to a specified memory address */
 	E65_MEMORY_WRITE_WORD,			/* Write a word to a specified memory address */
-
-	/* Processor commands */
 	E65_PROCESSOR_ACCUMULATOR,		/* Retrieve the processors accumulator register */
 	E65_PROCESSOR_ACCUMULATOR_SET,		/* Set the processors accumulator register */
 	E65_PROCESSOR_BREAK,			/* Stop an actively running processor */
@@ -64,8 +59,6 @@ enum {
 	E65_PROCESSOR_WAIT,			/* Set the processors wait flag */
 	E65_PROCESSOR_WAIT_CLEAR,		/* Clear the processors wait flag */
 	E65_PROCESSOR_WAITING,			/* Retrieve the processor wait flag */
-
-	/* Video commands */
 	E65_VIDEO_FRAME,			/* Retrieve the video frame count */
 	E65_VIDEO_FRAME_CYCLE,			/* Retrieve the video frame cycle count */
 	E65_VIDEO_FREQUENCY,			/* Retrieve the video frequency (Hz) */
@@ -75,19 +68,7 @@ enum {
 	E65_VIDEO_PIXEL_SET,			/* Set a video display pixel color */
 };
 
-typedef struct {
-	unsigned short address;			/* Command debug address */
-	int result;				/* Command debug result (EXIT_SUCCESS or EXIT_FAILURE) */
-
-
-	union {
-		unsigned char byte;
-		unsigned short word;
-		unsigned int dword;
-		char *literal;
-	} payload;				/* Command debug payload */
-} e65_debug_t;
-
+/* Event enumeration */
 enum {
 	E65_EVENT_BREAK = 0,			/* Encountered processor break command (BRK) */
 	E65_EVENT_BREAKPOINT,			/* Encountered breakpoint */
@@ -97,10 +78,24 @@ enum {
 	E65_EVENT_WAIT,				/* Encountered processor wait command (WAI) */
 };
 
+/* State enumeration */
 enum {
 	E65_STATE_INACTIVE = 0,			/* Library is inactive */
 	E65_STATE_ACTIVE,			/* Library is active */
 };
+
+/* Command debug struture */
+typedef struct {
+	unsigned short address;			/* Command debug address */
+	int result;				/* Command debug result (EXIT_SUCCESS or EXIT_FAILURE) */
+
+	union {
+		unsigned char byte;
+		unsigned short word;
+		unsigned int dword;
+		char *literal;
+	} payload;				/* Command debug payload */
+} e65_debug_t;
 
 /* Event handler */
 typedef void (*e65_event_handler)(int type, unsigned short address);
@@ -116,7 +111,7 @@ extern "C" {
  */
 
 /**
- * Library initialization routine
+ * Initialization routine
  * @brief This routine creates a new library session, and must be called before calling any runtime routines
  * @param None
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -124,7 +119,7 @@ extern "C" {
 extern int e65_initialize(void);
 
 /**
- * Library uninitialization routine
+ * Uninitialization routine
  * @brief This routine destroys an active library session, and must be called after initialization and all runtime routines
  * @param None
  * @return None
@@ -138,7 +133,7 @@ extern void e65_uninitialize(void);
  */
 
 /**
- * Library runtime interrupt routine
+ * Runtime interrupt routine
  * @brief This routine allows the caller to interrupt an active library session
  * @param maskable A flag that defines the interrupt as either maskable=true or non-maskable=false (ie. IRQ=true, NMI=false)
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -146,7 +141,7 @@ extern void e65_uninitialize(void);
 extern int e65_interrupt(int maskable);
 
 /**
- * Library runtime register handler routine
+ * Runtime register handler routine
  * @brief This routine allows the caller to register an event handler for an active library session
  * @param handler A caller defined event handler routine
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -154,7 +149,7 @@ extern int e65_interrupt(int maskable);
 extern int e65_register_handler(e65_event_handler handler);
 
 /**
- * Library runtime reset routine
+ * Runtime reset routine
  * @brief This routine allows the caller to reset an active library session
  * @param None
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -162,7 +157,7 @@ extern int e65_register_handler(e65_event_handler handler);
 extern int e65_reset(void);
 
 /**
- * Library runtime run routine
+ * Runtime run routine
  * @brief This routine allows the caller to run a binary/ihex file in an active library session
  * @param path A pointer to a valid, caller allocated file path (Supports binary (.bin) and Intel Hex (.hex) formats)
  * @param hex A flag that defines whether the file is a binary or ihex file (ie. binary=0, ihex=1)
@@ -172,7 +167,7 @@ extern int e65_reset(void);
 extern int e65_run(const char *path, int hex, int debug);
 
 /**
- * Library runtime state routine
+ * Runtime state routine
  * @brief This routine allows the caller to retrieve a library session state
  * @param state A pointer to a valid integer, which will hold the library state
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -180,7 +175,7 @@ extern int e65_run(const char *path, int hex, int debug);
 extern int e65_state(int *state);
 
 /**
- * Library runtime terminate routine
+ * Runtime terminate routine
  * @brief This routine allows the caller to terminate an active library session
  * @param None
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -194,7 +189,7 @@ extern int e65_terminate(void);
  */
 
 /**
- * Library debug command routine
+ * Debug command routine
  * @brief This routine allows the caller to issue commands to an active library session
  * @param command Caller requested command
  * @param request A pointer to a valid, caller allocated request structure
@@ -204,7 +199,7 @@ extern int e65_terminate(void);
 extern int e65_debug_command(int command, const e65_debug_t *request, e65_debug_t *response);
 
 /**
- * Library debug step routine
+ * Debug step routine
  * @brief This routine allows the caller to step an active library session
  * @param offset Number of steps
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -212,7 +207,7 @@ extern int e65_debug_command(int command, const e65_debug_t *request, e65_debug_
 extern int e65_debug_step(int offset);
 
 /**
- * Library debug step frame routine
+ * Debug step frame routine
  * @brief This routine allows the caller to step an active library session through a frame
  * @param offset Number of frames
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
@@ -226,7 +221,7 @@ extern int e65_debug_step_frame(int offset);
  */
 
 /**
- * Library error routine
+ * Error routine
  * @brief This routine returns a string containing the last error
  * @param None
  * @return A string containing the last error
@@ -234,7 +229,7 @@ extern int e65_debug_step_frame(int offset);
 extern const char *e65_error(void);
 
 /**
- * Library version routine
+ * Version routine
  * @brief This routine returns the library version information
  * @param major A pointer to a valid integer, which will hold the library major version
  * @param minor A pointer to a valid integer, which will hold the library minor version
@@ -243,7 +238,7 @@ extern const char *e65_error(void);
 extern void e65_version(int *major, int *minor);
 
 /**
- * Library version as string routine
+ * Version as string routine
  * @brief This routine returns a string containing the library version
  * @param None
  * @return A string containing the library version
