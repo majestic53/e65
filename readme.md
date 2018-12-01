@@ -19,7 +19,7 @@ __NOTE__: Tested with the Clang C++ compiler. Modification to the makefiles migh
 Run the following command from the projects root directory:
 
 ```
-make release
+$ make release
 ```
 
 To build with tracing enabled, run the following command from the project's root directory:
@@ -36,7 +36,7 @@ Usage
 Launch from the project root directory:
 
 ```
-./bin/e65 [ARGS]
+$ ./bin/e65 [ARGS]
 ```
 
 ### Interface
