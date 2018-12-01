@@ -429,6 +429,7 @@ namespace e65 {
 		std::ifstream file;
 		std::stringstream title;
 		std::vector<uint8_t> data;
+		float frame_frequency, frame_rate;
 		uint32_t begin = 0, current = 0, previous = 0;
 
 		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
@@ -470,6 +471,14 @@ namespace e65 {
 			m_bus.video().display().set_hidden(true);
 		}
 
+		m_bus.video().display().show();
+
+		frame_frequency = m_bus.video().display().frequency();
+		frame_rate = (E65_MILLISECONDS_PER_SECOND / frame_frequency);
+
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime frame", "Frequency=%.1f Hz, Rate=%.1f ms", frame_frequency,
+			frame_rate);
+
 		m_running = true;
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop entry");
@@ -480,10 +489,9 @@ namespace e65 {
 
 			rate = (end - begin);
 			if(rate >= E65_MILLISECONDS_PER_SECOND) {
-				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / E65_RUNTIME_FRAME_RATE));
+				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / frame_frequency));
 
-				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime framerate", "%.1f",
-					(rate > 0.f) ? rate : 0.f);
+				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Runtime framerate", "%.1f", (rate > 0.f) ? rate : 0.f);
 
 				m_bus.video().display().set_frame_rate((rate > 0.f) ? rate : 0.f);
 				begin = end;
@@ -503,8 +511,8 @@ namespace e65 {
 			m_bus.video().display().show();
 
 			delta = (SDL_GetTicks() - end);
-			if(delta < E65_RUNTIME_FRAME_DELTA) {
-				SDL_Delay(E65_RUNTIME_FRAME_DELTA - delta);
+			if(delta < frame_rate) {
+				SDL_Delay(frame_rate - delta);
 			}
 
 			++current;

@@ -86,6 +86,8 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Data[%u]=%p, Hex=%x, Origin=%u(%04x)", data.size(), &data, hex, origin, origin);
 
 			m_memory.clear();
+			m_input.clear(m_memory);
+			m_video.clear(m_memory);
 
 			E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Bus loading", "%s, %.1f KB (%u bytes)", hex ? "Hex" : "Binary",
 				data.size() / E65_BYTES_PER_KBYTE, data.size());
@@ -96,10 +98,8 @@ namespace e65 {
 				load_binary(data, origin);
 			}
 
-			m_input.clear(m_memory);
-			m_video.clear(m_memory);
-
 			m_processor.reset(m_memory);
+			m_video.step(m_memory);
 
 			E65_TRACE_EXIT();
 		}
