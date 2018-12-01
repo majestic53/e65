@@ -337,10 +337,10 @@ e65_dump(
 }
 
 int
-e65_command(
+e65_debug_command(
 	__in int command,
-	__in const e65_t *request,
- 	__in e65_t *response
+	__in const e65_debug_t *request,
+	__in e65_debug_t *response
 	)
 {
 	int result = EXIT_SUCCESS;
@@ -506,6 +506,52 @@ e65_command(
 	return result;
 }
 
+int
+e65_debug_step(
+	__in int offset
+	)
+{
+	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
+
+	try {
+		result = (e65::runtime::acquire().debug_step(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
+	} catch(e65::type::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
+int
+e65_debug_step_frame(
+	__in int offset
+	)
+{
+	int result = EXIT_SUCCESS;
+
+	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
+
+	try {
+		result = (e65::runtime::acquire().debug_step_frame(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
+	} catch(e65::type::exception &exc) {
+		g_error = exc.to_string();
+		result = EXIT_FAILURE;
+	} catch(std::exception &exc) {
+		g_error = exc.what();
+		result = EXIT_FAILURE;
+	}
+
+	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
+	return result;
+}
+
 const char *
 e65_error(void)
 {
@@ -558,7 +604,7 @@ e65_interrupt(
 
 int
 e65_register_handler(
-	__in e65_cb handler
+	__in e65_event_handler handler
 	)
 {
 	int result = EXIT_SUCCESS;
@@ -644,52 +690,6 @@ e65_state(
 		}
 
 		*state = (e65::runtime::acquire().running() ? E65_STATE_ACTIVE : E65_STATE_INACTIVE);
-	} catch(e65::type::exception &exc) {
-		g_error = exc.to_string();
-		result = EXIT_FAILURE;
-	} catch(std::exception &exc) {
-		g_error = exc.what();
-		result = EXIT_FAILURE;
-	}
-
-	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
-	return result;
-}
-
-int
-e65_step(
-	__in int offset
-	)
-{
-	int result = EXIT_SUCCESS;
-
-	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
-
-	try {
-		result = (e65::runtime::acquire().debug_step(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
-	} catch(e65::type::exception &exc) {
-		g_error = exc.to_string();
-		result = EXIT_FAILURE;
-	} catch(std::exception &exc) {
-		g_error = exc.what();
-		result = EXIT_FAILURE;
-	}
-
-	E65_TRACE_EXIT_FORMAT("Result=%u(%x)", result, result);
-	return result;
-}
-
-int
-e65_step_frame(
-	__in int offset
-	)
-{
-	int result = EXIT_SUCCESS;
-
-	E65_TRACE_ENTRY_FORMAT("Offset=%i", offset);
-
-	try {
-		result = (e65::runtime::acquire().debug_step_frame(offset) ? EXIT_SUCCESS : EXIT_FAILURE);
 	} catch(e65::type::exception &exc) {
 		g_error = exc.to_string();
 		result = EXIT_FAILURE;

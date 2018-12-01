@@ -364,7 +364,7 @@ namespace e65 {
 								m_bus.video().display().show();
 								break;
 							default:
-								m_bus.input().key(m_bus.memory(), value);
+								m_bus.input().key(m_bus.memory(), event.key.keysym.sym);
 								break;
 						}
 					}
@@ -384,7 +384,7 @@ namespace e65 {
 
 	bool
 	runtime::register_handler(
-		__in e65_cb handler
+		__in e65_event_handler handler
 		)
 	{
 		bool result = true;

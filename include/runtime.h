@@ -68,7 +68,7 @@ namespace e65 {
 				);
 
 			bool register_handler(
-				__in e65_cb handler
+				__in e65_event_handler handler
 				);
 
 			bool reset(void);
@@ -127,7 +127,7 @@ namespace e65 {
 
 			bool m_debug_running;
 
-			e65_cb m_handler;
+			e65_event_handler m_handler;
 
 			bool m_running;
 

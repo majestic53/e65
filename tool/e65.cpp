@@ -265,7 +265,7 @@ prompt_command(
 	)
 {
 	std::stringstream stream;
-	e65_t request = {}, response = {};
+	e65_debug_t request = {}, response = {};
 	int id, index = 0, result = EXIT_SUCCESS, value;
 
 	terminate = false;
@@ -281,11 +281,11 @@ prompt_command(
 				id = E65_BREAKPOINT_CLEAR_ALL;
 			}
 
-			result = e65_command(id, &request, &response);
+			result = e65_debug_command(id, &request, &response);
 			break;
 		case E65_COMMAND_BREAKPOINT_LIST:
 
-			result = e65_command(E65_BREAKPOINT_LIST, &request, &response);
+			result = e65_debug_command(E65_BREAKPOINT_LIST, &request, &response);
 			if(result == EXIT_SUCCESS) {
 
 				char *literal = response.payload.literal;
@@ -304,7 +304,7 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.address;
 
-			result = e65_command(E65_BREAKPOINT_SET, &request, &response);
+			result = e65_debug_command(E65_BREAKPOINT_SET, &request, &response);
 			break;
 		case E65_COMMAND_MEMORY_DUMP:
 			stream << std::hex << arguments.front();
@@ -315,7 +315,7 @@ prompt_command(
 			stream << std::hex << arguments.back();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_MEMORY_DUMP, &request, &response);
+			result = e65_debug_command(E65_MEMORY_DUMP, &request, &response);
 			if(result == EXIT_SUCCESS) {
 
 				char *literal = response.payload.literal;
@@ -334,7 +334,7 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.address;
 
-			result = e65_command(E65_MEMORY_READ, &request, &response);
+			result = e65_debug_command(E65_MEMORY_READ, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
@@ -343,7 +343,7 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.address;
 
-			result = e65_command(E65_MEMORY_READ_WORD, &request, &response);
+			result = e65_debug_command(E65_MEMORY_READ_WORD, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
 			}
@@ -357,7 +357,7 @@ prompt_command(
 			stream << std::hex << arguments.back();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_MEMORY_WRITE, &request, &response);
+			result = e65_debug_command(E65_MEMORY_WRITE, &request, &response);
 			break;
 		case E65_COMMAND_MEMORY_WRITE_WORD:
 			stream << std::hex << arguments.front();
@@ -368,11 +368,11 @@ prompt_command(
 			stream << std::hex << arguments.back();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_MEMORY_WRITE_WORD, &request, &response);
+			result = e65_debug_command(E65_MEMORY_WRITE_WORD, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_ACCUMULATOR:
 
-			result = e65_command(E65_PROCESSOR_ACCUMULATOR, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_ACCUMULATOR, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
@@ -381,14 +381,14 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_ACCUMULATOR_SET, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_ACCUMULATOR_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_BREAK:
-			result = e65_command(E65_PROCESSOR_BREAK, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_BREAK, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_CORE:
 
-			result = e65_command(E65_PROCESSOR_CORE, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_CORE, &request, &response);
 			if(result == EXIT_SUCCESS) {
 
 				char *literal = response.payload.literal;
@@ -406,7 +406,7 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_CYCLE:
 
-			result = e65_command(E65_PROCESSOR_CYCLE, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_CYCLE, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << response.payload.dword << std::endl;
 			}
@@ -420,7 +420,7 @@ prompt_command(
 			stream << std::hex << arguments.back();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_DISASSEMBLE, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_DISASSEMBLE, &request, &response);
 			if(result == EXIT_SUCCESS) {
 
 				char *literal = response.payload.literal;
@@ -437,7 +437,7 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_FLAGS:
 
-			result = e65_command(E65_PROCESSOR_FLAGS, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_FLAGS, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				int flag;
 
@@ -454,11 +454,11 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_FLAGS_SET, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_FLAGS_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_INDEX_X:
 
-			result = e65_command(E65_PROCESSOR_INDEX_X, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_INDEX_X, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
@@ -467,11 +467,11 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_INDEX_X_SET, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_INDEX_X_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_INDEX_Y:
 
-			result = e65_command(E65_PROCESSOR_INDEX_Y, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_INDEX_Y, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
@@ -480,7 +480,7 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_INDEX_Y_SET, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_INDEX_Y_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_IRQ:
 		case E65_COMMAND_PROCESSOR_NMI:
@@ -488,7 +488,7 @@ prompt_command(
 			break;
 		case E65_COMMAND_PROCESSOR_PROGRAM_COUNTER:
 
-			result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_PROGRAM_COUNTER, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint16_t, response.payload.word) << std::endl;
 			}
@@ -497,17 +497,17 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_PROGRAM_COUNTER_SET, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_PROGRAM_COUNTER_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_RESET:
 			result = e65_reset();
 			break;
 		case E65_COMMAND_PROCESSOR_RUN:
-			result = e65_command(E65_PROCESSOR_RUN, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_RUN, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_STACK_POINTER:
 
-			result = e65_command(E65_PROCESSOR_STACK_POINTER, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_STACK_POINTER, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << E65_STRING_HEX(uint8_t, response.payload.byte) << std::endl;
 			}
@@ -516,49 +516,49 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.word;
 
-			result = e65_command(E65_PROCESSOR_STACK_POINTER_SET, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_STACK_POINTER_SET, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_STEP:
 			stream << std::hex << arguments.front();
 			stream >> value;
 
-			result = e65_step(value);
+			result = e65_debug_step(value);
 			break;
 		case E65_COMMAND_PROCESSOR_STEP_FRAME:
 			stream << std::hex << arguments.front();
 			stream >> value;
 
-			result = e65_step_frame(value);
+			result = e65_debug_step_frame(value);
 			break;
 		case E65_COMMAND_PROCESSOR_STOP:
-			result = e65_command(E65_PROCESSOR_STOP, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_STOP, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_STOP_CLEAR:
-			result = e65_command(E65_PROCESSOR_STOP_CLEAR, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_STOP_CLEAR, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_WAIT:
-			result = e65_command(E65_PROCESSOR_WAIT, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_WAIT, &request, &response);
 			break;
 		case E65_COMMAND_PROCESSOR_WAIT_CLEAR:
-			result = e65_command(E65_PROCESSOR_WAIT_CLEAR, &request, &response);
+			result = e65_debug_command(E65_PROCESSOR_WAIT_CLEAR, &request, &response);
 			break;
 		case E65_COMMAND_VIDEO_FRAME:
 
-			result = e65_command(E65_VIDEO_FRAME, &request, &response);
+			result = e65_debug_command(E65_VIDEO_FRAME, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << response.payload.dword << std::endl;
 			}
 			break;
 		case E65_COMMAND_VIDEO_FRAME_CYCLE:
 
-			result = e65_command(E65_VIDEO_FRAME_CYCLE, &request, &response);
+			result = e65_debug_command(E65_VIDEO_FRAME_CYCLE, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << response.payload.dword << std::endl;
 			}
 			break;
 		case E65_COMMAND_VIDEO_FREQUENCY:
 
-			result = e65_command(E65_VIDEO_FREQUENCY, &request, &response);
+			result = e65_debug_command(E65_VIDEO_FREQUENCY, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << response.payload.dword << std::endl;
 			}
@@ -567,13 +567,13 @@ prompt_command(
 			stream << std::hex << arguments.front();
 			stream >> request.payload.dword;
 
-			result = e65_command(E65_VIDEO_FULLSCREEN, &request, &response);
+			result = e65_debug_command(E65_VIDEO_FULLSCREEN, &request, &response);
 			break;
 		case E65_COMMAND_VIDEO_HIDE:
 			stream << std::hex << arguments.front();
 			stream >> request.payload.dword;
 
-			result = e65_command(E65_VIDEO_HIDE, &request, &response);
+			result = e65_debug_command(E65_VIDEO_HIDE, &request, &response);
 			break;
 		case E65_COMMAND_VIDEO_PIXEL:
 			stream << std::dec << arguments.front();
@@ -586,7 +586,7 @@ prompt_command(
 			stream >> value;
 			request.address |= (value << CHAR_BIT);
 
-			result = e65_command(E65_VIDEO_PIXEL, &request, &response);
+			result = e65_debug_command(E65_VIDEO_PIXEL, &request, &response);
 			if(result == EXIT_SUCCESS) {
 				std::cout << (int) response.payload.byte << " (" << E65_COLOR_STRING(response.payload.byte) << ")" << std::endl;
 			}
@@ -608,7 +608,7 @@ prompt_command(
 			stream >> value;
 			request.payload.byte = value;
 
-			result = e65_command(E65_VIDEO_PIXEL_SET, &request, &response);
+			result = e65_debug_command(E65_VIDEO_PIXEL_SET, &request, &response);
 			break;
 		case E65_COMMAND_EXIT:
 			terminate = true;

@@ -76,21 +76,17 @@ enum {
 };
 
 typedef struct {
+	unsigned short address;			/* Command debug address */
+	int result;				/* Command debug result (EXIT_SUCCESS or EXIT_FAILURE) */
 
-	/* Command address */
-	unsigned short address;
 
-	/* Command return code (EXIT_SUCCESS on success, EXIT_FAILURE otherwise) */
-	int result;
-
-	/* Command payload */
 	union {
 		unsigned char byte;
 		unsigned short word;
 		unsigned int dword;
 		char *literal;
-	} payload;
-} e65_t;
+	} payload;				/* Command debug payload */
+} e65_debug_t;
 
 enum {
 	E65_EVENT_BREAK = 0,			/* Encountered processor break command (BRK) */
@@ -106,8 +102,8 @@ enum {
 	E65_STATE_ACTIVE,			/* Library is active */
 };
 
-/* Callback handler */
-typedef void (*e65_cb)(int type, unsigned short address);
+/* Event handler */
+typedef void (*e65_event_handler)(int type, unsigned short address);
 
 #ifdef __cplusplus
 extern "C" {
@@ -155,7 +151,7 @@ extern int e65_interrupt(int maskable);
  * @param handler A caller defined event handler routine
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_register_handler(e65_cb handler);
+extern int e65_register_handler(e65_event_handler handler);
 
 /**
  * Library runtime reset routine
@@ -198,30 +194,30 @@ extern int e65_terminate(void);
  */
 
 /**
- * Library runtime command routine
+ * Library debug command routine
  * @brief This routine allows the caller to issue commands to an active library session
  * @param command Caller requested command
  * @param request A pointer to a valid, caller allocated request structure
  * @param response A pointer to a valid, caller allocated response structure
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_command(int command, const e65_t *request, e65_t *response);
+extern int e65_debug_command(int command, const e65_debug_t *request, e65_debug_t *response);
 
 /**
- * Library runtime step routine
+ * Library debug step routine
  * @brief This routine allows the caller to step an active library session
  * @param offset Number of steps
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_step(int offset);
+extern int e65_debug_step(int offset);
 
 /**
- * Library runtime step frame routine
+ * Library debug step frame routine
  * @brief This routine allows the caller to step an active library session through a frame
  * @param offset Number of frames
  * @return EXIT_SUCCESS on success, EXIT_FAILURE otherwise
  */
-extern int e65_step_frame(int offset);
+extern int e65_debug_step_frame(int offset);
 
 /**
  * ========================================================

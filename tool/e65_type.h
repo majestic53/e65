@@ -221,7 +221,7 @@ static const std::string E65_COMMAND_DESC[] = {
 	"Break processor",
 	"Display processor core",
 	"Display current processor cycle",
-	"Disassemble instructions at an address for a given offset",
+	"Disassemble instructions at a given address and offset",
 	"Display processor flags",
 	"Set processor flags to given value",
 	"Display processor index-x",
