@@ -50,6 +50,32 @@ e65 [-d|-h|-i|-v] input
 -v|--version           Display version information
 ```
 
+### Example
+
+To load a binary (.bin) file into the emulator
+
+```
+$ e65 <PATH_TO_BIN_FILE>
+
+For example: e65 ./test/snake/snake.bin
+```
+
+To load an ihex (.hex) file into the emulator
+
+```
+$ e65 -i <PATH_TO_HEX_FILE>
+
+For example: e65 -i ./test/snake/snake.hex
+```
+
+To run the emulator in debug mode
+
+```
+$ e65 -d <PATH_TO_FILE>
+
+For example: e65 -d -i ./test/snake/snake.hex
+```
+
 ### Debug Interface
 
 ```
@@ -108,6 +134,11 @@ Changelog
 
 Version 0.1.1848
 ----------------
+*Updated: 11/02/2018*
+
+* Implemented adc/sbc instructions
+	* Todo: Add support for decimal mode
+
 *Updated: 11/29/2018-12/01/2018*
 
 * Additional bug fixes

@@ -467,10 +467,6 @@ namespace e65 {
 		title << E65 << " -- " << path << (m_debug ? " [Debug]" : "");
 		m_bus.video().display().set_title(title.str());
 
-		if(m_debug) {
-			m_bus.video().display().set_hidden(true);
-		}
-
 		m_bus.video().display().show();
 
 		frame_frequency = m_bus.video().display().frequency();

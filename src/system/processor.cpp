@@ -65,6 +65,31 @@ namespace e65 {
 		}
 
 		uint16_t
+		processor::calculate_add_carry(
+			__in uint8_t value
+			)
+		{
+			uint16_t result;
+
+			E65_TRACE_ENTRY_FORMAT("Value=%u(%02x)", value, value);
+
+			result = (m_accumulator + value + m_flags.carry);
+
+			if(m_flags.decimal_enable) {
+
+				// TODO: handle decimal mode
+
+				++m_cycle_last;
+			}
+
+			m_flags.carry = (result > UINT8_MAX);
+			m_flags.overflow = (((m_accumulator ^ result) & (value ^ result) & E65_BIT_HIGH) == E65_BIT_HIGH);
+
+			E65_TRACE_EXIT_FORMAT("Result=%u(%04x)", result, result);
+			return result;
+		}
+
+		uint16_t
 		processor::calculate_address(
 			__in e65::interface::system::memory &memory,
 			__in int mode,
@@ -299,13 +324,9 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_ADC), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			if(m_flags.decimal_enable) {
-				// TODO: decimal mode
-
-				++m_cycle_last;
-			} else {
-				// TODO: binary mode
-			}
+			m_accumulator = (calculate_add_carry(value) & UINT8_MAX);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
+			m_flags.zero = (m_accumulator == 0);
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_ADC, mode, boundary);
 
@@ -345,7 +366,7 @@ namespace e65 {
 			}
 
 			m_accumulator &= value;
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_AND, mode, boundary);
 
@@ -381,9 +402,9 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_ASL), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			m_flags.carry = (value & E65_BIT_HIGH);
+			m_flags.carry = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			value <<= 1;
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 
 			switch(mode) {
@@ -571,8 +592,8 @@ namespace e65 {
 			}
 
 			value &= m_accumulator;
-			m_flags.overflow = (value & (E65_BIT_HIGH >> 1));
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.overflow = ((value & (E65_BIT_HIGH >> 1)) == (E65_BIT_HIGH >> 1));
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_BIT, mode);
 
@@ -807,7 +828,7 @@ namespace e65 {
 			}
 
 			m_flags.carry = (m_accumulator >= value);
-			m_flags.sign = ((m_accumulator - value) & E65_BIT_HIGH);
+			m_flags.sign = (((m_accumulator - value) & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == value);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_CMP, mode, boundary);
 
@@ -840,7 +861,7 @@ namespace e65 {
 			}
 
 			m_flags.carry = (m_index_x >= value);
-			m_flags.sign = ((m_index_x - value) & E65_BIT_HIGH);
+			m_flags.sign = (((m_index_x - value) & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == value);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_CPX, mode);
 
@@ -873,7 +894,7 @@ namespace e65 {
 			}
 
 			m_flags.carry = (m_index_y >= value);
-			m_flags.sign = ((m_index_y - value) & E65_BIT_HIGH);
+			m_flags.sign = (((m_index_y - value) & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == value);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_CPY, mode);
 
@@ -910,7 +931,7 @@ namespace e65 {
 			}
 
 			--value;
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 
 			switch(mode) {
@@ -939,7 +960,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			--m_index_x;
-			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_x & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_DEX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -952,7 +973,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			--m_index_y;
-			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_y & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_DEY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -992,7 +1013,7 @@ namespace e65 {
 			}
 
 			m_accumulator ^= value;
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_EOR, mode, boundary);
 
@@ -1029,7 +1050,7 @@ namespace e65 {
 			}
 
 			++value;
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 
 			switch(mode) {
@@ -1058,7 +1079,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			++m_index_x;
-			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_x & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_INX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1071,7 +1092,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			++m_index_y;
-			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_y & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_INY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1168,7 +1189,7 @@ namespace e65 {
 			}
 
 			m_accumulator = value;
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_LDA, mode, boundary);
 
@@ -1204,7 +1225,7 @@ namespace e65 {
 			}
 
 			m_index_x = value;
-			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_x & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_LDX, mode, boundary);
 
@@ -1240,7 +1261,7 @@ namespace e65 {
 			}
 
 			m_index_y = value;
-			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_y & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_LDY, mode, boundary);
 
@@ -1276,9 +1297,9 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_LSR), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			m_flags.carry = (value & E65_BIT_LOW);
+			m_flags.carry = ((value & E65_BIT_LOW) == E65_BIT_LOW);
 			value >>= 1;
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 
 			switch(mode) {
@@ -1344,7 +1365,7 @@ namespace e65 {
 			}
 
 			m_accumulator |= value;
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_ORA, mode, boundary);
 
@@ -1411,7 +1432,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			m_accumulator = pop(memory);
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_PLA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1439,7 +1460,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			m_index_x = pop(memory);
-			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_x & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_PLX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1454,7 +1475,7 @@ namespace e65 {
 			E65_TRACE_ENTRY_FORMAT("Memory=%p", &memory);
 
 			m_index_y = pop(memory);
-			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_y & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_PLY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1528,14 +1549,14 @@ namespace e65 {
 			}
 
 			carry = m_flags.carry;
-			m_flags.carry = (value & E65_BIT_HIGH);
+			m_flags.carry = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			value <<= 1;
 
 			if(carry) {
 				value |= E65_BIT_LOW;
 			}
 
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 
 			switch(mode) {
@@ -1588,14 +1609,14 @@ namespace e65 {
 			}
 
 			carry = m_flags.carry;
-			m_flags.carry = (value & E65_BIT_LOW);
+			m_flags.carry = ((value & E65_BIT_LOW) == E65_BIT_LOW);
 			value >>= 1;
 
 			if(carry) {
 				value |= E65_BIT_HIGH;
 			}
 
-			m_flags.sign = (value & E65_BIT_HIGH);
+			m_flags.sign = ((value & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (value == 0);
 
 			switch(mode) {
@@ -1677,13 +1698,9 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_SBC), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			if(m_flags.decimal_enable) {
-				// TODO: decimal mode
-
-				++m_cycle_last;
-			} else {
-				// TODO: binary mode
-			}
+			m_accumulator = (calculate_add_carry(~value) & UINT8_MAX);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
+			m_flags.zero = (m_accumulator == 0);
 
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_SBC, mode, boundary);
 
@@ -1792,11 +1809,15 @@ namespace e65 {
 		}
 
 		void
-		processor::execute_stp(void)
+		processor::execute_stp(
+			__in e65::interface::runtime &runtime
+			)
 		{
-			E65_TRACE_ENTRY();
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_WARNING, "Processor stopped");
+
+			runtime.signal_event(E65_EVENT_STOP, m_program_counter);
 
 			m_stop = true;
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_STP, e65::type::E65_PCOMMAND_MODE_IMPLIED);
@@ -1889,7 +1910,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_index_x = m_accumulator;
-			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_x & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_TAX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1902,7 +1923,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_index_y = m_accumulator;
-			m_flags.sign = (m_index_y & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_y & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_y == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_TAY, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -1933,7 +1954,7 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_TRB), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			m_flags.zero = (m_accumulator & value);
+			m_flags.zero = ((m_accumulator & value) == value);
 			value &= ~m_accumulator;
 
 			switch(mode) {
@@ -1975,7 +1996,7 @@ namespace e65 {
 						"%s %s", E65_PCOMMAND_STRING(e65::type::E65_PCOMMAND_TSB), E65_PCOMMAND_MODE_STRING(mode));
 			}
 
-			m_flags.zero = (m_accumulator & value);
+			m_flags.zero = ((m_accumulator & value) == value);
 			value |= m_accumulator;
 
 			switch(mode) {
@@ -1999,7 +2020,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_index_x = m_stack_pointer;
-			m_flags.sign = (m_index_x & E65_BIT_HIGH);
+			m_flags.sign = ((m_index_x & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_index_x == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_TSX, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -2012,7 +2033,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_accumulator = m_index_x;
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_TXA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -2036,7 +2057,7 @@ namespace e65 {
 			E65_TRACE_ENTRY();
 
 			m_accumulator = m_index_y;
-			m_flags.sign = (m_accumulator & E65_BIT_HIGH);
+			m_flags.sign = ((m_accumulator & E65_BIT_HIGH) == E65_BIT_HIGH);
 			m_flags.zero = (m_accumulator == 0);
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_TYA, e65::type::E65_PCOMMAND_MODE_IMPLIED);
 
@@ -2044,11 +2065,15 @@ namespace e65 {
 		}
 
 		void
-		processor::execute_wai(void)
+		processor::execute_wai(
+			__in e65::interface::runtime &runtime
+			)
 		{
-			E65_TRACE_ENTRY();
+			E65_TRACE_ENTRY_FORMAT("Runtime=%p", &runtime);
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_WARNING, "Processor waiting for interrupt");
+
+			runtime.signal_event(E65_EVENT_WAIT, m_program_counter);
 
 			m_wait = true;
 			m_cycle_last += calculate_cycles(e65::type::E65_PCOMMAND_WAI, e65::type::E65_PCOMMAND_MODE_IMPLIED);
@@ -2444,7 +2469,7 @@ namespace e65 {
 						execute_sta(memory, mode, operand);
 						break;
 					case e65::type::E65_PCOMMAND_STP:
-						execute_stp();
+						execute_stp(runtime);
 						break;
 					case e65::type::E65_PCOMMAND_STX:
 						execute_stx(memory, mode, operand);
@@ -2480,22 +2505,13 @@ namespace e65 {
 						execute_tya();
 						break;
 					case e65::type::E65_PCOMMAND_WAI:
-						execute_wai();
+						execute_wai(runtime);
 						break;
 					default:
 						THROW_E65_SYSTEM_PROCESSOR_EXCEPTION_FORMAT(E65_SYSTEM_PROCESSOR_EXCEPTION_INVALID_CODE,
 							"[%04x] %u(%02x)=%i", address, code, code, command);
 				}
 			} else {
-
-				if(m_stop) {
-					runtime.signal_event(E65_EVENT_STOP, m_program_counter);
-				}
-
-				if(m_wait) {
-					runtime.signal_event(E65_EVENT_WAIT, m_program_counter);
-				}
-
 				execute_nop();
 			}
 
@@ -2600,7 +2616,7 @@ namespace e65 {
 			m_stop = false;
 			m_wait = false;
 
-			push_word(memory, 0);
+			push_word(memory, m_program_counter);
 
 			E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor reset");
 

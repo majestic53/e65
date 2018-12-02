@@ -1,4 +1,4 @@
-; Snake Example
+; Snake game test
 ; Code adapted from the Easy 6502 tutorial page by Nick Morgan (https://skilldrick.github.io/easy6502/)
 
 	.def applel 0x00
@@ -21,6 +21,10 @@
 
 	.def sysrandom 0xfe
 	.def syslastkey 0xff
+
+	.org 0x0200
+
+	.res 0x0400
 
 	.org 0x0600
 

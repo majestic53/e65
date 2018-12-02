@@ -119,6 +119,10 @@ namespace e65 {
 					__in const processor &other
 					) = delete;
 
+				uint16_t calculate_add_carry(
+					__in uint8_t value
+					);
+
 				uint16_t calculate_address(
 					__in e65::interface::system::memory &memory,
 					__in int mode,
@@ -409,7 +413,9 @@ namespace e65 {
 					__in uint16_t operand
 					);
 
-				void execute_stp(void);
+				void execute_stp(
+					__in e65::interface::runtime &runtime
+					);
 
 				void execute_stx(
 					__in e65::interface::system::memory &memory,
@@ -453,7 +459,9 @@ namespace e65 {
 
 				void execute_tya(void);
 
-				void execute_wai(void);
+				void execute_wai(
+					__in e65::interface::runtime &runtime
+					);
 
 				bool on_initialize(
 					__in const void *context,

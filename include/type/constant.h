@@ -35,7 +35,7 @@ namespace e65 {
 
 		#define E65_MILLISECONDS_PER_SECOND 1000.f
 
-		#define E65_PROCESSOR_FREQUENCY 1000000
+		#define E65_PROCESSOR_FREQUENCY 20000
 
 		#define E65_STRING_EMPTY "Empty"
 		#define E65_STRING_UNKNOWN "Unknown"

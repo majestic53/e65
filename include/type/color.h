@@ -78,8 +78,7 @@ namespace e65 {
 			};
 
 		#define E65_COLOR(_TYPE_) \
-			(((_TYPE_) > E65_COLOR_MAX) ? e65::type::E65_COL[e65::type::E65_COLOR_BLACK] : \
-				e65::type::E65_COL[_TYPE_])
+			e65::type::E65_COL[(_TYPE_) % E65_COLOR_MAX]
 
 		static const std::string E65_COL_STR[] = {
 			"Black", "White", "Red", "Cyan", "Purple", "Green", "Blue", "Yellow", "Orange", "Brown",
