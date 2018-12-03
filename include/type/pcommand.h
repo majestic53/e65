@@ -414,7 +414,7 @@ namespace e65 {
 			std::make_pair(0x8a, std::make_pair(e65::type::E65_PCOMMAND_TXA, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
 			std::make_pair(0x9a, std::make_pair(e65::type::E65_PCOMMAND_TXS, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
 			std::make_pair(0x98, std::make_pair(e65::type::E65_PCOMMAND_TYA, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
-			std::make_pair(0x9a, std::make_pair(e65::type::E65_PCOMMAND_WAI, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
+			std::make_pair(0xcb, std::make_pair(e65::type::E65_PCOMMAND_WAI, e65::type::E65_PCOMMAND_MODE_IMPLIED)),
 			};
 
 		static const std::map<int, std::pair<uint8_t, uint8_t>> E65_PCOMMAND_ABSOLUTE_CYCLE_MAP = {

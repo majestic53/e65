@@ -106,6 +106,11 @@ namespace e65 {
 				__in const runtime &other
 				) = delete;
 
+			void load(
+				__in const std::string &path,
+				__in bool hex
+				);
+
 			bool on_initialize(
 				__in const void *context,
 				__in size_t length
@@ -115,6 +120,8 @@ namespace e65 {
 
 			bool poll(void);
 
+			void run(void);
+
 			bool step_frame(
 				__in_opt uint32_t offset = 1
 				);
@@ -123,9 +130,17 @@ namespace e65 {
 
 			e65::system::bus &m_bus;
 
+			std::vector<uint8_t> m_data;
+
+			bool m_data_hex;
+
 			bool m_debug;
 
 			bool m_debug_running;
+
+			float m_frame_frequency;
+
+			float m_frame_rate;
 
 			e65_event_handler m_handler;
 

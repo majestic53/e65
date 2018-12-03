@@ -25,8 +25,11 @@ namespace e65 {
 	runtime::runtime(void) :
 		e65::type::singleton<e65::runtime>(e65::type::E65_SINGLETON_RUNTIME),
 		m_bus(e65::system::bus::acquire()),
+		m_data_hex(false),
 		m_debug(false),
 		m_debug_running(false),
+		m_frame_frequency(0.f),
+		m_frame_rate(0.f),
 		m_handler(nullptr),
 		m_running(false),
 		m_trace(e65::trace::acquire())
@@ -290,6 +293,45 @@ namespace e65 {
 		return result;
 	}
 
+	void
+	runtime::load(
+		__in const std::string &path,
+		__in bool hex
+		)
+	{
+		int length;
+		std::ifstream file;
+
+		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x", path.size(), E65_STRING_CHECK(path), hex);
+
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime loading", "%s, %s", m_debug ? "Debug" : "Normal",
+			E65_STRING_CHECK(path));
+
+		file = std::ifstream(path.c_str(), std::ios::binary | std::ios::in);
+		if(!file) {
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_FILE_NOT_FOUND, "%s", E65_STRING_CHECK(path));
+		}
+
+		file.seekg(0, std::ios::end);
+		length = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		if(length >= 0) {
+			m_data.resize(length);
+			file.read((char *) &m_data[0], m_data.size());
+		}
+
+		file.close();
+
+		if(length < 0) {
+			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_FILE_MALFORMED, "%s", E65_STRING_CHECK(path));
+		}
+
+		m_data_hex = hex;
+
+		E65_TRACE_EXIT();
+	}
+
 	bool
 	runtime::on_initialize(
 		__in const void *context,
@@ -357,11 +399,30 @@ namespace e65 {
 
 						value = event.key.keysym.scancode;
 						switch(value) {
+							case E65_RUNTIME_SDL_DEBUG_BREAK_KEY:
+
+								if(m_debug) {
+									debug_break();
+								}
+								break;
+							case E65_RUNTIME_SDL_DEBUG_RUN_KEY:
+
+								if(m_debug) {
+									debug_run();
+								}
+								break;
 							case E65_RUNTIME_SDL_FULLSCREEN_KEY:
 								m_bus.video().display().set_fullscreen(!m_bus.video().display().fullscreen());
 								break;
+							case E65_RUNTIME_SDL_INTERRUPT_MASKABLE_KEY:
+							case E65_RUNTIME_SDL_INTERRUPT_NON_MASKABLE_KEY:
+								m_bus.processor().interrupt(value == E65_RUNTIME_SDL_INTERRUPT_MASKABLE_KEY);
+								break;
 							case E65_RUNTIME_SDL_REFRESH_KEY:
 								m_bus.video().display().show();
+								break;
+							case E65_RUNTIME_SDL_RESET_KEY:
+								reset();
 								break;
 							default:
 								m_bus.input().key(m_bus.memory(), event.key.keysym.sym);
@@ -412,68 +473,18 @@ namespace e65 {
 
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime reset");
 
-		m_bus.reset(*this);
+		m_bus.load(m_data, m_data_hex);
 
 		E65_TRACE_EXIT_FORMAT("Result=%x", result);
 		return result;
 	}
 
 	void
-	runtime::run(
-		__in const std::string &path,
-		__in bool hex,
-		__in_opt bool debug
-		)
+	runtime::run(void)
 	{
-		int length;
-		std::ifstream file;
-		std::stringstream title;
-		std::vector<uint8_t> data;
-		float frame_frequency, frame_rate;
 		uint32_t begin = 0, current = 0, previous = 0;
 
-		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
-
-		if(!e65::type::singleton<e65::runtime>::initialized()) {
-			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
-		}
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime running", "%s, %s", debug ? "Debug" : "Normal",
-			E65_STRING_CHECK(path));
-
-		file = std::ifstream(path.c_str(), std::ios::binary | std::ios::in);
-		if(!file) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_FILE_NOT_FOUND, "%s", E65_STRING_CHECK(path));
-		}
-
-		file.seekg(0, std::ios::end);
-		length = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		if(length >= 0) {
-			data.resize(length);
-			file.read((char *) &data[0], data.size());
-		}
-
-		file.close();
-
-		if(length < 0) {
-			THROW_E65_RUNTIME_EXCEPTION_FORMAT(E65_RUNTIME_EXCEPTION_FILE_MALFORMED, "%s", E65_STRING_CHECK(path));
-		}
-
-		m_bus.load(data, hex);
-
-		m_debug = debug;
-		title << E65 << " -- " << path << (m_debug ? " [Debug]" : "");
-		m_bus.video().display().set_title(title.str());
-
-		m_bus.video().display().show();
-
-		frame_frequency = m_bus.video().display().frequency();
-		frame_rate = (E65_MILLISECONDS_PER_SECOND / frame_frequency);
-
-		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime frame", "Frequency=%.1f Hz, Rate=%.1f ms", frame_frequency,
-			frame_rate);
+		E65_TRACE_ENTRY();
 
 		m_running = true;
 
@@ -485,7 +496,7 @@ namespace e65 {
 
 			rate = (end - begin);
 			if(rate >= E65_MILLISECONDS_PER_SECOND) {
-				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / frame_frequency));
+				rate = (current - ((rate - E65_MILLISECONDS_PER_SECOND) / m_frame_frequency));
 
 				E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_VERBOSE, "Runtime framerate", "%.1f", (rate > 0.f) ? rate : 0.f);
 
@@ -507,8 +518,8 @@ namespace e65 {
 			m_bus.video().display().show();
 
 			delta = (SDL_GetTicks() - end);
-			if(delta < frame_rate) {
-				SDL_Delay(frame_rate - delta);
+			if(delta < m_frame_rate) {
+				SDL_Delay(m_frame_rate - delta);
 			}
 
 			++current;
@@ -517,6 +528,39 @@ namespace e65 {
 		E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Runtime main loop exit");
 
 		m_running = false;
+
+		E65_TRACE_EXIT();
+	}
+
+	void
+	runtime::run(
+		__in const std::string &path,
+		__in bool hex,
+		__in_opt bool debug
+		)
+	{
+		std::stringstream title;
+
+		E65_TRACE_ENTRY_FORMAT("Path[%u]=%s, Hex=%x, Debug=%x", path.size(), E65_STRING_CHECK(path), hex, debug);
+
+		if(!e65::type::singleton<e65::runtime>::initialized()) {
+			THROW_E65_RUNTIME_EXCEPTION(E65_RUNTIME_EXCEPTION_UNINITIALIZED);
+		}
+
+		m_debug = debug;
+		m_frame_frequency = m_bus.video().display().frequency();
+		m_frame_rate = (E65_MILLISECONDS_PER_SECOND / m_frame_frequency);
+
+		E65_TRACE_MESSAGE_FORMAT(e65::type::E65_LEVEL_INFORMATION, "Runtime frame", "Frequency=%.1f Hz, Rate=%.1f ms", m_frame_frequency,
+			m_frame_rate);
+
+		title << E65 << " -- " << path << (m_debug ? " [Debug]" : "");
+		m_bus.video().display().set_title(title.str());
+		m_bus.video().display().show();
+
+		load(path, hex);
+		reset();
+		run();
 
 		E65_TRACE_EXIT();
 	}
