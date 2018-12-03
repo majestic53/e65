@@ -3,6 +3,8 @@ E65
 
 A small 6502 emulator, written in C++
 
+![Demo](https://github.com/majestic53/e65/blob/master/doc/demo.png "Demo")
+
 This emulator is designed to be used along-side the [A65 assembler](https://github.com/majestic53/a65)
 
 Table of Contents
