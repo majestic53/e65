@@ -199,7 +199,7 @@ For example: dasm 600 10 will disassemble 16 instructions held at memory locatio
 These keyboard shortcuts are available in normal and debug modes (see table below for details):
 
 | Key | Description                         | Mode       |
-| --- |:-----------------------------------:| ----------:|
+| :-- | :---------------------------------- | :--------- |
 | F11 | Fullscreen display                  | Both       |
 | F5  | Refresh display                     | Both       |
 | B   | Signal break                        | Debug only |
