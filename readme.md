@@ -52,7 +52,7 @@ e65 [-d|-h|-i|-v] input
 -v|--version           Display version information
 ```
 
-### Example
+### Interface Examples
 
 To load a binary (.bin) file into the emulator:
 
@@ -98,7 +98,8 @@ as|accumulator-set                    <value>                 Set processor accu
 b|break                                                       Break processor
 c|core                                                        Display processor core
 cy|cycle                                                      Display current processor cycle
-dasm|disassemble                      <address> <offset>      Disassemble instructions at a given address and offset
+dasm|disassemble                      <address> <offset>      Disassemble instructions at a given address
+								and offset
 flg|flags                                                     Display processor flags
 flgs|flags-set                        <value>                 Set processor flags to given value
 x|index-x                                                     Display processor index-x
@@ -133,7 +134,7 @@ v|version                                                     Display version in
 q|exit                                                        Exit debug mode
 ```
 
-### Example
+### Debug Interface Examples
 
 To retrieve the processor registers:
 
@@ -193,7 +194,7 @@ $ dasm <ADDRESS> <OFFSET>
 For example: dasm 600 10 will disassemble 16 instructions held at memory location 0x0600
 ```
 
-###Keyboard Shortcuts
+### Keyboard Shortcuts
 
 These keyboard shortcuts are available in normal and debug modes (see table below for details):
 
