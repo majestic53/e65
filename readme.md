@@ -196,7 +196,7 @@ For example: dasm 600 10 will disassemble 16 instructions held at memory locatio
 
 ### Keyboard Shortcuts
 
-These keyboard shortcuts are available in normal and debug modes (see table below for details):
+These keyboard shortcuts are available in either normal, debug modes or both:
 
 | Key | Description                         | Mode       |
 | :-- | :---------------------------------- | :--------- |
