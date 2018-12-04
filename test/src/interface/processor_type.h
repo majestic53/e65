@@ -16,41 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef E65_DEFINE_H_
-#define E65_DEFINE_H_
+#ifndef E65_TEST_INTERFACE_PROCESSOR_TYPE_H_
+#define E65_TEST_INTERFACE_PROCESSOR_TYPE_H_
 
-#include <cstdint>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include "./type/color.h"
-#include "./type/constant.h"
-#include "./type/level.h"
-#include "./type/macro.h"
-#include "./type/pcommand.h"
-#include "./type/pflag.h"
+#include "../../../include/type/exception.h"
 
 namespace e65 {
 
-#ifndef __in
-	#define __in
-#endif // __in
-#ifndef __in_opt
-	#define __in_opt
-#endif // __in_opt
-#ifndef __inout
-	#define __inout
-#endif // __inout
+	namespace test {
 
-	#define E65 "E65"
+		namespace interface {
 
-	#define E65_VERSION_MAJOR 0
-	#define E65_VERSION_MINOR 2
-	#define E65_VERSION_RELEASE "alpha"
-	#define E65_VERSION_REVISION 1
-	#define E65_VERSION_WEEK 1849
+			// TODO
+		}
+	}
 }
 
-#endif // E65_DEFINE_H_
+#endif // E65_TEST_INTERFACE_PROCESSOR_TYPE_H_

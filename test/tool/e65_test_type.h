@@ -16,16 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../include/interface/processor.h"
-#include "./processor_type.h"
+#ifndef E65_TEST_TYPE_H_
+#define E65_TEST_TYPE_H_
 
-namespace e65 {
+#include "../../include/define.h"
 
-	namespace test {
+// TODO
 
-		namespace interface {
-
-			// TODO
-		}
-	}
-}
+#endif // E65_TEST_TYPE_H_

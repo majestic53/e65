@@ -16,16 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../include/interface/processor.h"
-#include "./processor_type.h"
+#include "../include/functional/processor.h"
+#include "../include/interface/processor.h"
+#include "./e65_test_type.h"
 
-namespace e65 {
+int
+main(void)
+{
+	int result = EXIT_SUCCESS;
 
-	namespace test {
+	// TODO
 
-		namespace interface {
-
-			// TODO
-		}
-	}
+	return result;
 }
