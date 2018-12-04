@@ -3,6 +3,8 @@ E65 Examples
 
 This folder contains a series of binaries/sources that have been tested with E65
 
+![Demo](https://github.com/majestic53/e65/blob/master/example/demo.png "Demo")
+
 Usage
 =====
 
