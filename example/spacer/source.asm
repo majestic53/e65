@@ -1,4 +1,4 @@
-; Spacer game test
+; Spacer game
 ; Code adapted from the 6502asm page (http://www.6502asm.com/)
 
 	.def background_color 0x0b

@@ -3,7 +3,7 @@ E65
 
 A small 6502 emulator, written in C++
 
-![Demo](https://github.com/majestic53/e65/blob/master/doc/demo.png "Demo")
+![Demo](https://github.com/majestic53/e65/blob/master/example/demo.png "Demo")
 
 This emulator is designed to be used along-side the [A65 assembler](https://github.com/majestic53/a65)
 
@@ -181,11 +181,11 @@ For example: rw fffa will read the word held at 0xfffa
 
 $ w <ADDRESS> <VALUE>
 
-For example: w fffa will write a byte to memory location 0xfffa
+For example: w fffa aa will write the byte 0xaa to memory location 0xfffa
 
 $ ww <ADDRESS> <VALUE>
 
-For example: ww fffa will write a word to memory location 0xfffa
+For example: ww fffa aabb will write the word 0xaabb to memory location 0xfffa
 ```
 
 To disassemble instructions in memory:
@@ -212,6 +212,12 @@ These keyboard shortcuts are available in either normal, debug modes or both:
 
 Changelog
 =========
+
+Version 0.1.1849
+----------------
+*Updated: 11/03/2018*
+
+* Added test suite files
 
 Version 0.1.1848
 ----------------
@@ -240,39 +246,6 @@ Version 0.1.1848
 *Updated: 11/26/2018*
 
 * Implemented jump instructions
-
-Version 0.1.1847
-----------------
-*Updated: 11/25/2018*
-
-* Implemented branch instructions
-
-*Updated: 11/24/2018*
-
-* Implemented additional processor instructions
-
-*Updated: 11/23/2108*
-
-* Added run/break debug commands
-* Added async event handlers
-* Cleaned up debug interface
-
-*Updated: 11/22/2018*
-
-* Added additional debug commands
-
-*Updated: 11/21/2018*
-
-* Added arithmetic commands
-* Minor code reorg
-
-*Updated: 11/20/2018*
-
-* Added processor implied commands
-
-*Updated: 11/19/2018*
-
-* Added processor commands
 
 *Changelog truncated (see file history for full log)*
 

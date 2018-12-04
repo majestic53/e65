@@ -1,4 +1,4 @@
-; Snake game test
+; Snake game
 ; Code adapted from the Easy 6502 tutorial page by Nick Morgan (https://skilldrick.github.io/easy6502/)
 
 	.def applel 0x00
