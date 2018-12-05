@@ -17,10 +17,10 @@
 CC=clang++
 CC_FLAGS=-march=native -std=c++17 -Wall -Werror
 DIR_BUILD=./../../build/test/
-DIR_INCLUDE_FUNCTIONAL=./../include/functional/
 DIR_INCLUDE_INTERFACE=./../include/interface/
-DIR_SRC_FUNCTIONAL=./functional/
+DIR_INCLUDE_TYPE=./../include/type/
 DIR_SRC_INTERFACE=./interface/
+DIR_SRC_TYPE=./type/
 LIB=libe65_test.a
 
 all: build archive
@@ -29,20 +29,13 @@ all: build archive
 
 archive:
 	@echo ''
-	@echo '--- BUILDING LIBRARY -----------------------'
-	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)functional_processor.o \
-		$(DIR_BUILD)interface_processor.o
+	@echo '--- BUILDING TEST LIBRARY ------------------'
+	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)interface_processor.o \
+		$(DIR_BUILD)type_fixture.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_functional build_interface
-
-### FUNCTIONAL ###
-
-build_functional: functional_processor.o
-
-functional_processor.o: $(DIR_SRC_FUNCTIONAL)processor.cpp $(DIR_INCLUDE_FUNCTIONAL)processor.h
-	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_FUNCTIONAL)processor.cpp -o $(DIR_BUILD)functional_processor.o
+build: build_interface build_type
 
 ### INTERFACE ###
 
@@ -50,3 +43,10 @@ build_interface: interface_processor.o
 
 interface_processor.o: $(DIR_SRC_INTERFACE)processor.cpp $(DIR_INCLUDE_INTERFACE)processor.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_INTERFACE)processor.cpp -o $(DIR_BUILD)interface_processor.o
+
+### TYPE ###
+
+build_type: type_fixture.o
+
+type_fixture.o: $(DIR_SRC_TYPE)fixture.cpp $(DIR_INCLUDE_TYPE)fixture.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_TYPE)fixture.cpp -o $(DIR_BUILD)type_fixture.o

@@ -215,6 +215,10 @@ Changelog
 
 Version 0.1.1849
 ----------------
+*Updated: 11/04/2018*
+
+* Added processor interface test fixture
+
 *Updated: 11/03/2018*
 
 * Added test suite files

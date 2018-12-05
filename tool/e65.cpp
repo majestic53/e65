@@ -233,7 +233,6 @@ parse(
 						<< std::endl << std::endl << display_usage(true) << std::endl;
 					result = EXIT_FAILURE;
 					goto exit;
-					break;
 			}
 		} else if(!path.empty()) {
 			std::cerr << display_version(true) << std::endl

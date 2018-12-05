@@ -93,7 +93,7 @@ reg_test:
 	@echo 'RUNNING REGRESSION TESTS'
 	@echo '============================================'
 	@echo ''
-	@echo '--- TESTS RUNNING --------------------------'
+	@echo '--- RUNNING TESTS --------------------------'
 	@cd $(DIR_BUILD_TEST) && if ./$(TEST); \
 	then \
 		echo '--- PASSED ---------------------------------'; \

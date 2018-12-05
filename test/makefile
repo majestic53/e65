@@ -45,7 +45,7 @@ init:
 lib_debug:
 	@echo ''
 	@echo '============================================'
-	@echo 'BUILDING LIBRARIES (DEBUG)'
+	@echo 'BUILDING TEST LIBRARIES (DEBUG)'
 	@echo '============================================'
 	cd $(DIR_SRC) && make $(BUILD_FLAGS_DBG) $(TRACE_FLAGS_DBG)$(TRACE) build -j $(JOB_SLOTS)
 	cd $(DIR_SRC) && make archive
@@ -53,7 +53,7 @@ lib_debug:
 lib_release:
 	@echo ''
 	@echo '============================================'
-	@echo 'BUILDING LIBRARIES (RELEASE)'
+	@echo 'BUILDING TEST LIBRARIES (RELEASE)'
 	@echo '============================================'
 	cd $(DIR_SRC) && make $(BUILD_FLAGS_REL) $(TRACE_FLAGS_REL) build -j $(JOB_SLOTS)
 	cd $(DIR_SRC) && make archive
@@ -63,14 +63,14 @@ lib_release:
 exe_debug:
 	@echo ''
 	@echo '============================================'
-	@echo 'BUILDING EXECUTABLES (DEBUG)'
+	@echo 'BUILDING TEST EXECUTABLES (DEBUG)'
 	@echo '============================================'
 	cd $(DIR_TOOL) && make $(BUILD_FLAGS_DBG) $(TRACE_FLAGS_DBG)$(TRACE)
 
 exe_release:
 	@echo ''
 	@echo '============================================'
-	@echo 'BUILDING EXECUTABLES (RELEASE)'
+	@echo 'BUILDING TEST EXECUTABLES (RELEASE)'
 	@echo '============================================'
 	cd $(DIR_TOOL) && make $(BUILD_FLAGS_REL) $(TRACE_FLAGS_REL)
 
