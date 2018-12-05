@@ -67,6 +67,8 @@ namespace e65 {
 
 					virtual std::string to_string(void) const;
 
+					int type(void) const;
+
 				protected:
 
 					fixture(

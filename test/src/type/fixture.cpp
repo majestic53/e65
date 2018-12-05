@@ -105,6 +105,12 @@ namespace e65 {
 
 				return result.str();
 			}
+
+			int
+			fixture::type(void) const
+			{
+				return m_type;
+			}
 		}
 	}
 }
