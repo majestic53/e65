@@ -51,31 +51,38 @@ namespace e65 {
 						) = delete;
 
 					bool accumulator(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool cycle(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool cycle_last(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool flags(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool index_x(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool index_y(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool interrupt(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					void on_clear(void) override;
@@ -93,7 +100,8 @@ namespace e65 {
 						) override;
 
 					bool program_counter(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool reset(
@@ -102,17 +110,19 @@ namespace e65 {
 						);
 
 					bool stack_pointer(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool stop(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
 
 					bool wait(
-						__in e65::interface::system::processor &processor
+						__in e65::interface::system::processor &processor,
+						__in e65::interface::system::memory &memory
 						);
-
 			};
 		}
 	}

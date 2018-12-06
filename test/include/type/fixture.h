@@ -30,13 +30,21 @@ namespace e65 {
 		namespace type {
 
 			enum {
-				E65_FIXTURE_PROCESSOR_INTERFACE = 0,
+				E65_FIXTURE_FUNCTIONAL_PROCESSOR = 0,
+				E65_FIXTURE_INTERFACE_INPUT,
+				E65_FIXTURE_INTERFACE_MEMORY,
+				E65_FIXTURE_INTERFACE_PROCESSOR,
+				E65_FIXTURE_INTERFACE_VIDEO,
 			};
 
-			#define E65_FIXTURE_MAX e65::test::type::E65_FIXTURE_PROCESSOR_INTERFACE
+			#define E65_FIXTURE_MAX e65::test::type::E65_FIXTURE_INTERFACE_VIDEO
 
 			static const std::string E65_FIXTURE_STR[] = {
-				"Test::Processor::Interface",
+				"Test::Functional::Processor",
+				"Test::Interface::Input",
+				"Test::Interface::Memory",
+				"Test::Interface::Processor",
+				"Test::Interface::Video",
 				};
 
 			#define E65_FIXTURE_STRING(_TYPE_) \

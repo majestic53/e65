@@ -17,7 +17,11 @@
  */
 
 #include "../../include/e65.h"
+#include "../include/functional/processor.h"
+#include "../include/interface/input.h"
+#include "../include/interface/memory.h"
 #include "../include/interface/processor.h"
+#include "../include/interface/video.h"
 #include "./e65_test_type.h"
 
 std::string
@@ -129,6 +133,8 @@ run(void)
 {
 	int fixture = 0, result = EXIT_SUCCESS;
 
+	std::srand(std::time(nullptr));
+
 	for(; fixture <= E65_FIXTURE_MAX; ++fixture) {
 		int sub_result = EXIT_SUCCESS;
 		std::vector<std::string> failures;
@@ -137,8 +143,40 @@ run(void)
 		std::cout << E65_COLUMN_WIDTH(E65_TEST_COLUMN_WIDTH) << E65_FIXTURE_STRING(fixture) << "[";
 
 		switch(fixture) {
-			case e65::test::type::E65_FIXTURE_PROCESSOR_INTERFACE: {
+			case e65::test::type::E65_FIXTURE_FUNCTIONAL_PROCESSOR: {
+					e65::test::functional::processor instance;
+
+					sub_result = (instance.run_all() ? EXIT_SUCCESS : EXIT_FAILURE);
+					if(sub_result != EXIT_SUCCESS) {
+						failures = instance.failure();
+					}
+				} break;
+			case e65::test::type::E65_FIXTURE_INTERFACE_INPUT: {
+					e65::test::interface::input instance;
+
+					sub_result = (instance.run_all() ? EXIT_SUCCESS : EXIT_FAILURE);
+					if(sub_result != EXIT_SUCCESS) {
+						failures = instance.failure();
+					}
+				} break;
+			case e65::test::type::E65_FIXTURE_INTERFACE_MEMORY: {
+					e65::test::interface::memory instance;
+
+					sub_result = (instance.run_all() ? EXIT_SUCCESS : EXIT_FAILURE);
+					if(sub_result != EXIT_SUCCESS) {
+						failures = instance.failure();
+					}
+				} break;
+			case e65::test::type::E65_FIXTURE_INTERFACE_PROCESSOR: {
 					e65::test::interface::processor instance;
+
+					sub_result = (instance.run_all() ? EXIT_SUCCESS : EXIT_FAILURE);
+					if(sub_result != EXIT_SUCCESS) {
+						failures = instance.failure();
+					}
+				} break;
+			case e65::test::type::E65_FIXTURE_INTERFACE_VIDEO: {
+					e65::test::interface::video instance;
 
 					sub_result = (instance.run_all() ? EXIT_SUCCESS : EXIT_FAILURE);
 					if(sub_result != EXIT_SUCCESS) {

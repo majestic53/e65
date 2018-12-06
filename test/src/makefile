@@ -17,8 +17,10 @@
 CC=clang++
 CC_FLAGS=-march=native -std=c++17 -Wall -Werror
 DIR_BUILD=./../../build/test/
+DIR_INCLUDE_FUNCTIONAL=./../include/functional/
 DIR_INCLUDE_INTERFACE=./../include/interface/
 DIR_INCLUDE_TYPE=./../include/type/
+DIR_SRC_FUNCTIONAL=./functional/
 DIR_SRC_INTERFACE=./interface/
 DIR_SRC_TYPE=./type/
 LIB=libe65_test.a
@@ -30,19 +32,36 @@ all: build archive
 archive:
 	@echo ''
 	@echo '--- BUILDING TEST LIBRARY ------------------'
-	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)interface_processor.o \
+	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)functional_processor.o\
+			$(DIR_BUILD)interface_input.o $(DIR_BUILD)interface_memory.o $(DIR_BUILD)interface_processor.o $(DIR_BUILD)interface_video.o \
 		$(DIR_BUILD)type_fixture.o
 	@echo '--- DONE -----------------------------------'
 	@echo ''
 
-build: build_interface build_type
+build: build_functional build_interface build_type
+
+### FUNCTIONAL ###
+
+build_functional: functional_processor.o
+
+functional_processor.o: $(DIR_SRC_FUNCTIONAL)processor.cpp $(DIR_INCLUDE_FUNCTIONAL)processor.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_FUNCTIONAL)processor.cpp -o $(DIR_BUILD)functional_processor.o
 
 ### INTERFACE ###
 
-build_interface: interface_processor.o
+build_interface: interface_input.o interface_memory.o interface_processor.o interface_video.o
+
+interface_input.o: $(DIR_SRC_INTERFACE)input.cpp $(DIR_INCLUDE_INTERFACE)input.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_INTERFACE)input.cpp -o $(DIR_BUILD)interface_input.o
+
+interface_memory.o: $(DIR_SRC_INTERFACE)memory.cpp $(DIR_INCLUDE_INTERFACE)memory.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_INTERFACE)memory.cpp -o $(DIR_BUILD)interface_memory.o
 
 interface_processor.o: $(DIR_SRC_INTERFACE)processor.cpp $(DIR_INCLUDE_INTERFACE)processor.h
 	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_INTERFACE)processor.cpp -o $(DIR_BUILD)interface_processor.o
+
+interface_video.o: $(DIR_SRC_INTERFACE)video.cpp $(DIR_INCLUDE_INTERFACE)video.h
+	$(CC) $(CC_FLAGS) $(CC_BUILD_FLAGS) $(CC_TRACE_FLAGS) -c $(DIR_SRC_INTERFACE)video.cpp -o $(DIR_BUILD)interface_video.o
 
 ### TYPE ###
 

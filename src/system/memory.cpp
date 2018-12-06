@@ -154,12 +154,12 @@ namespace e65 {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
-			if(address >= (m_memory.size() - 1)) {
+			if(address >= m_memory.size()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
 			}
 
 			result = m_memory.at(address);
-			result |= (m_memory.at(address + 1) << CHAR_BIT);
+			result |= (m_memory.at(++address) << CHAR_BIT);
 
 			E65_TRACE_EXIT_FORMAT("Result=%u(%04x)", result, result);
 			return result;
@@ -216,12 +216,12 @@ namespace e65 {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION(E65_SYSTEM_MEMORY_EXCEPTION_UNINITIALIZED);
 			}
 
-			if(address >= (m_memory.size() - 1)) {
+			if(address >= m_memory.size()) {
 				THROW_E65_SYSTEM_MEMORY_EXCEPTION_FORMAT(E65_SYSTEM_MEMORY_EXCEPTION_ADDRESS, "%u(%04x)", address, address);
 			}
 
 			m_memory.at(address) = value;
-			m_memory.at(address + 1) = (value >> CHAR_BIT);
+			m_memory.at(++address) = (value >> CHAR_BIT);
 
 			E65_TRACE_EXIT();
 		}
