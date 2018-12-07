@@ -20,7 +20,8 @@
 #define E65_TEST_FUNCTIONAL_PROCESSOR_H_
 
 #include "../../../include/interface/system/memory.h"
-#include "../../../include/interface/system/processor.h"
+#include "../../../include/interface/runtime.h"
+#include "../../../include/system/processor.h"
 #include "../../include/type/fixture.h"
 
 namespace e65 {
@@ -28,6 +29,21 @@ namespace e65 {
 	namespace test {
 
 		namespace functional {
+
+			typedef struct {
+				uint8_t accumulator;
+				uint32_t cycle;
+				uint8_t cycle_last;
+				uint8_t flags;
+				uint8_t index_x;
+				uint8_t index_y;
+				bool interrupt_maskable;
+				bool interrupt_non_maskable;
+				uint16_t program_counter;
+				uint8_t stack_pointer;
+				bool stopped;
+				bool waiting;
+			} processor_state_t;
 
 			class processor :
 					public e65::test::type::fixture {
@@ -50,9 +66,69 @@ namespace e65 {
 						__in const processor &other
 						) = delete;
 
-					bool command_nop_implied(
-						__in e65::interface::system::processor &processor,
+					bool command_clc_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
 						__in e65::interface::system::memory &memory
+						);
+
+					bool command_cld_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_cli_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_clv_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_nop_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_sec_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_sed_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_sei_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_stp_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool command_wai_implied(
+						__in e65::interface::runtime &runtime,
+						__in e65::system::processor &processor,
+						__in e65::interface::system::memory &memory
+						);
+
+					bool compare(
+						__in e65::interface::system::processor &processor,
+						__in const e65::test::functional::processor_state_t &expected
 						);
 
 					void on_clear(void) override;

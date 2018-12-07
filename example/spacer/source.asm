@@ -4,6 +4,10 @@
 	.def background_color 0x0b
 	.def ship_color 0x05
 
+	.org 0x0200
+
+	.res 0x0400
+
 	.org 0x0600
 
 reset:

@@ -44,20 +44,16 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.accumulator() == E65_TEST_INTERFACE_PROCESSOR_ACCUMULATOR_VALUE);
-					if(result) {
-						uint8_t value = std::rand();
+				result = (processor.accumulator() == E65_TEST_INTERFACE_PROCESSOR_ACCUMULATOR_VALUE);
+				if(result) {
+					uint8_t value = std::rand();
 
-						processor.set_accumulator(value);
-						result = (processor.accumulator() == value);
-					}
-				} catch(...) {
-					result = false;
+					processor.set_accumulator(value);
+					result = (processor.accumulator() == value);
 				}
 
 				return result;
@@ -69,15 +65,10 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
-
-					result = (processor.cycle() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_VALUE);
-				} catch(...) {
-					result = false;
-				}
+				processor.reset(memory);
+				result = (processor.cycle() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_VALUE);
 
 				return result;
 			}
@@ -88,15 +79,10 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
-
-					result = (processor.cycle_last() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_LAST_VALUE);
-				} catch(...) {
-					result = false;
-				}
+				processor.reset(memory);
+				result = (processor.cycle_last() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_LAST_VALUE);
 
 				return result;
 			}
@@ -107,20 +93,16 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.flags() == E65_TEST_INTERFACE_PROCESSOR_FLAGS_VALUE);
-					if(result) {
-						uint8_t value = std::rand();
+				result = (processor.flags() == E65_TEST_INTERFACE_PROCESSOR_FLAGS_VALUE);
+				if(result) {
+					uint8_t value = std::rand();
 
-						processor.set_flags(value);
-						result = (processor.flags() == value);
-					}
-				} catch(...) {
-					result = false;
+					processor.set_flags(value);
+					result = (processor.flags() == value);
 				}
 
 				return result;
@@ -132,20 +114,16 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.index_x() == E65_TEST_INTERFACE_PROCESSOR_INDEX_X_VALUE);
-					if(result) {
-						uint8_t value = std::rand();
+				result = (processor.index_x() == E65_TEST_INTERFACE_PROCESSOR_INDEX_X_VALUE);
+				if(result) {
+					uint8_t value = std::rand();
 
-						processor.set_index_x(value);
-						result = (processor.index_x() == value);
-					}
-				} catch(...) {
-					result = false;
+					processor.set_index_x(value);
+					result = (processor.index_x() == value);
 				}
 
 				return result;
@@ -157,20 +135,16 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.index_y() == E65_TEST_INTERFACE_PROCESSOR_INDEX_Y_VALUE);
-					if(result) {
-						uint8_t value = std::rand();
+				result = (processor.index_y() == E65_TEST_INTERFACE_PROCESSOR_INDEX_Y_VALUE);
+				if(result) {
+					uint8_t value = std::rand();
 
-						processor.set_index_y(value);
-						result = (processor.index_y() == value);
-					}
-				} catch(...) {
-					result = false;
+					processor.set_index_y(value);
+					result = (processor.index_y() == value);
 				}
 
 				return result;
@@ -182,44 +156,40 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = !processor.interrupted(false);
-					if(!result) {
-						goto exit;
-					}
+				result = !processor.interrupted(false);
+				if(!result) {
+					goto exit;
+				}
 
-					processor.interrupt(false);
+				processor.interrupt(false);
 
-					result = processor.interrupted(false);
-					if(!result) {
-						goto exit;
-					}
+				result = processor.interrupted(false);
+				if(!result) {
+					goto exit;
+				}
 
-					result = !processor.interrupted(true);
-					if(!result) {
-						goto exit;
-					}
+				result = !processor.interrupted(true);
+				if(!result) {
+					goto exit;
+				}
 
-					processor.interrupt(true);
+				processor.interrupt(true);
 
-					result = !processor.interrupted(true);
-					if(!result) {
-						goto exit;
-					}
+				result = !processor.interrupted(true);
+				if(!result) {
+					goto exit;
+				}
 
-					processor.set_flags(processor.flags() & ~E65_PFLAG(e65::type::E65_PFLAG_IRQ_DISABLE));
-					processor.interrupt(true);
+				processor.set_flags(processor.flags() & ~E65_PFLAG(e65::type::E65_PFLAG_IRQ_DISABLE));
+				processor.interrupt(true);
 
-					result = processor.interrupted(true);
-					if(!result) {
-						goto exit;
-					}
-				} catch(...) {
-					result = false;
+				result = processor.interrupted(true);
+				if(!result) {
+					goto exit;
 				}
 
 			exit:
@@ -247,55 +217,59 @@ namespace e65 {
 			{
 				bool result = true;
 
-				e65::system::memory &memory = e65::system::memory::acquire();
-				e65::system::processor &processor = e65::system::processor::acquire();
+				try {
+					e65::system::memory &memory = e65::system::memory::acquire();
+					e65::system::processor &processor = e65::system::processor::acquire();
 
-				memory.initialize();
-				processor.initialize();
+					memory.initialize();
+					processor.initialize();
 
-				switch(test) {
-					case E65_TEST_INTERFACE_PROCESSOR_ACCUMULATOR:
-						result = accumulator(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_CYCLE:
-						result = cycle(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_CYCLE_LAST:
-						result = cycle_last(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_FLAGS:
-						result = flags(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_INDEX_X:
-						result = index_x(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_INDEX_Y:
-						result = index_y(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_INTERRUPT:
-						result = interrupt(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_PROGRAM_COUNTER:
-						result = program_counter(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_RESET:
-						result = reset(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_STACK_POINTER:
-						result = stack_pointer(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_STOP:
-						result = stop(processor, memory);
-						break;
-					case E65_TEST_INTERFACE_PROCESSOR_WAIT:
-						result = wait(processor, memory);
-						break;
-					default:
-						break;
+					switch(test) {
+						case E65_TEST_INTERFACE_PROCESSOR_ACCUMULATOR:
+							result = accumulator(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_CYCLE:
+							result = cycle(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_CYCLE_LAST:
+							result = cycle_last(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_FLAGS:
+							result = flags(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_INDEX_X:
+							result = index_x(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_INDEX_Y:
+							result = index_y(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_INTERRUPT:
+							result = interrupt(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_PROGRAM_COUNTER:
+							result = program_counter(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_RESET:
+							result = reset(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_STACK_POINTER:
+							result = stack_pointer(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_STOP:
+							result = stop(processor, memory);
+							break;
+						case E65_TEST_INTERFACE_PROCESSOR_WAIT:
+							result = wait(processor, memory);
+							break;
+						default:
+							break;
+					}
+
+					processor.uninitialize();
+					memory.uninitialize();
+				} catch(...) {
+					result = false;
 				}
-
-				processor.uninitialize();
-				memory.uninitialize();
 
 				return result;
 			}
@@ -325,23 +299,18 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint16_t address = std::rand();
 
-				try {
-					uint16_t address = std::rand();
+				memory.write_word(E65_TEST_INTERFACE_PROCESSOR_RESET_ADDRESS, address);
+				processor.reset(memory);
 
-					memory.write_word(E65_TEST_INTERFACE_PROCESSOR_RESET_ADDRESS, address);
-					processor.reset(memory);
+				result = (processor.program_counter() == address);
+				if(result) {
+					address = std::rand();
 
+					processor.set_program_counter(address);
 					result = (processor.program_counter() == address);
-					if(result) {
-						address = std::rand();
-
-						processor.set_program_counter(address);
-						result = (processor.program_counter() == address);
-					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;
@@ -353,65 +322,60 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint16_t address = std::rand();
 
-				try {
-					uint16_t address = std::rand();
+				memory.write_word(E65_TEST_INTERFACE_PROCESSOR_RESET_ADDRESS, address);
+				processor.reset(memory);
 
-					memory.write_word(E65_TEST_INTERFACE_PROCESSOR_RESET_ADDRESS, address);
-					processor.reset(memory);
+				result = (processor.accumulator() == E65_TEST_INTERFACE_PROCESSOR_ACCUMULATOR_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.accumulator() == E65_TEST_INTERFACE_PROCESSOR_ACCUMULATOR_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.cycle() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.cycle() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.cycle_last() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_LAST_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.cycle_last() == E65_TEST_INTERFACE_PROCESSOR_CYCLE_LAST_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.flags() == E65_TEST_INTERFACE_PROCESSOR_FLAGS_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.flags() == E65_TEST_INTERFACE_PROCESSOR_FLAGS_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.index_x() == E65_TEST_INTERFACE_PROCESSOR_INDEX_X_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.index_x() == E65_TEST_INTERFACE_PROCESSOR_INDEX_X_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.index_y() == E65_TEST_INTERFACE_PROCESSOR_INDEX_Y_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.index_y() == E65_TEST_INTERFACE_PROCESSOR_INDEX_Y_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.program_counter() == address);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.program_counter() == address);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.stack_pointer() == E65_TEST_INTERFACE_PROCESSOR_STACK_POINTER_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.stack_pointer() == E65_TEST_INTERFACE_PROCESSOR_STACK_POINTER_VALUE);
-					if(!result) {
-						goto exit;
-					}
+				result = (processor.stopped() == E65_TEST_INTERFACE_PROCESSOR_STOP_VALUE);
+				if(!result) {
+					goto exit;
+				}
 
-					result = (processor.stopped() == E65_TEST_INTERFACE_PROCESSOR_STOP_VALUE);
-					if(!result) {
-						goto exit;
-					}
-
-					result = (processor.waiting() == E65_TEST_INTERFACE_PROCESSOR_WAIT_VALUE);
-					if(!result) {
-						goto exit;
-					}
-				} catch(...) {
-					result = false;
+				result = (processor.waiting() == E65_TEST_INTERFACE_PROCESSOR_WAIT_VALUE);
+				if(!result) {
+					goto exit;
 				}
 
 			exit:
@@ -424,20 +388,16 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.stack_pointer() == E65_TEST_INTERFACE_PROCESSOR_STACK_POINTER_VALUE);
-					if(result) {
-						uint8_t value = std::rand();
+				result = (processor.stack_pointer() == E65_TEST_INTERFACE_PROCESSOR_STACK_POINTER_VALUE);
+				if(result) {
+					uint8_t value = std::rand();
 
-						processor.set_stack_pointer(value);
-						result = (processor.stack_pointer() == value);
-					}
-				} catch(...) {
-					result = false;
+					processor.set_stack_pointer(value);
+					result = (processor.stack_pointer() == value);
 				}
 
 				return result;
@@ -449,23 +409,19 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.stopped() == E65_TEST_INTERFACE_PROCESSOR_STOP_VALUE);
+				result = (processor.stopped() == E65_TEST_INTERFACE_PROCESSOR_STOP_VALUE);
+				if(result) {
+					processor.set_stop(true);
+
+					result = processor.stopped();
 					if(result) {
-						processor.set_stop(true);
-
-						result = processor.stopped();
-						if(result) {
-							processor.set_stop(false);
-							result = !processor.stopped();
-						}
+						processor.set_stop(false);
+						result = !processor.stopped();
 					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;
@@ -488,23 +444,19 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
-					processor.reset(memory);
+				processor.reset(memory);
 
-					result = (processor.waiting() == E65_TEST_INTERFACE_PROCESSOR_WAIT_VALUE);
+				result = (processor.waiting() == E65_TEST_INTERFACE_PROCESSOR_WAIT_VALUE);
+				if(result) {
+					processor.set_wait(true);
+
+					result = processor.waiting();
 					if(result) {
-						processor.set_wait(true);
-
-						result = processor.waiting();
-						if(result) {
-							processor.set_wait(false);
-							result = !processor.waiting();
-						}
+						processor.set_wait(false);
+						result = !processor.waiting();
 					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;

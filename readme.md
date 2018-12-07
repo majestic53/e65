@@ -215,6 +215,10 @@ Changelog
 
 Version 0.1.1849
 ----------------
+*Updated: 11/06/2018*
+
+* Added processor implied command tests
+
 *Updated: 11/05/2018*
 
 * Added additional functional/interface test fixtures

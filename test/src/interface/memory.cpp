@@ -58,28 +58,32 @@ namespace e65 {
 			{
 				bool result = true;
 
-				e65::system::memory &memory = e65::system::memory::acquire();
+				try {
+					e65::system::memory &memory = e65::system::memory::acquire();
 
-				memory.initialize();
+					memory.initialize();
 
-				switch(test) {
-					case E65_TEST_INTERFACE_MEMORY_READ:
-						result = read(memory);
-						break;
-					case E65_TEST_INTERFACE_MEMORY_READ_WORD:
-						result = read_word(memory);
-						break;
-					case E65_TEST_INTERFACE_MEMORY_WRITE:
-						result = write(memory);
-						break;
-					case E65_TEST_INTERFACE_MEMORY_WRITE_WORD:
-						result = write_word(memory);
-						break;
-					default:
-						break;
+					switch(test) {
+						case E65_TEST_INTERFACE_MEMORY_READ:
+							result = read(memory);
+							break;
+						case E65_TEST_INTERFACE_MEMORY_READ_WORD:
+							result = read_word(memory);
+							break;
+						case E65_TEST_INTERFACE_MEMORY_WRITE:
+							result = write(memory);
+							break;
+						case E65_TEST_INTERFACE_MEMORY_WRITE_WORD:
+							result = write_word(memory);
+							break;
+						default:
+							break;
+					}
+
+					memory.uninitialize();
+				} catch(...) {
+					result = false;
 				}
-
-				memory.uninitialize();
 
 				return result;
 			}
@@ -108,32 +112,27 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint8_t value;
+				uint16_t address = std::rand();
 
-				try {
-					uint8_t value;
-					uint16_t address = std::rand();
+				switch(address) {
+					case E65_TEST_INTERFACE_MEMORY_KEY_ADDRESS_LOW ... E65_TEST_INTERFACE_MEMORY_KEY_ADDRESS_HIGH:
+					case E65_TEST_INTERFACE_MEMORY_VIDEO_ADDRESS_LOW ... E65_TEST_INTERFACE_MEMORY_VIDEO_ADDRESS_HIGH:
+						value = E65_TEST_INTERFACE_MEMORY_VALUE_ZERO;
+						break;
+					default:
+						value = E65_TEST_INTERFACE_MEMORY_VALUE;
+						break;
+				}
 
-					switch(address) {
-						case E65_TEST_INTERFACE_MEMORY_KEY_ADDRESS_LOW ... E65_TEST_INTERFACE_MEMORY_KEY_ADDRESS_HIGH:
-						case E65_TEST_INTERFACE_MEMORY_VIDEO_ADDRESS_LOW ... E65_TEST_INTERFACE_MEMORY_VIDEO_ADDRESS_HIGH:
-							value = E65_TEST_INTERFACE_MEMORY_VALUE_ZERO;
-							break;
-						default:
-							value = E65_TEST_INTERFACE_MEMORY_VALUE;
-							break;
-					}
+				result = (memory.read(address) == value);
+				if(result) {
+					address = std::rand();
+					value = std::rand();
 
+					memory.write(address, value);
 					result = (memory.read(address) == value);
-					if(result) {
-						address = std::rand();
-						value = std::rand();
-
-						memory.write(address, value);
-						result = (memory.read(address) == value);
-					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;
@@ -144,27 +143,22 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint16_t address = std::rand(), value = std::rand();
 
-				try {
-					uint16_t address = std::rand(), value = std::rand();
+				if(address == UINT16_MAX) {
+					--address;
+				}
 
-					if(address == UINT16_MAX) {
-						--address;
-					}
+				memory.write_word(address, value);
+
+				result = (memory.read_word(address) == value);
+				if(result) {
+					address = UINT16_MAX;
+					value = std::rand();
 
 					memory.write_word(address, value);
-
 					result = (memory.read_word(address) == value);
-					if(result) {
-						address = UINT16_MAX;
-						value = std::rand();
-
-						memory.write_word(address, value);
-						result = (memory.read_word(address) == value);
-					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;
@@ -186,17 +180,12 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint8_t value = std::rand();
+				uint16_t address = std::rand();
 
-				try {
-					uint8_t value = std::rand();
-					uint16_t address = std::rand();
-
-					memory.write(address, value);
-					result = (memory.read(address) == value);
-				} catch(...) {
-					result = false;
-				}
+				memory.write(address, value);
+				result = (memory.read(address) == value);
 
 				return result;
 			}
@@ -206,27 +195,22 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint16_t address = std::rand(), value = std::rand();
 
-				try {
-					uint16_t address = std::rand(), value = std::rand();
+				if(address == UINT16_MAX) {
+					--address;
+				}
 
-					if(address == UINT16_MAX) {
-						--address;
-					}
+				memory.write_word(address, value);
+
+				result = (memory.read_word(address) == value);
+				if(result) {
+					address = UINT16_MAX;
+					value = std::rand();
 
 					memory.write_word(address, value);
-
 					result = (memory.read_word(address) == value);
-					if(result) {
-						address = UINT16_MAX;
-						value = std::rand();
-
-						memory.write_word(address, value);
-						result = (memory.read_word(address) == value);
-					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;

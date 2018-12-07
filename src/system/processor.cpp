@@ -2631,7 +2631,7 @@ namespace e65 {
 		{
 			E65_TRACE_ENTRY_FORMAT("Runtime=%p, Memory=%p", &runtime, &memory);
 
-			if(m_interrupt_irq || m_interrupt_nmi) {
+			if(!m_stop && (m_interrupt_irq || m_interrupt_nmi)) {
 
 				if(m_interrupt_nmi) {
 					E65_TRACE_MESSAGE(e65::type::E65_LEVEL_INFORMATION, "Processor servicing NMI interrupt");

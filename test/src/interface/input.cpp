@@ -44,19 +44,14 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
 
-				try {
+				result = (memory.read(E65_TEST_INTERFACE_INPUT_KEY_ADDRESS) == E65_TEST_INTERFACE_INPUT_KEY_VALUE);
+				if(result) {
+					uint8_t value = std::rand();
 
-					result = (memory.read(E65_TEST_INTERFACE_INPUT_KEY_ADDRESS) == E65_TEST_INTERFACE_INPUT_KEY_VALUE);
-					if(result) {
-						uint8_t value = std::rand();
-
-						input.key(memory, value);
-						result = (memory.read(E65_TEST_INTERFACE_INPUT_KEY_ADDRESS) == value);
-					}
-				} catch(...) {
-					result = false;
+					input.key(memory, value);
+					result = (memory.read(E65_TEST_INTERFACE_INPUT_KEY_ADDRESS) == value);
 				}
 
 				return result;
@@ -83,22 +78,26 @@ namespace e65 {
 			{
 				bool result = true;
 
-				e65::system::memory &memory = e65::system::memory::acquire();
-				e65::system::input &input = e65::system::input::acquire();
+				try {
+					e65::system::memory &memory = e65::system::memory::acquire();
+					e65::system::input &input = e65::system::input::acquire();
 
-				memory.initialize();
-				input.initialize();
+					memory.initialize();
+					input.initialize();
 
-				switch(test) {
-					case E65_TEST_INTERFACE_INPUT_KEY:
-						result = key(input, memory);
-						break;
-					default:
-						break;
+					switch(test) {
+						case E65_TEST_INTERFACE_INPUT_KEY:
+							result = key(input, memory);
+							break;
+						default:
+							break;
+					}
+
+					input.uninitialize();
+					memory.uninitialize();
+				} catch(...) {
+					result = false;
 				}
-
-				input.uninitialize();
-				memory.uninitialize();
 
 				return result;
 			}

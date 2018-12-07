@@ -44,15 +44,7 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
-
-				try {
-					result = (video.frame() == E65_TEST_INTERFACE_VIDEO_FRAME_VALUE);
-				} catch(...) {
-					result = false;
-				}
-
-				return result;
+				return (video.frame() == E65_TEST_INTERFACE_VIDEO_FRAME_VALUE);
 			}
 
 			void
@@ -76,28 +68,32 @@ namespace e65 {
 			{
 				bool result = true;
 
-				e65::system::memory &memory = e65::system::memory::acquire();
-				e65::system::video &video = e65::system::video::acquire();
+				try {
+					e65::system::memory &memory = e65::system::memory::acquire();
+					e65::system::video &video = e65::system::video::acquire();
 
-				memory.initialize();
-				video.initialize();
+					memory.initialize();
+					video.initialize();
 
-				switch(test) {
-					case E65_TEST_INTERFACE_VIDEO_FRAME:
-						result = frame(video, memory);
-						break;
-					case E65_TEST_INTERFACE_VIDEO_PIXEL:
-						result = pixel(video, memory);
-						break;
-					case E65_TEST_INTERFACE_VIDEO_SET_PIXEL:
-						result = set_pixel(video, memory);
-						break;
-					default:
-						break;
+					switch(test) {
+						case E65_TEST_INTERFACE_VIDEO_FRAME:
+							result = frame(video, memory);
+							break;
+						case E65_TEST_INTERFACE_VIDEO_PIXEL:
+							result = pixel(video, memory);
+							break;
+						case E65_TEST_INTERFACE_VIDEO_SET_PIXEL:
+							result = set_pixel(video, memory);
+							break;
+						default:
+							break;
+					}
+
+					video.uninitialize();
+					memory.uninitialize();
+				} catch(...) {
+					result = false;
 				}
-
-				video.uninitialize();
-				memory.uninitialize();
 
 				return result;
 			}
@@ -127,31 +123,26 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint32_t x = (std::rand() % E65_VIDEO_WIDTH), y = (std::rand() % E65_VIDEO_HEIGHT);
 
-				try {
-					uint32_t x = (std::rand() % E65_VIDEO_WIDTH), y = (std::rand() % E65_VIDEO_HEIGHT);
+				result = ((video.pixel(memory, x, y) % E65_COLOR_MAX) == e65::type::E65_COLOR_BROWN);
+				if(result) {
+					uint8_t color = std::rand();
 
-					result = ((video.pixel(memory, x, y) % E65_COLOR_MAX) == e65::type::E65_COLOR_BROWN);
+					x = (std::rand() % E65_VIDEO_WIDTH);
+					y = (std::rand() % E65_VIDEO_HEIGHT);
+					video.set_pixel(memory, x, y, color);
+
+					result = (video.pixel(memory, x, y) == color);
 					if(result) {
-						uint8_t color = std::rand();
 
-						x = (std::rand() % E65_VIDEO_WIDTH);
-						y = (std::rand() % E65_VIDEO_HEIGHT);
-						video.set_pixel(memory, x, y, color);
-
-						result = (video.pixel(memory, x, y) == color);
-						if(result) {
-
-							try {
-								x = (E65_VIDEO_WIDTH + 1), y = (E65_VIDEO_HEIGHT + 1);
-								video.pixel(memory, x, y);
-								result = false;
-							} catch(...) { }
-						}
+						try {
+							x = (E65_VIDEO_WIDTH + 1), y = (E65_VIDEO_HEIGHT + 1);
+							video.pixel(memory, x, y);
+							result = false;
+						} catch(...) { }
 					}
-				} catch(...) {
-					result = false;
 				}
 
 				return result;
@@ -163,25 +154,20 @@ namespace e65 {
 				__in e65::interface::system::memory &memory
 				)
 			{
-				bool result = true;
+				bool result;
+				uint8_t color = std::rand();
+				uint32_t x = (std::rand() % E65_VIDEO_WIDTH), y = (std::rand() % E65_VIDEO_HEIGHT);
 
-				try {
-					uint8_t color = std::rand();
-					uint32_t x = (std::rand() % E65_VIDEO_WIDTH), y = (std::rand() % E65_VIDEO_HEIGHT);
+				video.set_pixel(memory, x, y, color);
 
-					video.set_pixel(memory, x, y, color);
+				result = (video.pixel(memory, x, y) == color);
+				if(result) {
 
-					result = (video.pixel(memory, x, y) == color);
-					if(result) {
-
-						try {
-							x = (E65_VIDEO_WIDTH + 1), y = (E65_VIDEO_HEIGHT + 1);
-							video.set_pixel(memory, x, y, color);
-							result = false;
-						} catch(...) { }
-					}
-				} catch(...) {
-					result = false;
+					try {
+						x = (E65_VIDEO_WIDTH + 1), y = (E65_VIDEO_HEIGHT + 1);
+						video.set_pixel(memory, x, y, color);
+						result = false;
+					} catch(...) { }
 				}
 
 				return result;
